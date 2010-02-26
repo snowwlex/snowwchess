@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules name="classic">
+	<board sizex="8" sizey="8"/>
+	<players>
+		<player id="1" name="WHITE" turns="1"/>
+		<player id="2" name="BLACK"/>
+	</players>
+	<figures>
+		<figure id="1" name="KING" letter="K" special="1"/>
+		<figure id="2" name="QUEEN" letter="Q"/>
+		<figure id="3" name="ROOK" letter="R"/>
+		<figure id="4" name="KNIGHT" letter="H"/>
+		<figure id="5" name="BISHOP" letter="B"/>
+		<figure id="6" name="PAWN" letter="P"/>
+	</figures>
+	<positions>
+		<player id="1">
+			<figure id="1">
+				<position x="4" y="7"/>
+			</figure>
+			<figure id="2">
+				<position x="3" y="7"/>
+			</figure>
+			<figure id="3">
+				<position x="0" y="7"/>
+				<position x="7" y="7"/>
+			</figure>
+			<figure id="4">
+				<position x="1" y="7"/>
+				<position x="6" y="7"/>
+			</figure>
+			<figure id="5">
+				<position x="2" y="7"/>
+				<position x="5" y="7"/>
+			</figure>
+			<figure id="6">
+				<position x="0" y="6"/>
+				<position x="1" y="6"/>
+				<position x="2" y="6"/>
+				<position x="3" y="6"/>
+				<position x="4" y="6"/>
+				<position x="5" y="6"/>
+				<position x="6" y="6"/>
+				<position x="7" y="6"/>
+				<position x="0" y="6"/>
+			</figure>
+		</player>
+		<player id="2">
+			<figure id="1">
+				<position x="4" y="0"/>
+			</figure>
+			<figure id="2">
+				<position x="3" y="0"/>
+			</figure>
+			<figure id="3">
+				<position x="0" y="0"/>
+				<position x="7" y="0"/>
+			</figure>
+			<figure id="4">
+				<position x="1" y="0"/>
+				<position x="6" y="0"/>
+			</figure>
+			<figure id="5">
+				<position x="2" y="0"/>
+				<position x="5" y="0"/>
+			</figure>
+			<figure id="6">
+				<position x="0" y="1"/>
+				<position x="1" y="1"/>
+				<position x="2" y="1"/>
+				<position x="3" y="1"/>
+				<position x="4" y="1"/>
+				<position x="5" y="1"/>
+				<position x="6" y="1"/>
+				<position x="7" y="1"/>
+			</figure>
+		</player>
+	</positions>
+	<moves>
+		<figure id="1">
+			<jump x="1" y="0"/>
+			<jump x="-1" y="0"/>
+			<jump x="0" y="1"/>
+			<jump x="1" y="1"/>
+			<jump x="-1" y="1"/>
+			<jump x="1" y="-1"/>
+			<jump x="-1" y="1"/>
+		</figure>
+		<figure id="2">
+			<direction x="1" y="1"/>
+			<direction x="1" y="-1"/>
+			<direction x="-1" y="1"/>
+			<direction x="-1" y="-1"/>
+			<direction x="1" y="0"/>
+			<direction x="-1" y="0"/>
+			<direction x="0" y="1"/>
+			<direction x="0" y="-1"/>
+		</figure>
+		<figure id="3">
+			<direction x="1" y="0"/>
+			<direction x="-1" y="0"/>
+			<direction x="0" y="1"/>
+			<direction x="0" y="-1"/>
+		</figure>
+		<figure id="4">
+			<jump x="2" y="1"/>
+			<jump x="2" y="-1"/>
+			<jump x="-2" y="1"/>
+			<jump x="-2" y="-1"/>
+			<jump x="-1" y="2"/>
+			<jump x="1" y="-2"/>
+			<jump x="-1" y="-2"/>
+		</figure>
+		<figure id="5">
+			<direction x="1" y="1"/>
+			<direction x="1" y="-1"/>
+			<direction x="-1" y="1"/>
+			<direction x="-1" y="-1"/>
+		</figure>
+		<figure id="6">
+			<jump x="0" y="1" type="move" player="2"/>
+			<jump x="1" y="1" type="eat" player="2"/>
+			<jump x="-1" y="1" type="eat" player="2"/>
+			<jump x="0" y="-1" type="move" player="1"/>
+			<jump x="1" y="-1" type="eat" player="1"/>
+			<jump x="-1" y="-1" type="eat" player="1"/>
+		</figure>
+	</moves>
+</rules>
