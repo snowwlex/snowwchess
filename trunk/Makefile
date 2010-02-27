@@ -1,20 +1,19 @@
-default: snowwchess
+CXXFLAGS =	-O2 -g -Wall -fmessage-length=0
 
-player.o: player.cpp player.h
-	g++ -Wall -c player.cpp
+OBJS =		main.o rules.o model.o io.o view.o game.o player.o
 
-model.o: model.cpp model.h
-	g++ -Wall -c model.cpp
+LIBS =		-lncurses -lexpat
 
-main.o: main.cpp model.h
-	g++ -Wall -c main.cpp 
+TARGET =	snowwchess
 
-snowwchess: main.o model.o player.o
-	g++ -Wall -o snowwchess -lncurses main.o model.o player.o
+$(TARGET):	$(OBJS)
+	$(CXX) -o $(TARGET) $(OBJS) $(LIBS)
 
-clean: 
-	rm *.o snowwchess
+all:	$(TARGET)
 
-
+clean:
+	rm -f $(OBJS) $(TARGET)
+	
 
 
+	

@@ -1,25 +1,32 @@
-#ifndef _PLAYER_H
-#define _PLAYER_H
+/*
+ * player.h
+ *
+ *
+ *      Author: snowwlex
+ */
+
+#ifndef PLAYER_H_
+#define PLAYER_H_
 
 
 class Player {
 	protected:
-		
+
 	public:
 		//Player(PlayerColor color, WINDOW * user_w, WINDOW* info_w);
-		virtual bool YourTurn() = 0;
+		virtual PlayerCommand YourTurn(Move& move, GameMessage message = NONE) = 0;
 };
 
 
 class HumanPlayer : public Player {
 	private:
-		PlayerColor myColor;
-		WINDOW *user_window;
-		WINDOW *info_window;
+		int myColor;
 		Model *model;
+		View *myBoardView;
+		View *myUserView;
 	public:
-		HumanPlayer(PlayerColor color, WINDOW * user_w, WINDOW* info_w, Model* m);
-		bool YourTurn();
+		HumanPlayer(int _color, Model* m, View *board_view, View * user_view);
+		virtual PlayerCommand YourTurn(Move& move, GameMessage message = NONE);
 };
 
-#endif
+#endif /* PLAYER_H_ */
