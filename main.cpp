@@ -14,7 +14,7 @@
 #include "view.h"
 #include "game.h"
 
-int main(int argc, char* argv[]) {
+void init_graphic() {
 	initscr();	start_color();
 	//белые фигуры
 	init_pair(1,COLOR_RED,COLOR_BLACK);
@@ -27,8 +27,12 @@ int main(int argc, char* argv[]) {
 	init_pair(7,COLOR_YELLOW,COLOR_BLACK); // окно доски
 	init_pair(8,COLOR_WHITE,COLOR_RED); // окно игрока с белыми фигурами
 	init_pair(9,COLOR_WHITE,COLOR_CYAN); // окно игрока с черными фигурами
+}
 
-	View *view = new MainMenuCLIView(6,30,1,1,6);
+int main(int argc, char* argv[]) {
+	init_graphic();
+
+	CLIView *view = new MainMenuCLIView(6,30,2,2,6);
 	view->Render();
 	delete view;
 	Game game;

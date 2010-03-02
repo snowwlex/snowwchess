@@ -8,35 +8,37 @@
 #ifndef VIEW_H_
 #define VIEW_H_
 
-class View {
+class CLIView {
 	protected:
 		Model *myModel;
+		WINDOW *myWindow;
 		int myColor;
 	public:
-		WINDOW *myWindow;
-		View(int x1,int x2,int y1,int y2, int _color, bool scroll = false, Model *model = 0);
+		CLIView(int height,int width,int y,int x, int _color, bool scroll = false, Model *model = 0);
 		virtual std::string Ask(std::string msg = "");
 		virtual void Render(std::string msg = "");
-		virtual ~View();
+		virtual ~CLIView();
 
 };
 
 
-class MainMenuCLIView : public View {
+class MainMenuCLIView : public CLIView {
 	public:
-		MainMenuCLIView(int x1,int x2,int y1,int y2, int _color, bool scroll = false, Model *model = 0);
+		inline MainMenuCLIView(int height,int width,int y,int x, int _color, bool scroll = false, Model *model = 0):
+								CLIView(height,width,y,x,_color,scroll, model) { }
 		virtual void Render(std::string msg = "");
 };
 
-class InfoCLIView : public View {
+class InfoCLIView : public CLIView {
 	public:
 };
-class BoardCLIView : public View {
+class BoardCLIView : public CLIView {
 	public:
-	inline BoardCLIView(int x1,int x2,int y1,int y2, int _color, bool scroll = false, Model *model = 0): View(x1,y1,x2,y2,_color,scroll, model) { }
+	inline BoardCLIView(int height,int width,int y,int x, int _color, bool scroll = false, Model *model = 0):
+									CLIView(height,width,y,x,_color,scroll, model) { }
 	virtual void Render(std::string msg = "");
 };
-class UserCLIView : public View {
+class UserCLIView : public CLIView {
 
 };
 #endif /* VIEW_H_ */

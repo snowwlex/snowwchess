@@ -22,10 +22,10 @@ class HumanPlayer : public Player {
 	private:
 		int myColor;
 		Model *model;
-		View *myBoardView;
-		View *myUserView;
+		CLIView *myBoardView;
+		CLIView *myUserView;
 	public:
-		HumanPlayer(int _color, Model* m, View *board_view, View * user_view);
+		HumanPlayer(int _color, Model* m, CLIView *board_view, CLIView * user_view);
 		virtual PlayerCommand YourTurn(Move& move, GameMessage message = NONE);
 };
 

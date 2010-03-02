@@ -26,11 +26,11 @@ void Game::Start() {
 	rules_io.Load();
 	model_io.Load();
 
-	View *info_view = new View(30, 60, 2,80,6, true);
-	View *board_view = new BoardCLIView(10,13,2,2,7, false, &model);
-	View *user_view[2];
-	user_view[WHITE] = new View(10,60,17,1,8,true);
-	user_view[BLACK] = new View(10,60,17,1,9,true);
+	CLIView *info_view = new CLIView(25, 30, 14,2,6, true);
+	CLIView *board_view = new BoardCLIView(12,20,2,2,7, false, &model);
+	CLIView *user_view[2];
+	user_view[WHITE] = new CLIView(10,70,2,40,8,true);
+	user_view[BLACK] = new CLIView(10,70,13,40,9,true);
 
 	Player *players[2];
 	players[WHITE] = new HumanPlayer(WHITE, &model, board_view, user_view[WHITE]);
