@@ -37,43 +37,70 @@ void Game::Start() {
 	players[BLACK] = new HumanPlayer(BLACK, &model, board_view, user_view[BLACK]);
 
 	int cur_player = WHITE;
-	bool is_end = false, correct_move;
+	bool isEndGame, correct_move;
+	char buffer[1024];
 	GameMessage message;
 	PlayerCommand command;
 	Move player_move;
-	message = NONE;
+	GameStatus status;
+
 	do {
-		correct_move = false;
-		do {
-			command = players[cur_player]->YourTurn(player_move, message);
-			if (player_move.pos1.x == 0 && player_move.pos2.y == 0) {
-				correct_move = true;
-				is_end = true;
-			}	else if ( !model.CanMove(player_move) ) {
-				message = WRONG_MOVE;
-			} else {
-				correct_move = true;
-			}
-		}
-		while( !correct_move );
-		if (!is_end) model.Remove(player_move);
-		if ( !is_end && model.IsWin(cur_player) == true) {
-			is_end = true;
-			std::string msg;
-			msg = "Player ";
-			msg += (cur_player == WHITE ? "BLACK" : "WHITE");
-			msg += " has got the mate!";
-			info_view->Render(msg);
+		isEndGame = false;
+		status = model.GetGameStatus(cur_player);
+		switch(status) {
+		case CHECK:
+			message = GOT_CHECK;
+			break;
+		case MATE:
+			isEndGame = true;
+			sprintf(buffer,"Player %s has got the MATE!", cur_player == WHITE ? "BLACK" : "WHITE");
+			info_view->Render(buffer);
+			info_view->Ask();
+			break;
+		case STALEMATE:
+			isEndGame = true;
+			sprintf(buffer,"Player %s has got the STALEMATE!", cur_player == WHITE ? "BLACK" : "WHITE");
+			info_view->Render(buffer);
+			info_view->Ask();
+			break;
+		default:
+			message = NONE;
+			break;
 		}
 
-		cur_player = (cur_player == WHITE ? BLACK : WHITE);
-		if ( !is_end && model.IsCheck(cur_player) ) {
-			message = CHECK;
+		if (isEndGame == false) {
+			do {
+				command = players[cur_player]->YourTurn(player_move, message);
+				if (command == TURN) {
+					if (player_move.pos1.x == 0 && player_move.pos2.y == 0) {
+						correct_move = true;
+					}	else if ( model.CanMove(player_move) == false) {
+						message = WRONG_MOVE;
+						correct_move = false;
+					} else {
+						correct_move = true;
+					}
+				}
+			}
+			while( command == TURN && correct_move == false );
+
+
+			switch(command) {
+				case TURN:
+					model.Remove(player_move);
+
+					cur_player = (cur_player == WHITE ? BLACK : WHITE);
+					break;
+				case EXIT:
+					isEndGame = true;
+					break;
+				case SAVE:
+					break;
+				default:
+					break;
+			}
 		}
-		else {
-			message = NONE;
-		}
-	} while( !is_end );
+	} while( isEndGame == false );
 
 
 	delete players[WHITE];

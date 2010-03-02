@@ -28,10 +28,10 @@ PlayerCommand HumanPlayer::YourTurn(Move& move, GameMessage message) {
 
 	switch(message) {
 		case WRONG_MOVE:
-				myUserView->Render("Wrong move!");
+				myUserView->Render("Wrong move!\n");
 				break;
-		case CHECK:
-				myUserView->Render("You've gotta check!");
+		case GOT_CHECK:
+				myUserView->Render("You've gotta check!\n");
 				break;
 		default:
 				break;

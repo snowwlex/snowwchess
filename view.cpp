@@ -28,6 +28,14 @@ void CLIView::Render(std::string msg) {
 	wrefresh(myWindow);
 	refresh();
 }
+void CLIView::Show() {
+	wbkgd(myWindow,COLOR_PAIR(myColor));
+	refresh();
+}
+void CLIView::Hide() {
+	wbkgd(myWindow,COLOR_PAIR(9));
+	refresh();
+}
 std::string CLIView::Ask(std::string msg) {
 	char input_buffer[1024];
 	wprintw(myWindow, "%s",msg.c_str());
@@ -37,8 +45,8 @@ std::string CLIView::Ask(std::string msg) {
 }
 CLIView::~CLIView() {
 	wclear(myWindow);
-	wbkgd(myWindow,5);
-	//wrefresh(myWindow);
+	wbkgd(myWindow,COLOR_PAIR(5));
+	wrefresh(myWindow);
 	refresh();
 	delwin(myWindow);
 }

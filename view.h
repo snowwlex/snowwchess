@@ -15,6 +15,8 @@ class CLIView {
 		int myColor;
 	public:
 		CLIView(int height,int width,int y,int x, int _color, bool scroll = false, Model *model = 0);
+		virtual void Show();
+		virtual void Hide();
 		virtual std::string Ask(std::string msg = "");
 		virtual void Render(std::string msg = "");
 		virtual ~CLIView();

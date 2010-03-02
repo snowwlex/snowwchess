@@ -8,7 +8,7 @@
 #ifndef GAME_H_
 #define GAME_H_
 enum PlayerCommand {NOTHING, TURN, SAVE, EXIT };
-enum GameMessage {NONE, WRONG_MOVE, CHECK};
+enum GameMessage {NONE, WRONG_MOVE, GOT_CHECK};
 
 class Game {
 	private:

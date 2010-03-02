@@ -27,17 +27,18 @@ void init_graphic() {
 	init_pair(7,COLOR_YELLOW,COLOR_BLACK); // окно доски
 	init_pair(8,COLOR_WHITE,COLOR_RED); // окно игрока с белыми фигурами
 	init_pair(9,COLOR_WHITE,COLOR_CYAN); // окно игрока с черными фигурами
+	init_pair(10,COLOR_BLACK,COLOR_BLACK); // для метода CLIView::Hide()
 }
-
 int main(int argc, char* argv[]) {
 	init_graphic();
-
 	CLIView *view = new MainMenuCLIView(6,30,2,2,6);
 	view->Render();
-	delete view;
+	view->Hide();
 	Game game;
 	game.Start();
-
+	view->Show();
+	view->Ask("Press enter\n");
+	delete view;
 	endwin();
 	return 0;
 }

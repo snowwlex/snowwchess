@@ -11,6 +11,9 @@
 #define BUFFER_SIZE 2
 #define BOARD_SIZE 8
 
+//ENUMS
+enum GameStatus {USUAL, CHECK, MATE, STALEMATE };
+
 //CLASSES
 class Board {
 	private:
@@ -36,7 +39,7 @@ class Model {
 		std::vector<Figure>::iterator findFigure(int player, int figure);
 	public:
 		Model(Rules* _myRules);
-		bool IsWin(int player);
+		GameStatus GetGameStatus(int player);
 		bool IsCheck(int player);
 		void Remove(Move move);
 		void Unmove(Move move);
