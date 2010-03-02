@@ -39,16 +39,22 @@ int& Board::operator() (int x,int y) {
 
 Model::Model(Rules* _myRules): myRules(_myRules) { myRules->SetModel(this); }
 
-bool Model::IsWin(int player) {
+GameStatus Model::GetGameStatus(int player) {
 	std::vector< Move > av_moves;
-	int opponent;
-	opponent = player == WHITE ? BLACK : WHITE;
-	av_moves = Moves(opponent);
-	if ( av_moves.begin() == av_moves.end() ) {
-		return true;
+	bool is_check;
+	av_moves = Moves(player);
+	is_check = IsCheck(player);
+
+	if ( av_moves.size() == 0 && is_check == true) {
+		return MATE;
+	} else if (av_moves.size() == 0) {
+		return STALEMATE;
+	} else if (is_check == true) {
+		return CHECK;
 	}
-	return false;
+	return USUAL;
 }
+
 
 bool Model::IsCheck(int player) {
 	return myRules->IsCheck(player);
