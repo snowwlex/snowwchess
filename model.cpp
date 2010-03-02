@@ -37,7 +37,7 @@ int& Board::operator() (int x,int y) {
 }
 
 
-Model::Model(Rules* _myRules): myRules(_myRules) { myRules->SetModel(this); }
+Model::Model(Rules* _myRules): myRules(_myRules) {  }
 
 GameStatus Model::GetGameStatus(int player) {
 	std::vector< Move > av_moves;
@@ -57,7 +57,22 @@ GameStatus Model::GetGameStatus(int player) {
 
 
 bool Model::IsCheck(int player) {
-	return myRules->IsCheck(player);
+	bool is_check;
+	std::vector<Move> av_moves;
+	std::vector<Figure>::iterator it_figure;
+	std::vector<Figure>::iterator it_KingFigure;
+	std::vector <Move>::iterator it_move;
+	int opponent = player == WHITE ? BLACK : WHITE;
+	it_KingFigure = findFigure(player, 1 );
+	for (is_check = false, it_figure = mySetFigures[opponent].begin(); !is_check &&  it_figure != mySetFigures[opponent].end(); ++it_figure) {
+		av_moves = Moves(opponent, it_figure, false);
+		for (it_move = av_moves.begin(); !is_check && it_move != av_moves.end(); ++it_move) {
+			if (it_move->pos2.x == it_KingFigure->position.x &&  it_move->pos2.y == it_KingFigure->position.y) {
+				is_check = true;
+			}
+		}
+	}
+	return is_check;
 }
 void Model::Remove(Move move) {
 
@@ -135,23 +150,72 @@ std::vector< Move > Model::Moves(int player, Position pos1) {
 	std::vector< Move > av_moves;
 	std::vector<Figure>::iterator it_figure;
 
+
 	it_figure = findFigure(player, pos1);
 	if (it_figure == mySetFigures[player].end()) {
 		return av_moves; // на исходной точке нет фигуры
 	}
-	av_moves = myRules->Moves(player,it_figure);
+
+	av_moves = Moves(player,it_figure);
 	return av_moves;
 }
 
+std::vector< Move > Model::Moves(int player, std::vector<Figure>::iterator it_figure,  bool check) {
+	bool accepted;
+	std::vector< Move > av_moves;
+	Move move;
+	std::vector < MoveRule >::iterator it_rule;
+	std::vector<Figure>::iterator it_player;
+	Position cur_pos;
+	std::vector < MoveRule > curRules = myRules->GetMoveRules(it_figure->id);
+	for ( it_rule=curRules.begin() ; it_rule != curRules.end(); ++it_rule ) {
+		if  ( ((it_rule->player+1) & (player+1))  && (it_rule->from_line == -1 || it_rule->from_line == it_figure->position.y) ) 	{
+			cur_pos = it_figure->position;
+			do  {
+				accepted = false;
+				cur_pos.x += it_rule->delta_x;
+				cur_pos.y += it_rule->delta_y;
+				if (myBoard(cur_pos.x,cur_pos.y) != -1) {
+					move.pos1 = it_figure->position;
+					move.pos2 = cur_pos;
+					move.player = player;
+					if ( myBoard(cur_pos.x,cur_pos.y) == 0 && (it_rule->move_type & MOVE) ) {
+						move.type = MOVE;
+						accepted = true;
+					}
+					if ( myBoard(cur_pos.x,cur_pos.y) != 0 ) {
+						it_player = findFigure(player, cur_pos);
+						if (it_player == mySetFigures[player].end() && (it_rule->move_type & EAT) ) {
+							move.type = EAT;
+							accepted = true;
+						}
+					}
+					if(check == true && accepted == true) {
+						//апдейт модели - совершаем ход
+						Remove(move);
+						if ( IsCheck(player) ) {
+							accepted = false;
+						}
+						//делаем ход обратно
+						Unmove(move);
+					}
+					if (accepted == true) {
+						av_moves.push_back(move);
+					}
+				}
+			} while (myBoard(cur_pos.x,cur_pos.y) == 0 && it_rule->rule_type == DIRECTION);
+		}
+	}
+	return av_moves;
+}
 std::vector< Move > Model::Moves(int player) {
 
 	std::vector< Move > av_moves, all_moves;
-
 	std::vector<Figure>::iterator it_figure;
 	std::vector<Move>::iterator it_move;
 
 	for (it_figure = mySetFigures[player].begin();  it_figure != mySetFigures[player].end(); ++it_figure) {
-		av_moves = myRules->Moves(player, it_figure);
+		av_moves = Moves(player, it_figure);
 		for (it_move = av_moves.begin(); it_move != av_moves.end(); ++it_move) {
 			all_moves.push_back(*it_move);
 		}
@@ -159,16 +223,6 @@ std::vector< Move > Model::Moves(int player) {
 
 	return all_moves;
 }
-
-/*
-std::vector< Position> Model::Eatable(PlayerColor player) {
-
-	std::vector< Position > eatable;
-
-	eatable = myRules->Eatable(player);
-	return eatable;
-}
-*/
 
 
 std::vector<Figure>::iterator Model::findFigure(int player , Position find_pos) {
@@ -193,17 +247,11 @@ std::vector<Figure>::iterator Model::findFigure(int player , int figure_id) {
 
 }
 
-/*
-const char& Model::getBoard(int x,int y) {
-	return myBoard(x,y);
-}
-*/
-
-const std::vector<Figure>& Model::getSetFigures(int player) {
+const std::vector<Figure>& Model::getSetFigures(int player) const {
 	return mySetFigures[player];
 }
 
-const FigureData& Model::GetFigureData(int figure_id) {
+const FigureData& Model::GetFigureData(int figure_id) const {
 	return myRules->GetFigureData(figure_id);
 }
 
@@ -211,7 +259,7 @@ void Model::SetInitFigures(int player) {
 	SetFigures(player, myRules->GetInitFigures(player) );
 }
 
-void Model::SetFigures(int player_id, std::vector<Figure> setfigures) {
+void Model::SetFigures(int player_id, const std::vector<Figure>& setfigures) {
 	mySetFigures[player_id] = setfigures;
 	myBoard.Set(mySetFigures[player_id]);
 }

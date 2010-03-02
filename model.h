@@ -37,20 +37,21 @@ class Model {
 		std::vector<Figure> mySetFigures[2];
 		std::vector<Figure>::iterator findFigure(int player, Position find_pos);
 		std::vector<Figure>::iterator findFigure(int player, int figure);
+		std::vector<Move> Moves(int player, std::vector<Figure>::iterator it_figure,  bool check=true);
+		void Unmove(Move move);
+		bool IsCheck(int player);
 	public:
 		Model(Rules* _myRules);
 		GameStatus GetGameStatus(int player);
-		bool IsCheck(int player);
 		void Remove(Move move);
-		void Unmove(Move move);
 		bool CanMove(Move move);
 		std::vector< Move > Moves(int player, Position pos1);
 		std::vector< Move > Moves(int player);
 		void SetInitFigures(int player);
-		const std::vector<Figure>& getSetFigures(int player);
-		const FigureData& GetFigureData(int figure_id);
+		const std::vector<Figure>& getSetFigures(int player) const;
+		const FigureData& GetFigureData(int figure_id) const;
 
-		void SetFigures(int player_id, std::vector<Figure> setfigures);
+		void SetFigures(int player_id, const std::vector<Figure>& setfigures);
 
 };
 #endif /* MODEL_H_ */
