@@ -57,27 +57,20 @@ struct MoveRule {
 	 delta_x(_deltax), delta_y(_deltay), rule_type(_ruletype), move_type(_movetype), player(_player), from_line(_fromline) { }
 };
 
-class Model;
 
 class Rules {
 	private:
-		Model *myModel;
 		std::map<int, std::vector<MoveRule> > myMoveRules;
-		std::vector<Figure> myInitFigures[2];
 		std::map < int , FigureData > myFiguresData;
-
+		std::vector<Figure> myInitFigures[2];
 	public:
-		std::vector< Move > Moves(int player, std::vector<Figure>::iterator it_figure,  bool check=true);
+		const std::vector < MoveRule >& GetMoveRules(int figure_id) ;
+		const FigureData& GetFigureData(int figure_id);
+		const std::vector<Figure>& GetInitFigures(int player_id) const;
 
-		void SetModel(Model* _myModel);
 		void SetInitFigures(int player_id, std::vector<Figure> figures);
 		void SetMoveRule(int figure_id, std::vector < MoveRule > _moverules);
 		void SetFiguresData(int figure_id, FigureData figuredata);
-		const std::vector<Figure>& GetInitFigures(int player_id);
-		const FigureData& GetFigureData(int figure_id);
-		bool IsCheck( int player );
-		//std::vector< Position> Eatable(PlayerColor player);
-		//bool is_win();
 
 
 };

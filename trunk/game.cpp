@@ -12,6 +12,8 @@
 #include "rules.h"
 #include "model.h"
 #include "io.h"
+#include "rules_io.h"
+#include "model_io.h"
 #include "view.h"
 #include "game.h"
 #include "player.h"
@@ -88,7 +90,6 @@ void Game::Start() {
 			switch(command) {
 				case TURN:
 					model.Remove(player_move);
-
 					cur_player = (cur_player == WHITE ? BLACK : WHITE);
 					break;
 				case EXIT:
