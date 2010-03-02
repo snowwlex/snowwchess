@@ -15,7 +15,7 @@
 #include "game.h"
 #include "player.h"
 
-HumanPlayer::HumanPlayer(int _color, Model* m, View *board_view, View * user_view): myColor(_color), model(m), myBoardView(board_view), myUserView(user_view) { }
+HumanPlayer::HumanPlayer(int _color, Model* m, CLIView *board_view, CLIView * user_view): myColor(_color), model(m), myBoardView(board_view), myUserView(user_view) { }
 
 PlayerCommand HumanPlayer::YourTurn(Move& move, GameMessage message) {
 
@@ -23,6 +23,7 @@ PlayerCommand HumanPlayer::YourTurn(Move& move, GameMessage message) {
 	std::string input_command;
 	int x1,y1, x2,y2;
 	std::vector< Move > moves;
+	char buffer[1024];
 	curs_set(1);
 
 	switch(message) {
@@ -49,25 +50,27 @@ PlayerCommand HumanPlayer::YourTurn(Move& move, GameMessage message) {
 			moves.clear();
 
 			moves = model->Moves(myColor, Position(x1,y1));
-			wprintw(myUserView->myWindow, "Available moves for %c%c:\n", x1+'a',8-y1+'0');
+			sprintf(buffer, "Available moves for %c%c:\n", x1+'a',8-y1+'0');
+			myUserView->Render(buffer);
 			std::vector < Move >::iterator it;
 			for ( it=moves.begin() ; it != moves.end(); it++ ) {
-				wprintw(myUserView->myWindow, "[%c%c-%c%c (%s)] ", x1+'a',8 - y1+'0',it->pos2.x+'a', 8 - it->pos2.y+'0', it->type == EAT ? "eat" : "move" );
+				sprintf(buffer, "[%c%c-%c%c (%s)] ", x1+'a',8 - y1+'0',it->pos2.x+'a', 8 - it->pos2.y+'0', it->type == EAT ? "eat" : "move" );
+				myUserView->Render(buffer);
 			}
-			wprintw(myUserView->myWindow, "\n");
-			wrefresh(myUserView->myWindow);
+			myUserView->Render("\n");
 		} else if (input_command == "moves") {
 
 			moves.clear();
 
 			moves = model->Moves(myColor);
-			wprintw(myUserView->myWindow, "Available moves for all\n", x1+'a',8-y1+'0');
+			sprintf(buffer, "\n");
+			myUserView->Render("Available moves for all\n");
 			std::vector < Move >::iterator it;
 			for ( it=moves.begin() ; it != moves.end(); it++ ) {
-				wprintw(myUserView->myWindow, "[%c%c-%c%c (%s)] ", it->pos1.x+'a',8 - it->pos1.y+'0',it->pos2.x+'a', 8 - it->pos2.y+'0', it->type == EAT ? "eat" : "move" );
+				sprintf(buffer, "[%c%c-%c%c (%s)] ", it->pos1.x+'a',8 - it->pos1.y+'0',it->pos2.x+'a', 8 - it->pos2.y+'0', it->type == EAT ? "eat" : "move" );
+				myUserView->Render(buffer);
 			}
-			wprintw(myUserView->myWindow, "\n");
-			wrefresh(myUserView->myWindow);
+			myUserView->Render("\n");
 		} else if (input_command == "exit") {
 			command = EXIT;
 

@@ -109,6 +109,7 @@
 			<jump x="-2" y="-1"/>
 			<jump x="-1" y="2"/>
 			<jump x="1" y="-2"/>
+			<jump x="1" y="2"/>
 			<jump x="-1" y="-2"/>
 		</figure>
 		<figure id="5">
