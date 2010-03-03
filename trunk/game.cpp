@@ -25,14 +25,15 @@ void Game::Start() {
 	Model model(&rules);
 	RulesIO rules_io(&rules);
 	ModelIO model_io(&model);
-	rules_io.Load();
+	rules_io.Load("kapablanka.xml");
 	model_io.Load();
 
 	CLIView *info_view = new CLIView(25, 30, 14,2,6, true);
-	CLIView *board_view = new BoardCLIView(12,20,2,2,7, false, &model);
+	CLIView *board_view = new BoardCLIView(model.GetBoardSizeX()+2,model.GetBoardSizeY()+10,2,2,7, false, &model);
 	CLIView *user_view[2];
 	user_view[WHITE] = new CLIView(10,70,2,40,8,true);
 	user_view[BLACK] = new CLIView(10,70,13,40,9,true);
+
 
 	Player *players[2];
 	players[WHITE] = new HumanPlayer(WHITE, &model, board_view, user_view[WHITE]);
@@ -48,6 +49,7 @@ void Game::Start() {
 
 	do {
 		isEndGame = false;
+
 		status = model.GetGameStatus(cur_player);
 		switch(status) {
 		case CHECK:

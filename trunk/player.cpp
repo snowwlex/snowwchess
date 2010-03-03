@@ -44,17 +44,18 @@ PlayerCommand HumanPlayer::YourTurn(Move& move, GameMessage message) {
 
 		input_command = myUserView->Ask("> ");
 		if (input_command.length() == 2) {
+
 			x1 = input_command[0]-'a';
-			y1 = 8-input_command[1]+'0';
+			y1 = model->GetBoardSizeY()-input_command[1]+'0';
 
 			moves.clear();
 
 			moves = model->Moves(myColor, Position(x1,y1));
-			sprintf(buffer, "Available moves for %c%c:\n", x1+'a',8-y1+'0');
+			sprintf(buffer, "Available moves for %c%c:\n", x1+'a',model->GetBoardSizeY()-y1+'0');
 			myUserView->Render(buffer);
 			std::vector < Move >::iterator it;
 			for ( it=moves.begin() ; it != moves.end(); it++ ) {
-				sprintf(buffer, "[%c%c-%c%c (%s)] ", x1+'a',8 - y1+'0',it->pos2.x+'a', 8 - it->pos2.y+'0', it->type == EAT ? "eat" : "move" );
+				sprintf(buffer, "[%c%c-%c%c (%s)] ", x1+'a',model->GetBoardSizeY() - y1+'0',it->pos2.x+'a', model->GetBoardSizeY() - it->pos2.y+'0', it->type == EAT ? "eat" : "move" );
 				myUserView->Render(buffer);
 			}
 			myUserView->Render("\n");
@@ -67,7 +68,7 @@ PlayerCommand HumanPlayer::YourTurn(Move& move, GameMessage message) {
 			myUserView->Render("Available moves for all\n");
 			std::vector < Move >::iterator it;
 			for ( it=moves.begin() ; it != moves.end(); it++ ) {
-				sprintf(buffer, "[%c%c-%c%c (%s)] ", it->pos1.x+'a',8 - it->pos1.y+'0',it->pos2.x+'a', 8 - it->pos2.y+'0', it->type == EAT ? "eat" : "move" );
+				sprintf(buffer, "[%c%c-%c%c (%s)] ", it->pos1.x+'a',model->GetBoardSizeY() - it->pos1.y+'0',it->pos2.x+'a', model->GetBoardSizeY() - it->pos2.y+'0', it->type == EAT ? "eat" : "move" );
 				myUserView->Render(buffer);
 			}
 			myUserView->Render("\n");
@@ -76,9 +77,9 @@ PlayerCommand HumanPlayer::YourTurn(Move& move, GameMessage message) {
 
 		} else {
 			x1 = input_command[0]-'a';
-			y1 = 8 - input_command[1] + '0';
+			y1 = model->GetBoardSizeY() - input_command[1] + '0';
 			x2 = input_command[3]-'a';
-			y2 = 8 - input_command[4] + '0';
+			y2 = model->GetBoardSizeY() - input_command[4] + '0';
 			move.pos1.x = x1;
 			move.pos1.y = y1;
 			move.pos2.x = x2;

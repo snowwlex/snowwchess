@@ -11,7 +11,10 @@
 #include "rules.h"
 
 
-
+void Rules::SetBoardSize(int sizex, int sizey) {
+	myBoardSizeX = sizex;
+	myBoardSizeY = sizey;
+}
 void Rules::SetMoveRule(int figure_id, std::vector < MoveRule > _moverules) {
 	myMoveRules[figure_id] = _moverules;
 }

@@ -32,7 +32,7 @@ void XMLCALL RulesIOstartElementHandler(void *userData, const char *name, const 
 			if (attr == "name") {  storage->rules_name = value; }
 		 }
 	} else if (tag == "board") {
-		storage->boardsize_x = storage->boardsize_y = 8;
+		storage->boardsize_x = storage->boardsize_y = 0;
 		for (i = 0; atts[i]; i += 2)  {
 			attr = atts[i]; value = atts[i+1];
 			if (attr == "sizex") {  storage->boardsize_x = makeInt(value); }
@@ -83,8 +83,7 @@ void XMLCALL RulesIOstartElementHandler(void *userData, const char *name, const 
 				figure.position.y = 0;
 				for (i = 0; atts[i]; i += 2)  {
 					attr = atts[i]; value = atts[i+1];
-					if (attr == "x") {  figure.position.x = makeInt(value); }
-					if (attr == "y") {  figure.position.y = makeInt(value); }
+					if (attr == "cell") {  figure.position.x = value[0]-'a'; figure.position.y = storage->boardsize_y - value[1] + '0' ; }
 				}
 				storage->SetFigures[storage->cur_player_id].push_back(figure);
 			}
@@ -102,8 +101,8 @@ void XMLCALL RulesIOstartElementHandler(void *userData, const char *name, const 
 				moverule.rule_type = (tag=="jump"?JUMP:DIRECTION);
 				for (i = 0; atts[i]; i += 2)  {
 					attr = atts[i]; value = atts[i+1];
-					if (attr == "x") {  moverule.delta_x = makeInt(value); }
-					if (attr == "y") {  moverule.delta_y = makeInt(value); }
+					if (attr == "dx") {  moverule.delta_x = makeInt(value); }
+					if (attr == "dy") {  moverule.delta_y = makeInt(value); }
 					if (attr == "type") {  moverule.move_type = (value == "move" ? MOVE : EAT); }
 					if (attr == "player") { moverule.player = (value == "1" ? WHITE:BLACK); }
 				}
@@ -124,9 +123,9 @@ void XMLCALL RulesIOendElementHandler(void *userData, const char *name) {
 	}
 }
 
-void RulesIO::Load() {
-
-	FILE *infile = fopen("rules/classic.xml", "r");
+void RulesIO::Load(std::string rules_file) {
+	rules_file = std::string("rules/")+rules_file;
+	FILE *infile = fopen(rules_file.c_str(), "r");
 
 	int done, length;
 	char buffer[1024];
@@ -151,6 +150,7 @@ void RulesIO::Load() {
 	XML_ParserFree(parser);
 	fclose(infile);
 
+	rules->SetBoardSize(storage.boardsize_x, storage.boardsize_y);
 	rules->SetInitFigures(WHITE, storage.SetFigures[WHITE]);
 	rules->SetInitFigures(BLACK, storage.SetFigures[BLACK]);
 

@@ -13,17 +13,31 @@
 #include "model.h"
 #include "io.h"
 
-Board::Board() {
-	for (int i=0; i<BOARD_SIZE+2*BUFFER_SIZE; ++i) {
-		for (int j=0; j<BOARD_SIZE+2*BUFFER_SIZE; ++j) {
+Board::Board( int buffer): myBufferSize(buffer), myBoardArray(0)  { }
+
+void Board::Init(int sizex, int sizey) {
+	mySizeX = sizex;
+	mySizeY = sizey;
+	myBoardArray = new int*[mySizeX+2*myBufferSize];
+	for (int i=0; i < mySizeX+2*myBufferSize; ++i) {
+		myBoardArray[i] = new int[mySizeY+2*myBufferSize];
+	}
+	for (int i=0; i<(mySizeX+2*myBufferSize); ++i) {
+		for (int j=0; j<(mySizeY+2*myBufferSize); ++j) {
 			myBoardArray[i][j] = -1;
 		}
 	}
-	for (int i=0; i<BOARD_SIZE; ++i) {
-		for (int j=0; j<BOARD_SIZE; ++j) {
+	for (int i=0; i<mySizeX; ++i) {
+		for (int j=0; j<mySizeY; ++j) {
 			operator()(i,j) = 0;
 		}
 	}
+}
+Board::~Board() {
+	for (int i=0; i < (mySizeX+2*myBufferSize); ++i) {
+		delete[] myBoardArray[i];
+	}
+	delete[] myBoardArray;
 }
 
 void Board::Set( std::vector<Figure> figure_set) {
@@ -33,12 +47,22 @@ void Board::Set( std::vector<Figure> figure_set) {
 	}
 }
 int& Board::operator() (int x,int y) {
-	return myBoardArray[x+BUFFER_SIZE][y+BUFFER_SIZE];
+	return myBoardArray[x+myBufferSize][y+myBufferSize];
 }
 
 
 Model::Model(Rules* _myRules): myRules(_myRules) {  }
 
+void Model::InitBoard() {
+	myBoard.Init(myRules->myBoardSizeX,myRules->myBoardSizeY);
+}
+
+int Model::GetBoardSizeX() const {
+	return myBoard.mySizeX;
+}
+int Model::GetBoardSizeY() const {
+	return myBoard.mySizeY;
+}
 GameStatus Model::GetGameStatus(int player) {
 	std::vector< Move > av_moves;
 	bool is_check;
@@ -150,7 +174,6 @@ std::vector< Move > Model::Moves(int player, Position pos1) {
 	std::vector< Move > av_moves;
 	std::vector<Figure>::iterator it_figure;
 
-
 	it_figure = findFigure(player, pos1);
 	if (it_figure == mySetFigures[player].end()) {
 		return av_moves; // на исходной точке нет фигуры
@@ -168,6 +191,7 @@ std::vector< Move > Model::Moves(int player, std::vector<Figure>::iterator it_fi
 	std::vector<Figure>::iterator it_player;
 	Position cur_pos;
 	std::vector < MoveRule > curRules = myRules->GetMoveRules(it_figure->id);
+
 	for ( it_rule=curRules.begin() ; it_rule != curRules.end(); ++it_rule ) {
 		if  ( ((it_rule->player+1) & (player+1))  && (it_rule->from_line == -1 || it_rule->from_line == it_figure->position.y) ) 	{
 			cur_pos = it_figure->position;
@@ -199,9 +223,11 @@ std::vector< Move > Model::Moves(int player, std::vector<Figure>::iterator it_fi
 						//делаем ход обратно
 						Unmove(move);
 					}
+
 					if (accepted == true) {
 						av_moves.push_back(move);
 					}
+
 				}
 			} while (myBoard(cur_pos.x,cur_pos.y) == 0 && it_rule->rule_type == DIRECTION);
 		}
