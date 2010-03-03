@@ -64,10 +64,12 @@ class Rules {
 		std::map < int , FigureData > myFiguresData;
 		std::vector<Figure> myInitFigures[2];
 	public:
+		int myBoardSizeX, myBoardSizeY;
+
 		const std::vector < MoveRule >& GetMoveRules(int figure_id) ;
 		const FigureData& GetFigureData(int figure_id);
 		const std::vector<Figure>& GetInitFigures(int player_id) const;
-
+		void SetBoardSize(int sizex, int sizey);
 		void SetInitFigures(int player_id, std::vector<Figure> figures);
 		void SetMoveRule(int figure_id, std::vector < MoveRule > _moverules);
 		void SetFiguresData(int figure_id, FigureData figuredata);

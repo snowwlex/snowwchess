@@ -31,7 +31,7 @@ void init_graphic() {
 }
 int main(int argc, char* argv[]) {
 	init_graphic();
-	CLIView *view = new MainMenuCLIView(6,30,2,2,6);
+	CLIView *view = new MainMenuCLIView(6,30,2,20,6);
 	view->Render();
 	view->Hide();
 	Game game;

@@ -69,24 +69,22 @@ void BoardCLIView::Render(std::string msg) {
 	wclear(myWindow);
 
 	wprintw(myWindow, "  ");
-	for (int i = 0; i < BOARD_SIZE; ++i) {
+	for (int i = 0; i < myModel->GetBoardSizeX(); ++i) {
 		wprintw(myWindow, "%c", i+'a');
 	}
 	wprintw(myWindow, "\n");
-
-	for (int i = 0; i < BOARD_SIZE; ++i) {
-		wprintw(myWindow, "%d ", 8-i);
-		for (int j = 0; j < BOARD_SIZE; ++j) {
+	for (int i = 0; i < myModel->GetBoardSizeY(); ++i) {
+		wprintw(myWindow, "%d ", myModel->GetBoardSizeY()-i);
+		for (int j = 0; j < myModel->GetBoardSizeX(); ++j) {
 			color = ((i+j)%2 == 0) + 1 ;
 			wattron(myWindow, COLOR_PAIR(color) | A_BOLD);
-			wprintw(myWindow, " "); //myBoard(j,i));
+			wprintw(myWindow, " ");
 			wattroff(myWindow, COLOR_PAIR(color) | A_BOLD);
 		}
-		wprintw(myWindow, " %d\n",8-i);
+		wprintw(myWindow, " %d\n",myModel->GetBoardSizeY()-i);
 	}
-
 	wprintw(myWindow, "  ");
-	for (int i = 0; i < BOARD_SIZE; ++i) {
+	for (int i = 0; i < myModel->GetBoardSizeX(); ++i) {
 		wprintw(myWindow, "%c", i+'a');
 	}
 	wprintw(myWindow, "\n");
@@ -95,14 +93,14 @@ void BoardCLIView::Render(std::string msg) {
 
 	std::vector<Figure>::const_iterator it;
 
-	for ( it=myModel->getSetFigures(0).begin(); it != myModel->getSetFigures(0).end(); ++it ) {
+	for ( it=myModel->getSetFigures(WHITE).begin(); it != myModel->getSetFigures(WHITE).end(); ++it ) {
 		color = ((it->position.x+it->position.y)%2 == 0) + 1 ;
 		wattron(myWindow, COLOR_PAIR(color) | A_BOLD);
 		wmove(myWindow,it->position.y+1,it->position.x+2);
 		wprintw(myWindow, "%c", myModel->GetFigureData(it->id).letter);
 		wattroff(myWindow, COLOR_PAIR(color) | A_BOLD);
 	}
-	for ( it=myModel->getSetFigures(1).begin(); it != myModel->getSetFigures(1).end(); ++it ) {
+	for ( it=myModel->getSetFigures(BLACK).begin(); it != myModel->getSetFigures(BLACK).end(); ++it ) {
 		color = ((it->position.x+it->position.y)%2 == 0) + 1 ;
 		color += 2; // для черных фигур
 		wattron(myWindow, COLOR_PAIR(color) | A_BOLD);

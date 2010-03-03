@@ -27,7 +27,7 @@ class RulesIO {
 		Rules *rules;
 	public:
 		RulesIO(Rules *_rules);
-		void Load();
+		void Load(std::string rules_file);
 };
 
 

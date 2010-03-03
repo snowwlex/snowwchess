@@ -20,6 +20,7 @@
 ModelIO::ModelIO(Model *_model): model(_model) { }
 
 void ModelIO::Load(std::string file) {
+	model->InitBoard();
 	model->SetInitFigures(WHITE);
 	model->SetInitFigures(BLACK);
 }
