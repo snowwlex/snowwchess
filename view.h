@@ -19,6 +19,7 @@ class CLIView {
 		virtual void Hide();
 		virtual void Wait();
 		virtual std::string Ask(std::string msg = "");
+		virtual int GetKey();
 		virtual void Render(std::string msg = "");
 		virtual ~CLIView();
 
@@ -42,6 +43,7 @@ class BoardCLIView : public CLIView {
 	inline BoardCLIView(int height,int width,int y,int x, int _color, bool scroll = false, Model *model = 0):
 									CLIView(height,width,y,x,_color,scroll, model) { }
 	virtual void Render(std::string msg = "");
+	void Highlight(Position position, int color);
 };
 
 

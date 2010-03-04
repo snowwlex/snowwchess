@@ -1,78 +1,57 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<positions rules='kapablanka' turn='1'>
+<positions rules='classic' turn='1'>
 	<player id='1'>
 		<figure id='1'>
-			<position cell='f1'/>
+			<position cell='e1'/>
 		</figure>
 		<figure id='2'>
-			<position cell='e1'/>
+			<position cell='d1'/>
 		</figure>
 		<figure id='3'>
 			<position cell='a1'/>
-			<position cell='j1'/>
-		</figure>
-		<figure id='4'>
-			<position cell='b1'/>
-			<position cell='i1'/>
 		</figure>
 		<figure id='5'>
-			<position cell='d1'/>
-			<position cell='g1'/>
+			<position cell='c1'/>
 		</figure>
 		<figure id='6'>
-			<position cell='a2'/>
 			<position cell='b2'/>
-			<position cell='c2'/>
-			<position cell='d2'/>
 			<position cell='e2'/>
 			<position cell='f2'/>
-			<position cell='g2'/>
-			<position cell='h2'/>
-			<position cell='i2'/>
-			<position cell='j2'/>
+			<position cell='g3'/>
+			<position cell='d3'/>
+			<position cell='a2'/>
+			<position cell='c2'/>
 		</figure>
-		<figure id='7'>
-			<position cell='h1'/>
-		</figure>
-		<figure id='8'>
-			<position cell='c1'/>
+		<figure id='4'>
+			<position cell='f3'/>
 		</figure>
 	</player>
 	<player id='2'>
 		<figure id='1'>
-			<position cell='f8'/>
-		</figure>
-		<figure id='2'>
 			<position cell='e8'/>
 		</figure>
 		<figure id='3'>
 			<position cell='a8'/>
-			<position cell='j8'/>
+			<position cell='h8'/>
 		</figure>
 		<figure id='4'>
-			<position cell='b8'/>
-			<position cell='i8'/>
-		</figure>
-		<figure id='5'>
-			<position cell='d8'/>
+			<position cell='b4'/>
 			<position cell='g8'/>
 		</figure>
+		<figure id='5'>
+			<position cell='c8'/>
+			<position cell='f8'/>
+		</figure>
 		<figure id='6'>
-			<position cell='a7'/>
 			<position cell='b7'/>
-			<position cell='c7'/>
 			<position cell='d7'/>
 			<position cell='e7'/>
 			<position cell='f7'/>
 			<position cell='g7'/>
 			<position cell='h7'/>
-			<position cell='i7'/>
-			<position cell='j7'/>
+			<position cell='a7'/>
 		</figure>
-		<figure id='7'>
-			<position cell='h8'/>
-		</figure>
-		<figure id='8'>
-			<position cell='c8'/>
+		<figure id='2'>
+			<position cell='f1'/>
 		</figure>
 	</player>

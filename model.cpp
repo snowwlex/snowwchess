@@ -80,6 +80,10 @@ void Model::SetFigures(int player_id, const std::vector<Figure>& setfigures) {
 int Model::GetCurrentPlayer() const {
 	return myCurrentPlayer;
 }
+int Model::GetBoard(int x, int y) {
+	return myBoard(x,y);
+}
+
 void Model::SetCurrentPlayer(int player_id) {
 	myCurrentPlayer = player_id;
 }
