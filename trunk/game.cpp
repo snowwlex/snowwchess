@@ -23,11 +23,8 @@
 void Game::Start(std::string file, int mode) {
 
 	Rules rules;
-
 	Model model(&rules);
-
 	RulesIO rules_io(&rules);
-
 	ModelIO model_io(&model);
 
 	if ( mode == 0) {
@@ -61,6 +58,7 @@ void Game::Start(std::string file, int mode) {
 	int cur_player;
 	bool isEndGame, correct_move;
 	char buffer[1024];
+	std::string string;
 	GameMessage message;
 	PlayerCommand command;
 	Move player_move;
@@ -117,7 +115,9 @@ void Game::Start(std::string file, int mode) {
 					isEndGame = true;
 					break;
 				case SAVE:
-					model_io.Save("saves/save.xml");
+					string = user_view[cur_player]->Ask("enter savename:\n");
+					string = std::string("saves/") + string + std::string(".xml");
+					model_io.Save(string);
 					message = SAVED;
 					break;
 				default:

@@ -87,7 +87,7 @@ void ModelIO::UpdateModel() {
 
 void ModelIO::Load(std::string file) {
 
-	FILE *infile = fopen(file.c_str(), "r");
+	FILE *infile = fopen(file.c_str(), "rt");
 	int done, length;
 	char buffer[1024];
 	XML_Parser parser = XML_ParserCreate(NULL);
@@ -109,7 +109,7 @@ void ModelIO::Load(std::string file) {
 }
 
 void ModelIO::Save(std::string file) {
-	FILE *outfile = fopen(file.c_str(), "w");
+	FILE *outfile = fopen(file.c_str(), "wt");
 	char posX, posY, player;
 	int depth,i, cur_figure_id;
 	const char TAB = '\t';

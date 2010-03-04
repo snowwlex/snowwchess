@@ -170,7 +170,7 @@ void RulesIO::UpdateRules() {
 
 void RulesIO::Load(std::string file) {
 
-	FILE *infile = fopen(file.c_str(), "r");
+	FILE *infile = fopen(file.c_str(), "rt");
 
 	int done, length;
 	char buffer[1024];
