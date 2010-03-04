@@ -17,6 +17,7 @@ class CLIView {
 		CLIView(int height,int width,int y,int x, int _color, bool scroll = false, Model *model = 0);
 		virtual void Show();
 		virtual void Hide();
+		virtual void Wait();
 		virtual std::string Ask(std::string msg = "");
 		virtual void Render(std::string msg = "");
 		virtual ~CLIView();
@@ -43,4 +44,6 @@ class BoardCLIView : public CLIView {
 class UserCLIView : public CLIView {
 
 };
+
+extern CLIView* debug_view;
 #endif /* VIEW_H_ */

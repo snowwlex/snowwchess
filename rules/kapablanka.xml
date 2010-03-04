@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rules name="kapablanka">
 	<board sizex="10" sizey="8"/>
-	<players>
-		<player id="1" name="WHITE" turns="1"/>
+	<players turns="1">
+		<player id="1" name="WHITE"/>
 		<player id="2" name="BLACK"/>
 	</players>
-	<figures>
-		<figure id="1" name="KING" letter="K" special="1"/>
+	<figures special="1">
+		<figure id="1" name="KING" letter="K"/>
 		<figure id="2" name="QUEEN" letter="Q"/>
 		<figure id="3" name="ROOK" letter="R"/>
 		<figure id="4" name="KNIGHT" letter="H"/>
@@ -98,10 +98,11 @@
 			<jump dx="1" dy="0"/>
 			<jump dx="-1" dy="0"/>
 			<jump dx="0" dy="1"/>
+			<jump dx="0" dy="-1"/>
 			<jump dx="1" dy="1"/>
 			<jump dx="-1" dy="1"/>
 			<jump dx="1" dy="-1"/>
-			<jump dx="-1" dy="1"/>
+			<jump dx="-1" dy="-1"/>
 		</figure>
 		<figure id="2">
 			<direction dx="1" dy="1"/>

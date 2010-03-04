@@ -26,7 +26,6 @@ void CLIView::Render(std::string msg) {
 		wprintw(myWindow,"%s",msg.c_str());
 	}
 	wrefresh(myWindow);
-	refresh();
 }
 void CLIView::Show() {
 	wbkgd(myWindow,COLOR_PAIR(myColor));
@@ -43,6 +42,10 @@ std::string CLIView::Ask(std::string msg) {
 	wscanw(myWindow,"%s", input_buffer);
 	return std::string(input_buffer);
 }
+void CLIView::Wait() {
+	wgetch(myWindow);
+}
+
 CLIView::~CLIView() {
 	wclear(myWindow);
 	wbkgd(myWindow,COLOR_PAIR(5));

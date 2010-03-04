@@ -6,7 +6,6 @@
  */
 
 #include <cstdio>
-#include <ncurses.h>
 #include <expat.h>
 #include <string>
 #include <vector>
@@ -17,16 +16,16 @@
 #include "io.h"
 #include "rules_io.h"
 
-RulesIO::RulesIO(Rules *_rules): rules(_rules) { }
+RulesIO::RulesIO(Rules *_rules): myRules(_rules) { }
 
 
 void XMLCALL RulesIOstartElementHandler(void *userData, const char *name, const char **atts) {
-	XMLStorage *storage = (XMLStorage *)userData;
+	RulesIOXMLStorage *storage = (RulesIOXMLStorage *)userData;
 	int i;
 
 	std::string tag = name, attr, value;
 	if (tag == "rules") {
-		 storage->rules_name = "classic";
+		 storage->rules_name = "";
 		 for (i = 0; atts[i]; i += 2)  {
 			attr = atts[i];	value = atts[i+1];
 			if (attr == "name") {  storage->rules_name = value; }
@@ -40,14 +39,37 @@ void XMLCALL RulesIOstartElementHandler(void *userData, const char *name, const 
 		}
 	} else if (tag == "players") {
 		storage->section = "players";
+		int id = 0;
+		for (i = 0; atts[i]; i += 2)  {
+			attr = atts[i]; value = atts[i+1];
+			if (attr == "turns") {  id = makeInt(value); }
+			storage->first_turn = id-1;
+		}
 	} else if (tag == "figures") {
 		storage->section = "figures";
+		int id = 0;
+		for (i = 0; atts[i]; i += 2)  {
+			attr = atts[i]; value = atts[i+1];
+			if (attr == "special") {  id = makeInt(value); }
+			storage->special_figure = id;
+		}
 	} else if (tag == "positions") {
 		storage->section = "positions";
 	} else if (tag == "moves") {
 		storage->section = "moves";
-	} else if (storage->section != ""){
-		if (storage->section == "figures") {
+	} else if (storage->section != "") {
+		if (storage->section == "players") {
+			if (tag == "player") {
+				int id = 0;
+				std::string name;
+				for (i = 0; atts[i]; i += 2)  {
+					attr = atts[i]; value = atts[i+1];
+					if (attr == "id") {  id = makeInt(value); }
+					if (attr == "name") { name  = value; }
+					storage->PlayersData[id] = name;
+				}
+			}
+		}else if (storage->section == "figures") {
 			if (tag == "figure") {
 				FigureData figure_data;
 				int id = 0;
@@ -58,8 +80,9 @@ void XMLCALL RulesIOstartElementHandler(void *userData, const char *name, const 
 					if (attr == "name") {  figure_data.name = value; }
 					if (attr == "letter") {  figure_data.letter = value[0]; }
 					if (attr == "special") {  figure_data.special = true; }
+					storage->FiguresData[id] = figure_data;
 				}
-				storage->FiguresData[id] = figure_data;
+
 			}
 		} else if (storage->section == "positions") {
 			if (tag == "player") {
@@ -113,7 +136,7 @@ void XMLCALL RulesIOstartElementHandler(void *userData, const char *name, const 
 }
 
 void XMLCALL RulesIOendElementHandler(void *userData, const char *name) {
-	XMLStorage *storage = (XMLStorage *)userData;
+	RulesIOXMLStorage *storage = (RulesIOXMLStorage *)userData;
 	if (storage->section == "moves") {
 		if (std::string(name) == "figure") {
 			if (storage->tmp_move_rule.size() > 0) {
@@ -123,18 +146,38 @@ void XMLCALL RulesIOendElementHandler(void *userData, const char *name) {
 	}
 }
 
-void RulesIO::Load(std::string rules_file) {
-	rules_file = std::string("rules/")+rules_file;
-	FILE *infile = fopen(rules_file.c_str(), "r");
+const RulesIOXMLStorage& RulesIO::getStorage() const {
+	return myStorage;
+}
+
+void RulesIO::UpdateRules() {
+	myRules->SetRulesName(myStorage.rules_name);
+	myRules->SetFirstTurn(myStorage.first_turn);
+	myRules->SetSpecialFigure(myStorage.special_figure);
+	myRules->SetBoardSize(myStorage.boardsize_x, myStorage.boardsize_y);
+	myRules->SetInitFigures(WHITE, myStorage.SetFigures[WHITE]);
+	myRules->SetInitFigures(BLACK, myStorage.SetFigures[BLACK]);
+	for (std::map < int , FigureData >::iterator it=myStorage.FiguresData.begin(); it!=myStorage.FiguresData.end(); ++it) {
+		myRules->SetFigureData(it->first, it->second);
+	}
+	for (std::map < int , std::string >::iterator it=myStorage.PlayersData.begin(); it!=myStorage.PlayersData.end(); ++it) {
+		myRules->SetPlayerData(it->first, it->second);
+	}
+	for (std::map< int, std::vector<MoveRule> >::iterator it=myStorage.myMoveRulesIO.begin(); it!=myStorage.myMoveRulesIO.end(); ++it) {
+		myRules->SetMoveRule(it->first, it->second);
+	}
+}
+
+void RulesIO::Load(std::string file) {
+
+	FILE *infile = fopen(file.c_str(), "r");
 
 	int done, length;
 	char buffer[1024];
-	XMLStorage storage;
-	storage.section = "";
+	myStorage.section = "";
 	XML_Parser parser = XML_ParserCreate(NULL);
 	XML_SetElementHandler(parser, RulesIOstartElementHandler, RulesIOendElementHandler);
-	XML_SetUserData(parser, &storage);
-
+	XML_SetUserData(parser, &myStorage);
 	do  {
 		length = fread(buffer, 1, sizeof(buffer), infile);
 		done = feof(infile);
@@ -145,22 +188,8 @@ void RulesIO::Load(std::string rules_file) {
      		done = 1;
 	    }
 	} while (!done);
-
-
 	XML_ParserFree(parser);
 	fclose(infile);
-
-	rules->SetBoardSize(storage.boardsize_x, storage.boardsize_y);
-	rules->SetInitFigures(WHITE, storage.SetFigures[WHITE]);
-	rules->SetInitFigures(BLACK, storage.SetFigures[BLACK]);
-
-	for (std::map < int , FigureData >::iterator it=storage.FiguresData.begin(); it!=storage.FiguresData.end(); ++it) {
-		rules->SetFiguresData(it->first, it->second);
-	}
-
-	for (std::map< int, std::vector<MoveRule> >::iterator it=storage.myMoveRulesIO.begin(); it!=storage.myMoveRulesIO.end(); ++it) {
-		rules->SetMoveRule(it->first, it->second);
-	}
 
 }
 

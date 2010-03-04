@@ -33,6 +33,9 @@ PlayerCommand HumanPlayer::YourTurn(Move& move, GameMessage message) {
 		case GOT_CHECK:
 				myUserView->Render("You've gotta check!\n");
 				break;
+		case SAVED:
+				myUserView->Render("Game saved\n");
+				break;
 		default:
 				break;
 	}
@@ -74,7 +77,8 @@ PlayerCommand HumanPlayer::YourTurn(Move& move, GameMessage message) {
 			myUserView->Render("\n");
 		} else if (input_command == "exit") {
 			command = EXIT;
-
+		} else if (input_command == "save") {
+					command = SAVE;
 		} else {
 			x1 = input_command[0]-'a';
 			y1 = model->GetBoardSizeY() - input_command[1] + '0';
