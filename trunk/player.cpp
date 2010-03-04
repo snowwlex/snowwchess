@@ -6,14 +6,15 @@
  */
 
 #include <ncurses.h>
-#include "vector"
-#include "string"
-#include "map"
-#include "rules.h"
+#include <vector>
+#include <string>
+#include <map>
+
+#include "snowwchess.h"
 #include "model.h"
 #include "view.h"
-#include "game.h"
 #include "player.h"
+
 
 HumanPlayer::HumanPlayer(int _color, Model* m, CLIView *board_view, CLIView * user_view): myColor(_color), model(m), myBoardView(board_view), myUserView(user_view) { }
 

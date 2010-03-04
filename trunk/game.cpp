@@ -9,9 +9,10 @@
 #include <vector>
 #include <string>
 #include <map>
-#include "rules.h"
+
+#include "snowwchess.h"
 #include "model.h"
-#include "io.h"
+#include "rules.h"
 #include "rules_io.h"
 #include "model_io.h"
 #include "view.h"

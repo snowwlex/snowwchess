@@ -11,8 +11,8 @@
 #include <vector>
 #include <map>
 
+#include "snowwchess.h"
 #include "rules.h"
-#include "model.h"
 #include "io.h"
 #include "rules_io.h"
 

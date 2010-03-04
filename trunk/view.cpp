@@ -9,7 +9,8 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "rules.h"
+
+#include "snowwchess.h"
 #include "model.h"
 #include "view.h"
 
@@ -58,8 +59,7 @@ CLIView::~CLIView() {
 void MainMenuCLIView::Render(std::string msg) {
 	wprintw(myWindow,"          Main Menu\n");
 	wprintw(myWindow," * New Game\n");
-	//wrefresh(myWindow);
-	wgetch(myWindow);
+	wrefresh(myWindow);
 }
 
 

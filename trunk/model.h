@@ -21,6 +21,7 @@ class Board {
 		void Set(const std::vector<Figure>& figure_set);
 		int& operator() (int x,int y);
 };
+class Rules;
 class Model {
 	private:
 

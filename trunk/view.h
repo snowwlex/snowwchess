@@ -24,6 +24,7 @@ class CLIView {
 
 };
 
+extern CLIView* debug_view;
 
 class MainMenuCLIView : public CLIView {
 	public:
@@ -32,18 +33,12 @@ class MainMenuCLIView : public CLIView {
 		virtual void Render(std::string msg = "");
 };
 
-class InfoCLIView : public CLIView {
-	public:
-};
 class BoardCLIView : public CLIView {
 	public:
 	inline BoardCLIView(int height,int width,int y,int x, int _color, bool scroll = false, Model *model = 0):
 									CLIView(height,width,y,x,_color,scroll, model) { }
 	virtual void Render(std::string msg = "");
 };
-class UserCLIView : public CLIView {
 
-};
 
-extern CLIView* debug_view;
 #endif /* VIEW_H_ */
