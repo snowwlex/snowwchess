@@ -9,7 +9,8 @@
 #include <vector>
 #include <map>
 #include <string>
-#include "rules.h"
+
+#include "snowwchess.h"
 #include "model.h"
 #include "view.h"
 #include "game.h"
@@ -39,15 +40,17 @@ int main(int argc, char* argv[]) {
 	debug_view = new CLIView(15,70,24,40,11,true);
 	debug_view->Render("debug view\n");
 	view->Render();
+	view->Wait();
 	view->Hide();
 
 	Game game;
 
-	//game.Start("kapablanka", 0);
-	game.Start("save",1);
+	game.Start("classic", 0);
+	//game.Start("save",1);
 
 	view->Show();
-	view->Ask("Press enter\n");
+	view->Render("Press enter\n");
+	view->Wait();
 	delete view;
 	delete debug_view;
 	endwin();

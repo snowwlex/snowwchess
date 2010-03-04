@@ -8,6 +8,8 @@
 #include <vector>
 #include <map>
 #include <string>
+
+#include "snowwchess.h"
 #include "rules.h"
 
 void Rules::SetRulesName(std::string rules_name) {

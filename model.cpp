@@ -9,9 +9,9 @@
 #include <string>
 #include <map>
 
+#include "snowwchess.h"
 #include "rules.h"
 #include "model.h"
-#include "io.h"
 
 Board::Board(int buffer): myBufferSize(buffer), myBoardArray(0)  { }
 
