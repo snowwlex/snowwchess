@@ -21,12 +21,25 @@ class Player {
 class HumanPlayer : public Player {
 	private:
 		int myColor;
+		Position cursorPos;
 		Model *model;
-		CLIView *myBoardView;
+		BoardCLIView *myBoardView;
 		CLIView *myUserView;
 	public:
-		HumanPlayer(int _color, Model* m, CLIView *board_view, CLIView * user_view);
+		HumanPlayer(int _color, Model* m, BoardCLIView *board_view, CLIView * user_view);
 		virtual PlayerCommand YourTurn(Move& move, GameMessage message = NONE);
 };
+
+class HumanAltPlayer : public Player {
+	private:
+		int myColor;
+		Model *model;
+		BoardCLIView *myBoardView;
+		CLIView *myUserView;
+	public:
+		HumanAltPlayer(int _color, Model* m, BoardCLIView *board_view, CLIView * user_view);
+		virtual PlayerCommand YourTurn(Move& move, GameMessage message = NONE);
+};
+
 
 #endif /* PLAYER_H_ */

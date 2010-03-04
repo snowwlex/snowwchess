@@ -49,13 +49,22 @@ std::string CLIView::Ask(std::string msg) {
 void CLIView::Wait() {
 	wgetch(myWindow);
 }
+int CLIView::GetKey() {
+	keypad(myWindow, TRUE);
+	curs_set(0);
+	noecho();
+	int c = wgetch(myWindow);
+	echo();
+	return c;
 
+}
 CLIView::~CLIView() {
 	wclear(myWindow);
 	wbkgd(myWindow,COLOR_PAIR(5));
 	wrefresh(myWindow);
 	refresh();
 	delwin(myWindow);
+
 }
 
 MainMenuCLIView::MainMenuCLIView(int height,int width,int y,int x, int _color, bool scroll, Model *model):
@@ -73,10 +82,6 @@ void MainMenuCLIView::Render(std::string msg) {
 	wclear(myWindow);
 	curs_set(0);
 	wprintw(myWindow,"--- Main Menu ---\n");
-
-	char buffer[1024];
-	sprintf(buffer,"Highlighted: %d\n",highlight);
-	debug_view->Render(buffer);
 
 	for(i = 0,x=2,y=2; i < n_choices; ++i){
 		if(highlight == i)	{
@@ -141,6 +146,7 @@ void BoardCLIView::Render(std::string msg) {
 		wprintw(myWindow, "%d ", myModel->GetBoardSizeY()-i);
 		for (int j = 0; j < myModel->GetBoardSizeX(); ++j) {
 			color = ((i+j)%2 == 0) + 1 ;
+
 			wattron(myWindow, COLOR_PAIR(color) | A_BOLD);
 			wprintw(myWindow, " ");
 			wattroff(myWindow, COLOR_PAIR(color) | A_BOLD);
@@ -175,6 +181,17 @@ void BoardCLIView::Render(std::string msg) {
 
 	wrefresh(myWindow);
 
+}
+
+void BoardCLIView::Highlight(Position position, int color) {
+	int figure_id = myModel->GetBoard(position.x,position.y);
+	char figure_letter = ' ';
+	if (figure_id > 0) {
+		figure_letter = myModel->GetFigureData(figure_id).letter;
+	}
+	mvwchgat(myWindow,position.y+1,position.x+2, 1, A_BOLD, color, NULL);
+
+	wrefresh(myWindow);
 }
 
 

@@ -35,11 +35,12 @@ class Model {
 		int mySpecialFigure;
 		std::vector<Figure> mySetFigures[2];
 
-		std::vector<Figure>::iterator findFigure(int player, Position find_pos);
-		std::vector<Figure>::iterator findFigure(int player, int figure);
 		std::vector<Move> Moves(int player, std::vector<Figure>::iterator it_figure,  bool check=true);
 		void Unmove(Move move);
 		bool IsCheck(int player);
+
+		std::vector<Figure>::iterator findFigure(int player, Position find_pos);
+		std::vector<Figure>::iterator findFigure(int player, int figure);
 
 	public:
 
@@ -52,6 +53,7 @@ class Model {
 		std::vector< Move > Moves(int player, Position pos1);
 		std::vector< Move > Moves(int player);
 
+		int GetBoard(int x, int y);
 		int GetBoardSizeX() const;
 		int GetBoardSizeY() const;
 		std::string GetRulesName() const;
@@ -62,6 +64,8 @@ class Model {
 
 		void SetFigures(int player_id, const std::vector<Figure>& setfigures);
 		void SetCurrentPlayer(int player_id);
+
+
 
 
 

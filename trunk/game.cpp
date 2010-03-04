@@ -43,9 +43,9 @@ void Game::Start(std::string file, int mode) {
 		model.Init(1);
 	}
 
-
+	CLIView *choose_view;
 	CLIView *info_view = new CLIView(25, 30, 14,2,6, true);
-	CLIView *board_view = new BoardCLIView(model.GetBoardSizeX()+2,model.GetBoardSizeY()+10,2,2,7, false, &model);
+	BoardCLIView *board_view = new BoardCLIView(model.GetBoardSizeX()+2,model.GetBoardSizeY()+10,2,2,7, false, &model);
 	CLIView *user_view[2];
 	user_view[WHITE] = new CLIView(10,70,2,40,8,true);
 	user_view[BLACK] = new CLIView(10,70,13,40,9,true);
@@ -68,7 +68,7 @@ void Game::Start(std::string file, int mode) {
 		cur_player = model.GetCurrentPlayer();
 		isEndGame = false;
 
-		status = USUAL;//model.GetGameStatus(cur_player);
+		status = model.GetGameStatus(cur_player);
 		switch(status) {
 		case CHECK:
 			message = GOT_CHECK;
@@ -115,7 +115,10 @@ void Game::Start(std::string file, int mode) {
 					isEndGame = true;
 					break;
 				case SAVE:
-					string = user_view[cur_player]->Ask("enter savename:\n");
+					choose_view = new CLIView(5,30,25,35,6);
+					choose_view->Render("Enter savename:\n");
+					string = choose_view->Ask("> ");
+					delete choose_view;
 					string = std::string("saves/") + string + std::string(".xml");
 					model_io.Save(string);
 					message = SAVED;

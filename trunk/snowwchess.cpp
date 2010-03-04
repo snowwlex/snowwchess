@@ -29,10 +29,17 @@ void init_graphic() {
 	init_pair(8,COLOR_WHITE,COLOR_RED); // окно игрока с белыми фигурами
 	init_pair(9,COLOR_WHITE,COLOR_CYAN); // окно игрока с черными фигурами
 	init_pair(10,COLOR_BLACK,COLOR_BLACK); // для метода CLIView::Hide()
-	init_pair(11,COLOR_BLACK,COLOR_RED); // debug view
+	init_pair(11,COLOR_BLACK,COLOR_RED); // debug view & eat moves
+	init_pair(12,COLOR_BLACK,COLOR_CYAN); // move moves
+	init_pair(13,COLOR_BLACK,COLOR_YELLOW); // highlight
 }
 
 CLIView *debug_view;
+/*
+char buffer[1024];
+sprintf(buffer,"Highlighted: %d\n",highlight);
+debug_view->Render(buffer);
+*/
 
 int main(int argc, char* argv[]) {
 	init_graphic();

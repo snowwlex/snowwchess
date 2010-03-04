@@ -16,9 +16,110 @@
 #include "player.h"
 
 
-HumanPlayer::HumanPlayer(int _color, Model* m, CLIView *board_view, CLIView * user_view): myColor(_color), model(m), myBoardView(board_view), myUserView(user_view) { }
+HumanPlayer::HumanPlayer(int _color, Model* m, BoardCLIView *board_view, CLIView * user_view): myColor(_color), model(m), myBoardView(board_view), myUserView(user_view) { cursorPos.x = 0; cursorPos.y=0;}
 
 PlayerCommand HumanPlayer::YourTurn(Move& move, GameMessage message) {
+
+	PlayerCommand command;
+	std::string input_command;
+	std::vector< Move > moves;
+	std::vector < Move >::iterator it;
+	int key,mode;
+	switch(message) {
+		case WRONG_MOVE:
+				myUserView->Render("Wrong move!\n");
+				break;
+		case GOT_CHECK:
+				myUserView->Render("You've gotta check!\n");
+				break;
+		case SAVED:
+				myUserView->Render("Game saved\n");
+				break;
+		default:
+				break;
+	}
+
+
+	myBoardView->Render();
+	myBoardView->Highlight(cursorPos,13);
+
+	command = NOTHING;
+	mode = 0;
+	do {
+
+
+		key = myUserView->GetKey();
+
+		myBoardView->Render();
+
+		switch(key) {
+			case KEY_UP:
+				if (cursorPos.y > 0) cursorPos.y -= 1;
+				break;
+			case KEY_DOWN:
+				if (cursorPos.y < model->GetBoardSizeY()-1 ) cursorPos.y += 1;
+				break;
+			case KEY_LEFT:
+				if (cursorPos.x > 0 ) cursorPos.x -= 1;
+				break;
+			case KEY_RIGHT:
+				if (cursorPos.x < model->GetBoardSizeX()-1 ) cursorPos.x += 1;
+				break;
+			case 27:
+				command = EXIT;
+				break;
+			case KEY_F(5):
+				command = SAVE;
+				break;
+			case KEY_F(4):
+				moves = model->Moves(myColor);
+				for ( it=moves.begin() ; it != moves.end(); it++ ) {
+					myBoardView->Highlight(it->pos2,it->type == EAT ? 11 : 12);
+				}
+				break;
+			case ' ':
+				if (mode == 0) {
+					move.pos1.x = cursorPos.x;
+					move.pos1.y = cursorPos.y;
+					moves = model->Moves(myColor, Position(move.pos1.x,move.pos1.y));
+					mode = 1;
+				} else if (cursorPos.x == move.pos1.x && cursorPos.y == move.pos1.y){
+					mode = 0;
+				} else {
+					move.pos2.x = cursorPos.x;
+					move.pos2.y = cursorPos.y;
+					move.player = myColor;
+					move.type = EAT_MOVE;
+					command = TURN;
+				}
+				break;
+			default:
+				break;
+		}
+
+
+		if (mode == 1) {
+			for ( it=moves.begin() ; it != moves.end(); ++it ) {
+			myBoardView->Highlight(it->pos2,it->type == EAT ? 11 : 12);
+			}
+			myBoardView->Highlight(Position(move.pos1.x,move.pos1.y),13);
+		}
+		myBoardView->Highlight(cursorPos,13);
+
+
+
+
+	} while( command == NOTHING );
+
+
+	return command;
+}
+
+
+
+HumanAltPlayer::HumanAltPlayer(int _color, Model* m, BoardCLIView *board_view, CLIView * user_view): myColor(_color), model(m), myBoardView(board_view), myUserView(user_view) { }
+
+PlayerCommand HumanAltPlayer::YourTurn(Move& move, GameMessage message) {
 
 	PlayerCommand command;
 	std::string input_command;
