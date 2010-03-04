@@ -30,14 +30,17 @@ void CLIView::Render(std::string msg) {
 }
 void CLIView::Show() {
 	wbkgd(myWindow,COLOR_PAIR(myColor));
+	wrefresh(myWindow);
 	refresh();
 }
 void CLIView::Hide() {
-	wbkgd(myWindow,COLOR_PAIR(9));
+	wbkgd(myWindow,COLOR_PAIR(10));
+	wrefresh(myWindow);
 	refresh();
 }
 std::string CLIView::Ask(std::string msg) {
 	char input_buffer[1024];
+	curs_set(1);
 	wprintw(myWindow, "%s",msg.c_str());
 	wrefresh(myWindow);
 	wscanw(myWindow,"%s", input_buffer);
@@ -55,14 +58,72 @@ CLIView::~CLIView() {
 	delwin(myWindow);
 }
 
+MainMenuCLIView::MainMenuCLIView(int height,int width,int y,int x, int _color, bool scroll, Model *model):
+								CLIView(height,width,y,x,_color,scroll, model) {
+	highlight = 0;
+	keypad(myWindow, TRUE);
+	choices[0] = "New Game";
+	choices[1] = "Load Game";
+	choices[2] = "Exit";
+	n_choices = 3;
+}
 
 void MainMenuCLIView::Render(std::string msg) {
-	wprintw(myWindow,"          Main Menu\n");
-	wprintw(myWindow," * New Game\n");
+	int x,y,i;
+	wclear(myWindow);
+	curs_set(0);
+	wprintw(myWindow,"--- Main Menu ---\n");
+
+	char buffer[1024];
+	sprintf(buffer,"Highlighted: %d\n",highlight);
+	debug_view->Render(buffer);
+
+	for(i = 0,x=2,y=2; i < n_choices; ++i){
+		if(highlight == i)	{
+			wattron(myWindow, A_REVERSE);
+			mvwprintw(myWindow, y, x, "  %s  ", choices[i].c_str());
+			wattroff(myWindow, A_REVERSE);
+		}
+		else {
+			mvwprintw(myWindow, y, x, "  %s  ", choices[i].c_str());
+
+		}
+		++y;
+	}
 	wrefresh(myWindow);
 }
 
-
+std::string MainMenuCLIView::Ask(std::string msg) {
+	int choice = 0,c;
+	bool is_choiced = false;
+	while(is_choiced == false) {
+		noecho();
+		c = wgetch(myWindow);
+		switch(c)	{
+			case KEY_UP:
+				if(highlight == 0)
+					highlight = n_choices-1;
+				else
+					--highlight;
+				break;
+			case KEY_DOWN:
+				if(highlight == (n_choices-1))
+					highlight = 0;
+				else
+					++highlight;
+				break;
+			case 10:
+				choice = highlight;
+				is_choiced = true;
+				break;
+			default:
+				break;
+		}
+		Render();
+		echo();
+	}
+	return std::string(1,(char)(choice+'0'));
+}
 
 
 void BoardCLIView::Render(std::string msg) {

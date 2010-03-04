@@ -27,10 +27,14 @@ class CLIView {
 extern CLIView* debug_view;
 
 class MainMenuCLIView : public CLIView {
+	private:
+		int highlight;
+		std::string choices[3];
+		int n_choices;
 	public:
-		inline MainMenuCLIView(int height,int width,int y,int x, int _color, bool scroll = false, Model *model = 0):
-								CLIView(height,width,y,x,_color,scroll, model) { }
+		MainMenuCLIView(int height,int width,int y,int x, int _color, bool scroll = false, Model *model = 0);
 		virtual void Render(std::string msg = "");
+		virtual std::string Ask(std::string msg = "");
 };
 
 class BoardCLIView : public CLIView {

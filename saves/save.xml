@@ -2,7 +2,7 @@
 <positions rules='kapablanka' turn='1'>
 	<player id='1'>
 		<figure id='1'>
-			<position cell='f2'/>
+			<position cell='f1'/>
 		</figure>
 		<figure id='2'>
 			<position cell='e1'/>
@@ -25,7 +25,7 @@
 			<position cell='c2'/>
 			<position cell='d2'/>
 			<position cell='e2'/>
-			<position cell='f3'/>
+			<position cell='f2'/>
 			<position cell='g2'/>
 			<position cell='h2'/>
 			<position cell='i2'/>
@@ -40,7 +40,7 @@
 	</player>
 	<player id='2'>
 		<figure id='1'>
-			<position cell='f7'/>
+			<position cell='f8'/>
 		</figure>
 		<figure id='2'>
 			<position cell='e8'/>
@@ -63,7 +63,7 @@
 			<position cell='c7'/>
 			<position cell='d7'/>
 			<position cell='e7'/>
-			<position cell='f6'/>
+			<position cell='f7'/>
 			<position cell='g7'/>
 			<position cell='h7'/>
 			<position cell='i7'/>

@@ -36,22 +36,41 @@ CLIView *debug_view;
 
 int main(int argc, char* argv[]) {
 	init_graphic();
-	CLIView *view = new MainMenuCLIView(6,30,2,20,6);
+	std::string option,name;
+	int mode=0;
+	Game game;
+	CLIView *menu_view = new MainMenuCLIView(8,30,2,20,6);
+	CLIView *choose_view;
 	debug_view = new CLIView(15,70,24,40,11,true);
 	debug_view->Render("debug view\n");
-	view->Render();
-	view->Wait();
-	view->Hide();
 
-	Game game;
+	do {
+		menu_view->Render();
+		option = menu_view->Ask();
+		if (option == "0") {
+			choose_view = new CLIView(5,30,15,20,6);
+			choose_view->Render("Enter name of rules:\n");
+			name = choose_view->Ask("> ");
+			mode = 0;
+			delete choose_view;
+		}
+		else if (option == "1") {
+			choose_view = new CLIView(5,30,15,20,6);
+			choose_view->Render("Enter savename:\n");
+			name = choose_view->Ask("> ");
+			mode = 1;
+			delete choose_view;
+		}
 
-	game.Start("classic", 0);
-	//game.Start("save",1);
+		if (option != "2") {
+			menu_view->Hide();
+			game.Start(name,mode);
+			menu_view->Show();
+		}
 
-	view->Show();
-	view->Render("Press enter\n");
-	view->Wait();
-	delete view;
+	} while(option != "2");
+
+	delete menu_view;
 	delete debug_view;
 	endwin();
 	return 0;

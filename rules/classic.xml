@@ -9,7 +9,7 @@
 		<figure id="1" name="KING" letter="K" special="1"/>
 		<figure id="2" name="QUEEN" letter="Q"/>
 		<figure id="3" name="ROOK" letter="R"/>
-		<figure id="4" name="KNIGHT" letter="H"/>
+		<figure id="4" name="KNIGHT" letter="N"/>
 		<figure id="5" name="BISHOP" letter="B"/>
 		<figure id="6" name="PAWN" letter="P"/>
 	</figures>
