@@ -19,14 +19,32 @@
 #include "player.h"
 
 
-void Game::Start() {
+void Game::Start(std::string file, int mode) {
 
 	Rules rules;
+
 	Model model(&rules);
+
 	RulesIO rules_io(&rules);
+
 	ModelIO model_io(&model);
-	rules_io.Load("kapablanka.xml");
-	model_io.Load();
+
+	if ( mode == 0) {
+		file = std::string("rules/") + file + std::string(".xml");
+		rules_io.Load(file);
+		rules_io.UpdateRules();
+		model.Init(0);
+	}
+	else {
+		file = std::string("saves/") + file + std::string(".xml");
+		model_io.Load(file);
+		file = std::string("rules/") + model_io.getStorage().rules_name + std::string(".xml");
+		rules_io.Load(file);
+		rules_io.UpdateRules();
+		model_io.UpdateModel();
+		model.Init(1);
+	}
+
 
 	CLIView *info_view = new CLIView(25, 30, 14,2,6, true);
 	CLIView *board_view = new BoardCLIView(model.GetBoardSizeX()+2,model.GetBoardSizeY()+10,2,2,7, false, &model);
@@ -39,18 +57,19 @@ void Game::Start() {
 	players[WHITE] = new HumanPlayer(WHITE, &model, board_view, user_view[WHITE]);
 	players[BLACK] = new HumanPlayer(BLACK, &model, board_view, user_view[BLACK]);
 
-	int cur_player = WHITE;
+	int cur_player;
 	bool isEndGame, correct_move;
 	char buffer[1024];
 	GameMessage message;
 	PlayerCommand command;
 	Move player_move;
 	GameStatus status;
-
+	message = NONE;
 	do {
+		cur_player = model.GetCurrentPlayer();
 		isEndGame = false;
 
-		status = model.GetGameStatus(cur_player);
+		status = USUAL;//model.GetGameStatus(cur_player);
 		switch(status) {
 		case CHECK:
 			message = GOT_CHECK;
@@ -68,7 +87,6 @@ void Game::Start() {
 			info_view->Ask();
 			break;
 		default:
-			message = NONE;
 			break;
 		}
 
@@ -88,16 +106,18 @@ void Game::Start() {
 			}
 			while( command == TURN && correct_move == false );
 
-
+			message = NONE;
 			switch(command) {
 				case TURN:
 					model.Remove(player_move);
-					cur_player = (cur_player == WHITE ? BLACK : WHITE);
+					model.SetCurrentPlayer( cur_player == WHITE ? BLACK : WHITE );
 					break;
 				case EXIT:
 					isEndGame = true;
 					break;
 				case SAVE:
+					model_io.Save("saves/save.xml");
+					message = SAVED;
 					break;
 				default:
 					break;

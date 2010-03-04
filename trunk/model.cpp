@@ -13,7 +13,7 @@
 #include "model.h"
 #include "io.h"
 
-Board::Board( int buffer): myBufferSize(buffer), myBoardArray(0)  { }
+Board::Board(int buffer): myBufferSize(buffer), myBoardArray(0)  { }
 
 void Board::Init(int sizex, int sizey) {
 	mySizeX = sizex;
@@ -34,14 +34,16 @@ void Board::Init(int sizex, int sizey) {
 	}
 }
 Board::~Board() {
-	for (int i=0; i < (mySizeX+2*myBufferSize); ++i) {
-		delete[] myBoardArray[i];
+	if (myBoardArray != 0) {
+		for (int i=0; i < (mySizeX+2*myBufferSize); ++i) {
+			delete[] myBoardArray[i];
+		}
+		delete[] myBoardArray;
 	}
-	delete[] myBoardArray;
 }
 
-void Board::Set( std::vector<Figure> figure_set) {
-	std::vector<Figure>::iterator it;
+void Board::Set( const std::vector<Figure>& figure_set) {
+	std::vector<Figure>::const_iterator it;
 	for ( it=figure_set.begin() ; it != figure_set.end(); ++it ) {
 		operator()(it->position.x,it->position.y) = it->id;
 	}
@@ -53,15 +55,43 @@ int& Board::operator() (int x,int y) {
 
 Model::Model(Rules* _myRules): myRules(_myRules) {  }
 
-void Model::InitBoard() {
-	myBoard.Init(myRules->myBoardSizeX,myRules->myBoardSizeY);
+void Model::Init(int mode) {
+	if (mode == 0) {
+		myBoard.Init(myRules->GetBoardSizeX(),myRules->GetBoardSizeY());
+		myCurrentPlayer = myRules->GetFirstTurn();
+		mySpecialFigure = myRules->GetSpecialFigure();
+		SetFigures(WHITE, myRules->GetInitFigures(WHITE));
+		SetFigures(BLACK, myRules->GetInitFigures(BLACK));
+		myBoard.Set(mySetFigures[WHITE]);
+		myBoard.Set(mySetFigures[BLACK]);
+	}
+	else {
+		myBoard.Init(myRules->GetBoardSizeX(),myRules->GetBoardSizeY());
+		mySpecialFigure = myRules->GetSpecialFigure();
+		myBoard.Set(mySetFigures[WHITE]);
+		myBoard.Set(mySetFigures[BLACK]);
+	}
+}
+
+void Model::SetFigures(int player_id, const std::vector<Figure>& setfigures) {
+	mySetFigures[player_id] = setfigures;
+}
+
+int Model::GetCurrentPlayer() const {
+	return myCurrentPlayer;
+}
+void Model::SetCurrentPlayer(int player_id) {
+	myCurrentPlayer = player_id;
 }
 
 int Model::GetBoardSizeX() const {
-	return myBoard.mySizeX;
+	return myRules->GetBoardSizeX();
 }
 int Model::GetBoardSizeY() const {
-	return myBoard.mySizeY;
+	return myRules->GetBoardSizeY();
+}
+std::string Model::GetRulesName() const {
+	return myRules->GetRulesName();
 }
 GameStatus Model::GetGameStatus(int player) {
 	std::vector< Move > av_moves;
@@ -84,14 +114,14 @@ bool Model::IsCheck(int player) {
 	bool is_check;
 	std::vector<Move> av_moves;
 	std::vector<Figure>::iterator it_figure;
-	std::vector<Figure>::iterator it_KingFigure;
+	std::vector<Figure>::iterator it_SpecialFigure;
 	std::vector <Move>::iterator it_move;
 	int opponent = player == WHITE ? BLACK : WHITE;
-	it_KingFigure = findFigure(player, 1 );
+	it_SpecialFigure = findFigure(player, mySpecialFigure );
 	for (is_check = false, it_figure = mySetFigures[opponent].begin(); !is_check &&  it_figure != mySetFigures[opponent].end(); ++it_figure) {
 		av_moves = Moves(opponent, it_figure, false);
 		for (it_move = av_moves.begin(); !is_check && it_move != av_moves.end(); ++it_move) {
-			if (it_move->pos2.x == it_KingFigure->position.x &&  it_move->pos2.y == it_KingFigure->position.y) {
+			if (it_move->pos2.x == it_SpecialFigure->position.x &&  it_move->pos2.y == it_SpecialFigure->position.y) {
 				is_check = true;
 			}
 		}
@@ -281,11 +311,4 @@ const FigureData& Model::GetFigureData(int figure_id) const {
 	return myRules->GetFigureData(figure_id);
 }
 
-void Model::SetInitFigures(int player) {
-	SetFigures(player, myRules->GetInitFigures(player) );
-}
 
-void Model::SetFigures(int player_id, const std::vector<Figure>& setfigures) {
-	mySetFigures[player_id] = setfigures;
-	myBoard.Set(mySetFigures[player_id]);
-}

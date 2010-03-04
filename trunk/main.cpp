@@ -28,17 +28,28 @@ void init_graphic() {
 	init_pair(8,COLOR_WHITE,COLOR_RED); // окно игрока с белыми фигурами
 	init_pair(9,COLOR_WHITE,COLOR_CYAN); // окно игрока с черными фигурами
 	init_pair(10,COLOR_BLACK,COLOR_BLACK); // для метода CLIView::Hide()
+	init_pair(11,COLOR_BLACK,COLOR_RED); // debug view
 }
+
+CLIView *debug_view;
+
 int main(int argc, char* argv[]) {
 	init_graphic();
 	CLIView *view = new MainMenuCLIView(6,30,2,20,6);
+	debug_view = new CLIView(15,70,24,40,11,true);
+	debug_view->Render("debug view\n");
 	view->Render();
 	view->Hide();
+
 	Game game;
-	game.Start();
+
+	//game.Start("kapablanka", 0);
+	game.Start("save",1);
+
 	view->Show();
 	view->Ask("Press enter\n");
 	delete view;
+	delete debug_view;
 	endwin();
 	return 0;
 }
