@@ -9,6 +9,10 @@
 #define RULES_IO_H_
 
 struct RulesIOXMLStorage {
+	struct FigureInfo {
+		int id;
+		std::string cell;
+	};
 	int cur_player_id;
 	int cur_figure_id;
 	int first_turn;
@@ -20,7 +24,7 @@ struct RulesIOXMLStorage {
 	std::vector<MoveRule> tmp_move_rule;
 	std::map < int , std::string > PlayersData;
 	std::map < int , FigureData > FiguresData;
-	std::vector<Figure> SetFigures[2];
+	std::vector<FigureInfo> SetFiguresInfo[2];
 	std::map< int, std::vector<MoveRule> > myMoveRulesIO;
 };
 

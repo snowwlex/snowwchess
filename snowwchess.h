@@ -35,10 +35,13 @@ struct FigureData {
 };
 struct Move {
 	int player;
+	// id of figure
+	//promotion?
+	// mate, chess and stalemate or nothing
 	Position pos1;
 	Position pos2;
-	MoveType type;
-	inline Move(int _player, Position _pos1, Position _pos2,  MoveType _type): player(_player), pos1(_pos1), pos2(_pos2), type(_type) { }
+	int type;
+	inline Move(int _player, Position _pos1, Position _pos2,  int _type): player(_player), pos1(_pos1), pos2(_pos2), type(_type) { }
 	inline Move() { }
 };
 
@@ -46,11 +49,10 @@ struct MoveRule {
 	int delta_x;
 	int delta_y;
 	RuleType rule_type;
-	MoveType move_type;
+	int move_type;
 	int player;
-	int from_line;
-	inline MoveRule(int _deltax, int _deltay, RuleType _ruletype=DIRECTION, MoveType _movetype=(MoveType)(EAT + MOVE), int _player=(int)(WHITE+BLACK+1), int _fromline=-1) :
-	 delta_x(_deltax), delta_y(_deltay), rule_type(_ruletype), move_type(_movetype), player(_player), from_line(_fromline) { }
+	inline MoveRule(int _deltax, int _deltay, RuleType _ruletype=DIRECTION, int _movetype=(EAT | MOVE), int _player=(WHITE+BLACK+1)) :
+	 delta_x(_deltax), delta_y(_deltay), rule_type(_ruletype), move_type(_movetype), player(_player) { }
 };
 
 #endif /* SNOWWCHESS_H_ */

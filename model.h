@@ -8,25 +8,27 @@
 #ifndef MODEL_H_
 #define MODEL_H_
 
-//CLASSES
-class Board {
-	private:
-		const int myBufferSize;
-		int** myBoardArray;
-		int mySizeX, mySizeY;
-	public:
-		Board(int buffer=4); // 4 - размер буферной зоны
-		~Board();
-		void Init(int sizex, int sizey);
-		void Set(const std::vector<Figure>& figure_set);
-		int& operator() (int x,int y);
-};
 class Rules;
+
 class Model {
 	private:
 
+		class Board {
+			private:
+				const int myBufferSize;
+				int** myBoardArray;
+				int mySizeX, mySizeY;
+			public:
+				Board(int buffer=4); // 4 - размер буферной зоны
+				~Board();
+				void Init(int sizex, int sizey);
+				void Set(const Figure& figure);
+				int& operator() (int x,int y);
+		};
+
 		// для unmove:
 		Figure erased, moved;
+		void Unmove(Move move);
 
 		Board myBoard;
 		Rules* myRules;
@@ -36,7 +38,7 @@ class Model {
 		std::vector<Figure> mySetFigures[2];
 
 		std::vector<Move> Moves(int player, std::vector<Figure>::iterator it_figure,  bool check=true);
-		void Unmove(Move move);
+
 		bool IsCheck(int player);
 
 		std::vector<Figure>::iterator findFigure(int player, Position find_pos);
@@ -62,7 +64,7 @@ class Model {
 		const FigureData& GetFigureData(int figure_id) const;
 		int GetCurrentPlayer() const;
 
-		void SetFigures(int player_id, const std::vector<Figure>& setfigures);
+		void SetFigure(int player_id, const Figure& figure);
 		void SetCurrentPlayer(int player_id);
 
 

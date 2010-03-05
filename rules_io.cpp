@@ -100,15 +100,13 @@ void XMLCALL RulesIOstartElementHandler(void *userData, const char *name, const 
 				}
 				storage->cur_figure_id = id;
 			} else if (tag == "position") {
-				Figure figure;
-				figure.id = storage->cur_figure_id;
-				figure.position.x = 0;
-				figure.position.y = 0;
+				RulesIOXMLStorage::FigureInfo figure_info;
+				figure_info.id = storage->cur_figure_id;
 				for (i = 0; atts[i]; i += 2)  {
 					attr = atts[i]; value = atts[i+1];
-					if (attr == "cell") {  figure.position.x = value[0]-'a'; figure.position.y = storage->boardsize_y - value[1] + '0' ; }
+					if (attr == "cell") {  figure_info.cell = value; }
 				}
-				storage->SetFigures[storage->cur_player_id].push_back(figure);
+				storage->SetFiguresInfo[storage->cur_player_id].push_back(figure_info);
 			}
 		}  else if (storage->section == "moves") {
 			if (tag == "figure") {
@@ -155,16 +153,28 @@ void RulesIO::UpdateRules() {
 	myRules->SetFirstTurn(myStorage.first_turn);
 	myRules->SetSpecialFigure(myStorage.special_figure);
 	myRules->SetBoardSize(myStorage.boardsize_x, myStorage.boardsize_y);
-	myRules->SetInitFigures(WHITE, myStorage.SetFigures[WHITE]);
-	myRules->SetInitFigures(BLACK, myStorage.SetFigures[BLACK]);
+
+	std::vector<RulesIOXMLStorage::FigureInfo>::iterator it;
+	Figure tmp_figure;
+	for (int i=0; i<2; ++i) {
+		for ( it=myStorage.SetFiguresInfo[i].begin(); it != myStorage.SetFiguresInfo[i].end(); ++it ) {
+			tmp_figure.id = it->id;
+			tmp_figure.position.x = it->cell[0]-'a';
+			tmp_figure.position.y = myStorage.boardsize_y - it->cell[1] + '0';
+			myRules->SetInitFigure(i,tmp_figure);
+		}
+	}
 	for (std::map < int , FigureData >::iterator it=myStorage.FiguresData.begin(); it!=myStorage.FiguresData.end(); ++it) {
 		myRules->SetFigureData(it->first, it->second);
 	}
 	for (std::map < int , std::string >::iterator it=myStorage.PlayersData.begin(); it!=myStorage.PlayersData.end(); ++it) {
 		myRules->SetPlayerData(it->first, it->second);
 	}
-	for (std::map< int, std::vector<MoveRule> >::iterator it=myStorage.myMoveRulesIO.begin(); it!=myStorage.myMoveRulesIO.end(); ++it) {
-		myRules->SetMoveRule(it->first, it->second);
+	for (std::map< int, std::vector<MoveRule> >::iterator itMap=myStorage.myMoveRulesIO.begin(); itMap!=myStorage.myMoveRulesIO.end(); ++itMap) {
+		for (std::vector<MoveRule>::iterator itVector = itMap->second.begin(); itVector!=itMap->second.end(); ++itVector) {
+			myRules->SetMoveRule(itMap->first,*itVector);
+		}
+
 	}
 }
 

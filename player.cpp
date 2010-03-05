@@ -74,7 +74,7 @@ PlayerCommand HumanPlayer::YourTurn(Move& move, GameMessage message) {
 			case KEY_F(4):
 				moves = model->Moves(myColor);
 				for ( it=moves.begin() ; it != moves.end(); it++ ) {
-					myBoardView->Highlight(it->pos2,it->type == EAT ? 11 : 12);
+					myBoardView->Highlight(it->pos2,(it->type & EAT) ? 11 : 12);
 				}
 				break;
 			case ' ':
