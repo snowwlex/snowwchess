@@ -35,8 +35,8 @@ class Rules {
 		void SetFirstTurn(int first_turn_id);
 		void SetBoardSize(int sizex, int sizey);
 		void SetRulesName(std::string rules_name);
-		void SetInitFigures(int player_id, const std::vector<Figure>& figures);
-		void SetMoveRule(int figure_id, const std::vector < MoveRule >&  _moverules);
+		void SetInitFigure(int player_id, const Figure& figure);
+		void SetMoveRule(int figure_id, const MoveRule& _moverule);
 		void SetFigureData(int figure_id, const FigureData& figuredata);
 };
 

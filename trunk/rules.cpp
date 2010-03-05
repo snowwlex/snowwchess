@@ -30,12 +30,12 @@ int Rules::GetFirstTurn() const {
 	return myFirstTurn;
 }
 
-void Rules::SetMoveRule(int figure_id, const std::vector < MoveRule >& _moverules) {
-	myMoveRules[figure_id] = _moverules;
+void Rules::SetMoveRule(int figure_id, const MoveRule& _moverule) {
+	myMoveRules[figure_id].push_back(_moverule);
 }
 
-void Rules::SetInitFigures(int player_id, const std::vector<Figure>& figures) {
-	myInitFigures[player_id] = figures;
+void Rules::SetInitFigure(int player_id, const Figure& figure) {
+	myInitFigures[player_id].push_back(figure);
 }
 void Rules::SetFigureData(int figure_id, const FigureData& figuredata) {
 	myFiguresData[figure_id] = figuredata;

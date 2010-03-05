@@ -66,7 +66,6 @@ const ModelIOXMLStorage& ModelIO::getStorage() const {
 void ModelIO::UpdateModel() {
 	int boardsize_y = myModel->GetBoardSizeY();
 
-	std::vector<Figure> SetFigures[2];
 	std::vector<ModelIOXMLStorage::FigureInfo>::iterator it;
 	Figure tmp_figure;
 
@@ -77,9 +76,8 @@ void ModelIO::UpdateModel() {
 			tmp_figure.id = it->id;
 			tmp_figure.position.x = it->cell[0]-'a';
 			tmp_figure.position.y = boardsize_y - it->cell[1] + '0';
-			SetFigures[i].push_back(tmp_figure);
+			myModel->SetFigure(i, tmp_figure);
 		}
-		myModel->SetFigures(i, SetFigures[i]);
 	}
 
 

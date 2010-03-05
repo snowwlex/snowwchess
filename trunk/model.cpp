@@ -42,11 +42,8 @@ Board::~Board() {
 	}
 }
 
-void Board::Set( const std::vector<Figure>& figure_set) {
-	std::vector<Figure>::const_iterator it;
-	for ( it=figure_set.begin() ; it != figure_set.end(); ++it ) {
-		operator()(it->position.x,it->position.y) = it->id;
-	}
+void Board::Set(const Figure& figure) {
+	operator()(figure.position.x,figure.position.y) = figure.id;
 }
 int& Board::operator() (int x,int y) {
 	return myBoardArray[x+myBufferSize][y+myBufferSize];
@@ -56,25 +53,23 @@ int& Board::operator() (int x,int y) {
 Model::Model(Rules* _myRules): myRules(_myRules) {  }
 
 void Model::Init(int mode) {
+	myBoard.Init(myRules->GetBoardSizeX(),myRules->GetBoardSizeY());
 	if (mode == 0) {
-		myBoard.Init(myRules->GetBoardSizeX(),myRules->GetBoardSizeY());
 		myCurrentPlayer = myRules->GetFirstTurn();
 		mySpecialFigure = myRules->GetSpecialFigure();
-		SetFigures(WHITE, myRules->GetInitFigures(WHITE));
-		SetFigures(BLACK, myRules->GetInitFigures(BLACK));
-		myBoard.Set(mySetFigures[WHITE]);
-		myBoard.Set(mySetFigures[BLACK]);
+
+		mySetFigures[WHITE] = myRules->GetInitFigures(WHITE);
+		mySetFigures[BLACK] = myRules->GetInitFigures(BLACK);
 	}
-	else {
-		myBoard.Init(myRules->GetBoardSizeX(),myRules->GetBoardSizeY());
-		mySpecialFigure = myRules->GetSpecialFigure();
-		myBoard.Set(mySetFigures[WHITE]);
-		myBoard.Set(mySetFigures[BLACK]);
+	for (int i=0; i < 2; ++i) {
+		for (std::vector<Figure>::iterator it = mySetFigures[i].begin(); it!=mySetFigures[i].end(); ++it) {
+			myBoard.Set(*it);
+		}
 	}
 }
 
-void Model::SetFigures(int player_id, const std::vector<Figure>& setfigures) {
-	mySetFigures[player_id] = setfigures;
+void Model::SetFigure(int player_id, const Figure& figure) {
+	mySetFigures[player_id].push_back(figure);
 }
 
 int Model::GetCurrentPlayer() const {
@@ -227,7 +222,7 @@ std::vector< Move > Model::Moves(int player, std::vector<Figure>::iterator it_fi
 	std::vector < MoveRule > curRules = myRules->GetMoveRules(it_figure->id);
 
 	for ( it_rule=curRules.begin() ; it_rule != curRules.end(); ++it_rule ) {
-		if  ( ((it_rule->player+1) & (player+1))  && (it_rule->from_line == -1 || it_rule->from_line == it_figure->position.y) ) 	{
+		if  ( ((it_rule->player+1) & (player+1)) ) 	{
 			cur_pos = it_figure->position;
 			do  {
 				accepted = false;
