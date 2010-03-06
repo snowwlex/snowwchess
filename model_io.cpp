@@ -47,9 +47,11 @@ void XMLCALL ModelIOstartElementHandler(void *userData, const char *name, const 
 	} else if (tag == "position") {
 		ModelIOXMLStorage::FigureInfo figure_info;
 		figure_info.id = storage->cur_figure_id;
+		figure_info.unmoved = false;
 		for (i = 0; atts[i]; i += 2)  {
 			attr = atts[i]; value = atts[i+1];
 			if (attr == "cell") {  figure_info.cell = value; }
+			if (attr == "unmoved") { figure_info.unmoved = true; }
 		}
 		storage->SetFiguresInfo[storage->cur_player_id].push_back(figure_info);
 	}
@@ -75,7 +77,8 @@ void ModelIO::UpdateModel() {
 		for ( it=myStorage.SetFiguresInfo[i].begin(); it != myStorage.SetFiguresInfo[i].end(); ++it ) {
 			tmp_figure.id = it->id;
 			tmp_figure.position.x = it->cell[0]-'a';
-			tmp_figure.position.y = boardsize_y - it->cell[1] + '0';
+			tmp_figure.position.y = boardsize_y - makeInt(it->cell.substr(1,2));
+			tmp_figure.unmoved = it->unmoved;
 			myModel->SetFigure(i, tmp_figure);
 		}
 	}
@@ -137,7 +140,9 @@ void ModelIO::Save(std::string file) {
 			}
 			posX = it->position.x+'a';
 			posY = myModel->GetBoardSizeY() - it->position.y+'0';
-			buffer_str = std::string(depth,TAB) + "<position cell='"+posX + posY +"'/>\n";
+			buffer_str = std::string(depth,TAB) + "<position cell='"+posX + posY +"'";
+			if (it->unmoved == true) buffer_str += " unmoved='1'";
+			buffer_str += "/>\n";
 			fputs(buffer_str.c_str(),outfile);
 		}
 		--depth;

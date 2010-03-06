@@ -11,22 +11,13 @@
 			<position cell='a1' unmoved='1'/>
 			<position cell='h1' unmoved='1'/>
 		</figure>
-		<figure id='4'>
-			<position cell='b1' unmoved='1'/>
-			<position cell='g1' unmoved='1'/>
-		</figure>
-		<figure id='5'>
-			<position cell='c1' unmoved='1'/>
-			<position cell='f1' unmoved='1'/>
-		</figure>
 		<figure id='6'>
-			<position cell='a4'/>
+			<position cell='a2' unmoved='1'/>
 			<position cell='b2' unmoved='1'/>
 			<position cell='c2' unmoved='1'/>
 			<position cell='d2' unmoved='1'/>
 			<position cell='e2' unmoved='1'/>
 			<position cell='f2' unmoved='1'/>
-			<position cell='g2' unmoved='1'/>
 			<position cell='h2' unmoved='1'/>
 		</figure>
 	</player>
@@ -41,22 +32,12 @@
 			<position cell='a8' unmoved='1'/>
 			<position cell='h8' unmoved='1'/>
 		</figure>
-		<figure id='4'>
-			<position cell='b8' unmoved='1'/>
-			<position cell='g8' unmoved='1'/>
-		</figure>
-		<figure id='5'>
-			<position cell='c8' unmoved='1'/>
-			<position cell='f8' unmoved='1'/>
-		</figure>
 		<figure id='6'>
 			<position cell='a7' unmoved='1'/>
-			<position cell='b7' unmoved='1'/>
 			<position cell='c7' unmoved='1'/>
 			<position cell='d7' unmoved='1'/>
 			<position cell='e7' unmoved='1'/>
 			<position cell='f7' unmoved='1'/>
-			<position cell='g5'/>
 			<position cell='h7' unmoved='1'/>
 		</figure>
 	</player>

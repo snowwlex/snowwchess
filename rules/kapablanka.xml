@@ -103,6 +103,10 @@
 			<jump dx="-1" dy="1"/>
 			<jump dx="1" dy="-1"/>
 			<jump dx="-1" dy="-1"/>
+			<castle dx="3" dy="0" on="i1" with="j1" to="h1" player="1"/>
+			<castle dx="-3" dy="0" on="c1" with="a1" to="d1" player="1"/>
+			<castle dx="-3" dy="0" on="c8" with="a8" to="d8" player="2"/>
+			<castle dx="3" dy="0"  on="i8" with="j8" to="h8" player="2"/>
 		</figure>
 		<figure id="2">
 			<direction dx="1" dy="1"/>
@@ -143,6 +147,12 @@
 			<jump dx="0" dy="-1" type="move" player="1"/>
 			<jump dx="1" dy="-1" type="eat" player="1"/>
 			<jump dx="-1" dy="-1" type="eat" player="1"/>
+			<jump dx="1" dy="-1" type="enpassant" player="1"/>
+			<jump dx="-1" dy="-1" type="enpassant" player="1"/>
+			<jump dx="1" dy="1" type="enpassant" player="2"/>
+			<jump dx="-1" dy="1" type="enpassant" player="2"/>
+			<direction dx="0" dy="-2" limit="1" type="longmove" player="1"/>
+			<direction dx="0" dy="2" limit="1" type="longmove" player="2"/>
 		</figure>
 		<figure id="7">
 			<direction dx="1" dy="0"/>

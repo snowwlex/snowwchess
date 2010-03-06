@@ -89,7 +89,8 @@ PlayerCommand HumanPlayer::YourTurn(Move& move, GameMessage message) {
 					move.pos2.x = cursorPos.x;
 					move.pos2.y = cursorPos.y;
 					move.player = myColor;
-					move.type = EAT_MOVE;
+					move.type = EAT | MOVE;
+					move.figure_id = model->findFigure(myColor,move.pos1)->id;
 					command = TURN;
 				}
 				break;
@@ -191,7 +192,7 @@ PlayerCommand HumanAltPlayer::YourTurn(Move& move, GameMessage message) {
 			move.pos2.x = x2;
 			move.pos2.y = y2;
 			move.player = myColor;
-			move.type = EAT_MOVE;
+			move.type = EAT | MOVE;
 			command = TURN;
 		}
 

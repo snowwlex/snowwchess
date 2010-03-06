@@ -15,20 +15,24 @@ class Model {
 
 		class Board {
 			private:
-				const int myBufferSize;
+				int myBufferSize;
 				int** myBoardArray;
 				int mySizeX, mySizeY;
 			public:
 				Board(int buffer=4); // 4 - размер буферной зоны
 				~Board();
+				Board(const Board& board);
+				Board& operator=(const Board& board);
+
 				void Init(int sizex, int sizey);
 				void Set(const Figure& figure);
 				int& operator() (int x,int y);
 		};
 
-		// для unmove:
-		Figure erased, moved;
-		void Unmove(Move move);
+		// для en passant хода
+		Position passant_cell;
+		Figure passant_figure;
+		bool en_passant;
 
 		Board myBoard;
 		Rules* myRules;
@@ -41,8 +45,9 @@ class Model {
 
 		bool IsCheck(int player);
 
-		std::vector<Figure>::iterator findFigure(int player, Position find_pos);
 		std::vector<Figure>::iterator findFigure(int player, int figure);
+
+		int getDirection(int dir) const;
 
 	public:
 
@@ -51,7 +56,7 @@ class Model {
 		void Init(int mode);
 
 		void Remove(Move move);
-		bool CanMove(Move move);
+		bool CanMove(Move move, int* movetype=0);
 		std::vector< Move > Moves(int player, Position pos1);
 		std::vector< Move > Moves(int player);
 
@@ -67,7 +72,7 @@ class Model {
 		void SetFigure(int player_id, const Figure& figure);
 		void SetCurrentPlayer(int player_id);
 
-
+		std::vector<Figure>::iterator findFigure(int player, Position find_pos);
 
 
 

@@ -12,6 +12,7 @@ struct ModelIOXMLStorage {
 	struct FigureInfo {
 		int id;
 		std::string cell;
+		bool unmoved;
 	};
 	int cur_player_id;
 	int cur_figure_id;

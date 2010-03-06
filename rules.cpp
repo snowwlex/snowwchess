@@ -68,3 +68,16 @@ int Rules::GetBoardSizeX() const {
 int Rules::GetBoardSizeY() const {
 	return myBoardSizeY;
 }
+
+const CastleRule& Rules::GetCastleRule(int x,int y, int player) const {
+	for (std::vector<CastleRule>::const_iterator it=myCastlesRules.begin(); it != myCastlesRules.end(); ++it) {
+		if (it->kingcell.x == x && it->kingcell.y == y && player == it->player) {
+			return *it;
+		}
+	}
+	return *(myCastlesRules.begin());
+}
+
+void Rules::SetCastleRule(const CastleRule& castlerule) {
+	myCastlesRules.push_back(castlerule);
+}
