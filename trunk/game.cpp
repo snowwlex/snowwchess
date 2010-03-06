@@ -56,6 +56,7 @@ void Game::Start(std::string file, int mode) {
 	players[BLACK] = new HumanPlayer(BLACK, &model, board_view, user_view[BLACK]);
 
 	int cur_player;
+	int movetype;
 	bool isEndGame, correct_move;
 	char buffer[1024];
 	std::string string;
@@ -93,13 +94,9 @@ void Game::Start(std::string file, int mode) {
 			do {
 				command = players[cur_player]->YourTurn(player_move, message);
 				if (command == TURN) {
-					if (player_move.pos1.x == 0 && player_move.pos2.y == 0) {
-						correct_move = true;
-					}	else if ( model.CanMove(player_move) == false) {
+					correct_move = model.CanMove(player_move,&movetype);
+					if ( correct_move == false) {
 						message = WRONG_MOVE;
-						correct_move = false;
-					} else {
-						correct_move = true;
 					}
 				}
 			}
@@ -108,6 +105,7 @@ void Game::Start(std::string file, int mode) {
 			message = NONE;
 			switch(command) {
 				case TURN:
+					player_move.type = movetype;
 					model.Remove(player_move);
 					model.SetCurrentPlayer( cur_player == WHITE ? BLACK : WHITE );
 					break;

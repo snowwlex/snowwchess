@@ -137,13 +137,13 @@ void BoardCLIView::Render(std::string msg) {
 
 	wclear(myWindow);
 
-	wprintw(myWindow, "  ");
+	wprintw(myWindow, "   ");
 	for (int i = 0; i < myModel->GetBoardSizeX(); ++i) {
 		wprintw(myWindow, "%c", i+'a');
 	}
 	wprintw(myWindow, "\n");
 	for (int i = 0; i < myModel->GetBoardSizeY(); ++i) {
-		wprintw(myWindow, "%d ", myModel->GetBoardSizeY()-i);
+		wprintw(myWindow, "%2d ", myModel->GetBoardSizeY()-i);
 		for (int j = 0; j < myModel->GetBoardSizeX(); ++j) {
 			color = ((i+j)%2 == 0) + 1 ;
 
@@ -151,9 +151,9 @@ void BoardCLIView::Render(std::string msg) {
 			wprintw(myWindow, " ");
 			wattroff(myWindow, COLOR_PAIR(color) | A_BOLD);
 		}
-		wprintw(myWindow, " %d\n",myModel->GetBoardSizeY()-i);
+		wprintw(myWindow, " %2d\n",myModel->GetBoardSizeY()-i);
 	}
-	wprintw(myWindow, "  ");
+	wprintw(myWindow, "   ");
 	for (int i = 0; i < myModel->GetBoardSizeX(); ++i) {
 		wprintw(myWindow, "%c", i+'a');
 	}
@@ -166,7 +166,7 @@ void BoardCLIView::Render(std::string msg) {
 	for ( it=myModel->getSetFigures(WHITE).begin(); it != myModel->getSetFigures(WHITE).end(); ++it ) {
 		color = ((it->position.x+it->position.y)%2 == 0) + 1 ;
 		wattron(myWindow, COLOR_PAIR(color) | A_BOLD);
-		wmove(myWindow,it->position.y+1,it->position.x+2);
+		wmove(myWindow,it->position.y+1,it->position.x+3);
 		wprintw(myWindow, "%c", myModel->GetFigureData(it->id).letter);
 		wattroff(myWindow, COLOR_PAIR(color) | A_BOLD);
 	}
@@ -174,7 +174,7 @@ void BoardCLIView::Render(std::string msg) {
 		color = ((it->position.x+it->position.y)%2 == 0) + 1 ;
 		color += 2; // для черных фигур
 		wattron(myWindow, COLOR_PAIR(color) | A_BOLD);
-		wmove(myWindow,it->position.y+1,it->position.x+2);
+		wmove(myWindow,it->position.y+1,it->position.x+3);
 		wprintw(myWindow, "%c", myModel->GetFigureData(it->id).letter);
 		wattroff(myWindow, COLOR_PAIR(color) | A_BOLD);
 	}
@@ -189,7 +189,7 @@ void BoardCLIView::Highlight(Position position, int color) {
 	if (figure_id > 0) {
 		figure_letter = myModel->GetFigureData(figure_id).letter;
 	}
-	mvwchgat(myWindow,position.y+1,position.x+2, 1, A_BOLD, color, NULL);
+	mvwchgat(myWindow,position.y+1,position.x+3, 1, A_BOLD, color, NULL);
 
 	wrefresh(myWindow);
 }

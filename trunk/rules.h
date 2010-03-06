@@ -14,6 +14,7 @@ class Rules {
 		std::map < int , FigureData > myFiguresData;
 		std::map <int, std::string> myPlayersData;
 		std::vector<Figure> myInitFigures[2];
+		std::vector<CastleRule> myCastlesRules;
 		std::string myRulesName;
 		int myFirstTurn;
 		int mySpecialFigure;
@@ -38,6 +39,9 @@ class Rules {
 		void SetInitFigure(int player_id, const Figure& figure);
 		void SetMoveRule(int figure_id, const MoveRule& _moverule);
 		void SetFigureData(int figure_id, const FigureData& figuredata);
+
+		const CastleRule& GetCastleRule(int dx,int dy, int player) const;
+		void SetCastleRule(const CastleRule& castlerule);
 };
 
 #endif /* RULES_H_ */

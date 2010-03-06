@@ -124,10 +124,34 @@ void XMLCALL RulesIOstartElementHandler(void *userData, const char *name, const 
 					attr = atts[i]; value = atts[i+1];
 					if (attr == "dx") {  moverule.delta_x = makeInt(value); }
 					if (attr == "dy") {  moverule.delta_y = makeInt(value); }
-					if (attr == "type") {  moverule.move_type = (value == "move" ? MOVE : EAT); }
+					if (attr == "type") {
+						moverule.move_type = 0;
+						if (value == "move") moverule.move_type = MOVE;
+						if (value == "eat") moverule.move_type = EAT;
+						if (value == "longmove") moverule.move_type = MOVE | LONGMOVE;
+						if (value == "enpassant") moverule.move_type = EAT | ENPASSANT;
+					}
 					if (attr == "player") { moverule.player = (value == "1" ? WHITE:BLACK); }
+					if (attr == "limit") { moverule.limit = makeInt(value); }
 				}
 				storage->tmp_move_rule.push_back(moverule);
+			} else	if (tag == "castle") {
+				MoveRule moverule(0,0);
+				RulesIOXMLStorage::CastleRuleInfo castlerule;
+				moverule.rule_type = DIRECTION;
+				for (i = 0; atts[i]; i += 2)  {
+					attr = atts[i]; value = atts[i+1];
+					if (attr == "dx") {  castlerule.delta_x = moverule.delta_x = makeInt(value); }
+					if (attr == "dy") {  castlerule.delta_y = moverule.delta_y = makeInt(value); }
+					if (attr == "player") { castlerule.player = moverule.player = (value == "1" ? WHITE:BLACK); }
+					if (attr == "on") { castlerule.kingcell = value; }
+					if (attr == "with") { castlerule.rookcell_start = value; }
+					if (attr == "to") {  castlerule.rookcell_end = value; }
+				}
+				moverule.limit = 1;
+				moverule.move_type = MOVE | CASTLE;
+				storage->tmp_move_rule.push_back(moverule);
+				storage->CastlesRules.push_back(castlerule);
 			}
 		}
 	}
@@ -160,10 +184,26 @@ void RulesIO::UpdateRules() {
 		for ( it=myStorage.SetFiguresInfo[i].begin(); it != myStorage.SetFiguresInfo[i].end(); ++it ) {
 			tmp_figure.id = it->id;
 			tmp_figure.position.x = it->cell[0]-'a';
-			tmp_figure.position.y = myStorage.boardsize_y - it->cell[1] + '0';
+			tmp_figure.position.y = myStorage.boardsize_y - makeInt(it->cell.substr(1,2));
+			tmp_figure.unmoved = true;
 			myRules->SetInitFigure(i,tmp_figure);
 		}
 	}
+
+	for (std::vector<RulesIOXMLStorage::CastleRuleInfo>::iterator it=myStorage.CastlesRules.begin(); it != myStorage.CastlesRules.end(); ++it) {
+		CastleRule cr;
+		cr.delta_x=it->delta_x;
+		cr.delta_y=it->delta_y;
+		cr.player=it->player;
+		cr.kingcell.x = it->kingcell[0]-'a';
+		tmp_figure.position.y = myStorage.boardsize_y - makeInt(it->kingcell.substr(1,2));
+		cr.rookcell_end.x=it->rookcell_end[0]-'a';
+		cr.rookcell_end.y= myStorage.boardsize_y - makeInt(it->rookcell_end.substr(1,2));
+		cr.rookcell_start.x=it->rookcell_start[0]-'a';
+		cr.rookcell_start.y= myStorage.boardsize_y - makeInt(it->rookcell_start.substr(1,2));
+		myRules->SetCastleRule(cr);
+	}
+
 	for (std::map < int , FigureData >::iterator it=myStorage.FiguresData.begin(); it!=myStorage.FiguresData.end(); ++it) {
 		myRules->SetFigureData(it->first, it->second);
 	}

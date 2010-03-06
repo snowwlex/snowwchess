@@ -13,6 +13,13 @@ struct RulesIOXMLStorage {
 		int id;
 		std::string cell;
 	};
+	struct CastleRuleInfo {
+		int delta_x;
+		int delta_y;
+		int player;
+		std::string  kingcell;
+		std::string rookcell_start,rookcell_end;
+	};
 	int cur_player_id;
 	int cur_figure_id;
 	int first_turn;
@@ -25,6 +32,7 @@ struct RulesIOXMLStorage {
 	std::map < int , std::string > PlayersData;
 	std::map < int , FigureData > FiguresData;
 	std::vector<FigureInfo> SetFiguresInfo[2];
+	std::vector<CastleRuleInfo> CastlesRules;
 	std::map< int, std::vector<MoveRule> > myMoveRulesIO;
 };
 
