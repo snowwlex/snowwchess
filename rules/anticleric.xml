@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules name="anticleric">
+	<board sizex="6" sizey="6"/>
+	<players turns="1">
+		<player id="1" name="WHITE"/>
+		<player id="2" name="BLACK"/>
+	</players>
+	<figures special="1">
+		<figure id="1" name="KING" letter="K"/>
+		<figure id="2" name="QUEEN" letter="Q"/>
+		<figure id="3" name="ROOK" letter="R"/>
+		<figure id="4" name="KNIGHT" letter="N"/>
+		<figure id="5" name="PAWN" letter="P"/>
+	</figures>
+	<positions>
+		<player id="1">
+			<figure id="1">
+				<position cell="d1"/>
+			</figure>
+			<figure id="2">
+				<position cell="c1"/>
+			</figure>
+			<figure id="3">
+				<position cell="a1"/>
+				<position cell="f1"/>
+			</figure>
+			<figure id="4">
+				<position cell="b1"/>
+				<position cell="e1"/>
+			</figure>
+			<figure id="5">
+				<position cell="a2"/>
+				<position cell="b2"/>
+				<position cell="c2"/>
+				<position cell="d2"/>
+				<position cell="e2"/>
+				<position cell="f2"/>
+			</figure>
+		</player>
+		<player id="2">
+			<figure id="1">
+				<position cell="d6"/>
+			</figure>
+			<figure id="2">
+				<position cell="c6"/>
+			</figure>
+			<figure id="3">
+				<position cell="a6"/>
+				<position cell="f6"/>
+			</figure>
+			<figure id="4">
+				<position cell="b6"/>
+				<position cell="e6"/>
+			</figure>
+			<figure id="5">
+				<position cell="a5"/>
+				<position cell="b5"/>
+				<position cell="c5"/>
+				<position cell="d5"/>
+				<position cell="e5"/>
+				<position cell="f5"/>
+			</figure>
+		</player>
+	</positions>
+	<moves>
+		<figure id="1">
+			<jump dx="1" dy="0"/>
+			<jump dx="-1" dy="0"/>
+			<jump dx="0" dy="1"/>
+			<jump dx="0" dy="-1"/>
+			<jump dx="1" dy="1"/>
+			<jump dx="-1" dy="1"/>
+			<jump dx="1" dy="-1"/>
+			<jump dx="-1" dy="-1"/>
+		</figure>
+		<figure id="2">
+			<direction dx="1" dy="1"/>
+			<direction dx="1" dy="-1"/>
+			<direction dx="-1" dy="1"/>
+			<direction dx="-1" dy="-1"/>
+			<direction dx="1" dy="0"/>
+			<direction dx="-1" dy="0"/>
+			<direction dx="0" dy="1"/>
+			<direction dx="0" dy="-1"/>
+		</figure>
+		<figure id="3">
+			<direction dx="1" dy="0"/>
+			<direction dx="-1" dy="0"/>
+			<direction dx="0" dy="1"/>
+			<direction dx="0" dy="-1"/>
+		</figure>
+		<figure id="4">
+			<jump dx="2" dy="1"/>
+			<jump dx="2" dy="-1"/>
+			<jump dx="-2" dy="1"/>
+			<jump dx="-2" dy="-1"/>
+			<jump dx="-1" dy="2"/>
+			<jump dx="1" dy="-2"/>
+			<jump dx="1" dy="2"/>
+			<jump dx="-1" dy="-2"/>
+		</figure>
+		<figure id="5">
+			<jump dx="0" dy="1" type="move" player="2"/>
+			<jump dx="1" dy="1" type="eat" player="2"/>
+			<jump dx="-1" dy="1" type="eat" player="2"/>
+			<jump dx="0" dy="-1" type="move" player="1"/>
+			<jump dx="1" dy="-1" type="eat" player="1"/>
+			<jump dx="-1" dy="-1" type="eat" player="1"/>
+		</figure>
+	</moves>
+</rules>
