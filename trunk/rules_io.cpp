@@ -129,7 +129,7 @@ void XMLCALL RulesIOstartElementHandler(void *userData, const char *name, const 
 						if (value == "move") moverule.move_type = MOVE;
 						if (value == "eat") moverule.move_type = EAT;
 						if (value == "longmove") moverule.move_type = MOVE | LONGMOVE;
-						if (value == "enpassant") moverule.move_type = EAT | ENPASSANT;
+						if (value == "enpassant") moverule.move_type = EAT | EN_PASSANT;
 					}
 					if (attr == "player") { moverule.player = (value == "1" ? WHITE:BLACK); }
 					if (attr == "limit") { moverule.limit = makeInt(value); }

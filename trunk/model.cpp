@@ -198,7 +198,14 @@ void Model::Remove(Move move) {
 
 	it_figure = findFigure(move.player, move.pos1);
 
-	if (move.type & EAT) {
+	if (move.type & EN_PASSANT) {
+			myBoard(passant_figure.position.x,passant_figure.position.y) = 0;
+			opponent = move.player == WHITE ? BLACK : WHITE;
+			it_opp = findFigure(opponent, passant_figure.position);
+			if ( it_opp != mySetFigures[opponent].end() ) {
+				mySetFigures[opponent].erase(it_opp); //
+			}
+	} else if (move.type & EAT) {
 		opponent = move.player == WHITE ? BLACK : WHITE;
 		it_opp = findFigure(opponent, move.pos2);
 		if ( it_opp != mySetFigures[opponent].end() ) {
@@ -206,13 +213,21 @@ void Model::Remove(Move move) {
 		}
 	}
 
-	/*
-	if (move.type & EN_PASSANT) {
-		passant_cell = Position(move)
-		Figure passant_figure =
-		en_passant = true;
+
+	if (move.type & LONGMOVE) {
+		longmove = true;
+		if (move.player == WHITE) {
+			passant_cell.x = move.pos2.x;
+			passant_cell.y = move.pos2.y+1;
+		} else {
+			passant_cell.x =move.pos2.x;
+			passant_cell.y = move.pos2.y-1;
+		}
+		 passant_figure.id = move.figure_id;
+		 passant_figure.position = move.pos2;
+	} else {
+		longmove = false;
 	}
-	*/
 
 	if (move.type & CASTLE) {
 		Move rookmove;
@@ -338,9 +353,12 @@ std::vector< Move > Model::Moves(int player, std::vector<Figure>::iterator it_fi
 						}
 					}
 
-					if ( myBoard(cur_pos.x,cur_pos.y) == 0 && (it_rule->move_type & ENPASSANT)) {
-
+					if ( myBoard(cur_pos.x,cur_pos.y) == 0 && (it_rule->move_type & EN_PASSANT)) {
 						accepted = false;
+						if (longmove == true && passant_cell == cur_pos) {
+							move.type = EAT | EN_PASSANT;
+							accepted = true;
+						}
 
 					}
 					if ( myBoard(cur_pos.x,cur_pos.y) != 0 ) {

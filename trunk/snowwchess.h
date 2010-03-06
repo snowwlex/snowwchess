@@ -11,7 +11,7 @@
 enum GameStatus {USUAL, CHECK, MATE, STALEMATE };
 enum PlayerColor { WHITE = 0, BLACK = 1, ALL = 2 };
 enum RuleType {	JUMP, DIRECTION };
-enum MoveType {	EAT = 1, MOVE = 2, LONGMOVE = 4, ENPASSANT=8, CASTLE=16 }; //CHECK = 4, MATE = 8};
+enum MoveType {	EAT = 1, MOVE = 2, LONGMOVE = 4, EN_PASSANT=8, CASTLE=16 }; //CHECK = 4, MATE = 8};
 enum PlayerCommand {NOTHING, TURN, SAVE, EXIT };
 enum GameMessage {NONE, WRONG_MOVE, GOT_CHECK, SAVED};
 
