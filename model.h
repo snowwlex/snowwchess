@@ -29,10 +29,10 @@ class Model {
 				int& operator() (int x,int y);
 		};
 
-		// для en passant хода
+		// для взятия на проходе
 		Position passant_cell;
 		Figure passant_figure;
-		bool en_passant;
+		bool longmove;
 
 		Board myBoard;
 		Rules* myRules;

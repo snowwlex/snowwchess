@@ -101,7 +101,7 @@ PlayerCommand HumanPlayer::YourTurn(Move& move, GameMessage message) {
 
 		if (mode == 1) {
 			for ( it=moves.begin() ; it != moves.end(); ++it ) {
-			myBoardView->Highlight(it->pos2,it->type == EAT ? 11 : 12);
+			myBoardView->Highlight(it->pos2,(it->type & EAT) ? 11 : 12);
 			}
 			myBoardView->Highlight(Position(move.pos1.x,move.pos1.y),13);
 		}
