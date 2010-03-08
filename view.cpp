@@ -14,42 +14,42 @@
 #include "model.h"
 #include "view.h"
 
-CLIView::CLIView(int height,int width,int y,int x, int _color, bool scroll, Model *model) {
+CLIView::CLIView(int height,int width,int y,int x, int color, bool scroll, Model *model) {
 	myWindow = newwin(height,width,y,x);
-	myColor = _color;
+	myColor = color;
 	myModel = model;
 	wbkgd(myWindow,COLOR_PAIR(myColor));
 	scrollok(myWindow, scroll);
 	wrefresh(myWindow);
 }
-void CLIView::Render(std::string msg) {
+void CLIView::render(std::string msg) {
 	if (msg != "") {
 		wprintw(myWindow,"%s",msg.c_str());
 	}
 	wrefresh(myWindow);
 }
-void CLIView::Show() {
+void CLIView::show() {
 	wbkgd(myWindow,COLOR_PAIR(myColor));
 	wrefresh(myWindow);
 	refresh();
 }
-void CLIView::Hide() {
+void CLIView::hide() {
 	wbkgd(myWindow,COLOR_PAIR(10));
 	wrefresh(myWindow);
 	refresh();
 }
-std::string CLIView::Ask(std::string msg) {
-	char input_buffer[1024];
+std::string CLIView::ask(std::string msg) {
+	char inputBuffer[1024];
 	curs_set(1);
 	wprintw(myWindow, "%s",msg.c_str());
 	wrefresh(myWindow);
-	wscanw(myWindow,"%s", input_buffer);
-	return std::string(input_buffer);
+	wscanw(myWindow,"%s", inputBuffer);
+	return std::string(inputBuffer);
 }
-void CLIView::Wait() {
+void CLIView::wait() {
 	wgetch(myWindow);
 }
-int CLIView::GetKey() {
+int CLIView::getKey() {
 	keypad(myWindow, TRUE);
 	curs_set(0);
 	noecho();
@@ -69,28 +69,28 @@ CLIView::~CLIView() {
 
 MainMenuCLIView::MainMenuCLIView(int height,int width,int y,int x, int _color, bool scroll, Model *model):
 								CLIView(height,width,y,x,_color,scroll, model) {
-	highlight = 0;
+	myHighlight = 0;
 	keypad(myWindow, TRUE);
-	choices[0] = "New Game";
-	choices[1] = "Load Game";
-	choices[2] = "Exit";
-	n_choices = 3;
+	myChoices[0] = "New Game";
+	myChoices[1] = "Load Game";
+	myChoices[2] = "Exit";
+	nChoices = 3;
 }
 
-void MainMenuCLIView::Render(std::string msg) {
+void MainMenuCLIView::render(std::string msg) {
 	int x,y,i;
 	wclear(myWindow);
 	curs_set(0);
 	wprintw(myWindow,"--- Main Menu ---\n");
 
-	for(i = 0,x=2,y=2; i < n_choices; ++i){
-		if(highlight == i)	{
+	for(i = 0,x=2,y=2; i < nChoices; ++i){
+		if(myHighlight == i)	{
 			wattron(myWindow, A_REVERSE);
-			mvwprintw(myWindow, y, x, "  %s  ", choices[i].c_str());
+			mvwprintw(myWindow, y, x, "  %s  ", myChoices[i].c_str());
 			wattroff(myWindow, A_REVERSE);
 		}
 		else {
-			mvwprintw(myWindow, y, x, "  %s  ", choices[i].c_str());
+			mvwprintw(myWindow, y, x, "  %s  ", myChoices[i].c_str());
 
 		}
 		++y;
@@ -98,7 +98,7 @@ void MainMenuCLIView::Render(std::string msg) {
 	wrefresh(myWindow);
 }
 
-std::string MainMenuCLIView::Ask(std::string msg) {
+std::string MainMenuCLIView::ask(std::string msg) {
 	int choice = 0,c;
 	bool is_choiced = false;
 	while(is_choiced == false) {
@@ -106,55 +106,55 @@ std::string MainMenuCLIView::Ask(std::string msg) {
 		c = wgetch(myWindow);
 		switch(c)	{
 			case KEY_UP:
-				if(highlight == 0)
-					highlight = n_choices-1;
+				if(myHighlight == 0)
+					myHighlight = nChoices-1;
 				else
-					--highlight;
+					--myHighlight;
 				break;
 			case KEY_DOWN:
-				if(highlight == (n_choices-1))
-					highlight = 0;
+				if(myHighlight == (nChoices-1))
+					myHighlight = 0;
 				else
-					++highlight;
+					++myHighlight;
 				break;
 			case 10:
-				choice = highlight;
+				choice = myHighlight;
 				is_choiced = true;
 				break;
 			default:
 				break;
 		}
-		Render();
+		render();
 		echo();
 	}
 	return std::string(1,(char)(choice+'0'));
 }
 
 
-void BoardCLIView::Render(std::string msg) {
+void BoardCLIView::render(std::string msg) {
 
 	int color;
 
 	wclear(myWindow);
 
 	wprintw(myWindow, "   ");
-	for (int i = 0; i < myModel->GetBoardSizeX(); ++i) {
+	for (int i = 0; i < myModel->getBoardSizeX(); ++i) {
 		wprintw(myWindow, "%c", i+'a');
 	}
 	wprintw(myWindow, "\n");
-	for (int i = 0; i < myModel->GetBoardSizeY(); ++i) {
-		wprintw(myWindow, "%2d ", myModel->GetBoardSizeY()-i);
-		for (int j = 0; j < myModel->GetBoardSizeX(); ++j) {
+	for (int i = 0; i < myModel->getBoardSizeY(); ++i) {
+		wprintw(myWindow, "%2d ", myModel->getBoardSizeY()-i);
+		for (int j = 0; j < myModel->getBoardSizeX(); ++j) {
 			color = ((i+j)%2 == 0) + 1 ;
 
 			wattron(myWindow, COLOR_PAIR(color) | A_BOLD);
 			wprintw(myWindow, " ");
 			wattroff(myWindow, COLOR_PAIR(color) | A_BOLD);
 		}
-		wprintw(myWindow, " %2d\n",myModel->GetBoardSizeY()-i);
+		wprintw(myWindow, " %2d\n",myModel->getBoardSizeY()-i);
 	}
 	wprintw(myWindow, "   ");
-	for (int i = 0; i < myModel->GetBoardSizeX(); ++i) {
+	for (int i = 0; i < myModel->getBoardSizeX(); ++i) {
 		wprintw(myWindow, "%c", i+'a');
 	}
 	wprintw(myWindow, "\n");
@@ -164,18 +164,18 @@ void BoardCLIView::Render(std::string msg) {
 	std::vector<Figure>::const_iterator it;
 
 	for ( it=myModel->getSetFigures(WHITE).begin(); it != myModel->getSetFigures(WHITE).end(); ++it ) {
-		color = ((it->position.x+it->position.y)%2 == 0) + 1 ;
+		color = ((it->position.myX+it->position.myY)%2 == 0) + 1 ;
 		wattron(myWindow, COLOR_PAIR(color) | A_BOLD);
-		wmove(myWindow,it->position.y+1,it->position.x+3);
-		wprintw(myWindow, "%c", myModel->GetFigureData(it->id).letter);
+		wmove(myWindow,it->position.myY+1,it->position.myX+3);
+		wprintw(myWindow, "%c", myModel->getFigureData(it->id).letter);
 		wattroff(myWindow, COLOR_PAIR(color) | A_BOLD);
 	}
 	for ( it=myModel->getSetFigures(BLACK).begin(); it != myModel->getSetFigures(BLACK).end(); ++it ) {
-		color = ((it->position.x+it->position.y)%2 == 0) + 1 ;
+		color = ((it->position.myX+it->position.myY)%2 == 0) + 1 ;
 		color += 2; // для черных фигур
 		wattron(myWindow, COLOR_PAIR(color) | A_BOLD);
-		wmove(myWindow,it->position.y+1,it->position.x+3);
-		wprintw(myWindow, "%c", myModel->GetFigureData(it->id).letter);
+		wmove(myWindow,it->position.myY+1,it->position.myX+3);
+		wprintw(myWindow, "%c", myModel->getFigureData(it->id).letter);
 		wattroff(myWindow, COLOR_PAIR(color) | A_BOLD);
 	}
 
@@ -183,14 +183,8 @@ void BoardCLIView::Render(std::string msg) {
 
 }
 
-void BoardCLIView::Highlight(Position position, int color) {
-	int figure_id = myModel->GetBoard(position.x,position.y);
-	char figure_letter = ' ';
-	if (figure_id > 0) {
-		figure_letter = myModel->GetFigureData(figure_id).letter;
-	}
-	mvwchgat(myWindow,position.y+1,position.x+3, 1, A_BOLD, color, NULL);
-
+void BoardCLIView::highlight(Position position, int color) {
+	mvwchgat(myWindow,position.myY+1,position.myX+3, 1, A_BOLD, color, NULL);
 	wrefresh(myWindow);
 }
 

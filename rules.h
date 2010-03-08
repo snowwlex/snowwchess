@@ -21,27 +21,27 @@ class Rules {
 		int myBoardSizeX, myBoardSizeY;
 	public:
 
-		const std::vector < MoveRule >& GetMoveRules(int figure_id);
-		const FigureData& GetFigureData(int figure_id);
-		const std::vector<Figure>& GetInitFigures(int player_id) const;
-		std::string GetRulesName() const;
-		int GetFirstTurn() const;
-		std::string GetPlayerData(int player_id);
-		int GetSpecialFigure() const;
-		int GetBoardSizeX() const;
-		int GetBoardSizeY() const;
+		const std::vector < MoveRule >& getMoveRules(int figureId);
+		const FigureData& getFigureData(int figureId);
+		const std::vector<Figure>& getInitFigures(int playerId) const;
+		std::string getRulesName() const;
+		int getFirstTurn() const;
+		std::string getPlayerData(int playerId);
+		int getSpecialFigure() const;
+		int getBoardSizeX() const;
+		int getBoardSizeY() const;
 
-		void SetPlayerData(int player_id, std::string name);
-		void SetSpecialFigure(int figure_id);
-		void SetFirstTurn(int first_turn_id);
-		void SetBoardSize(int sizex, int sizey);
-		void SetRulesName(std::string rules_name);
-		void SetInitFigure(int player_id, const Figure& figure);
-		void SetMoveRule(int figure_id, const MoveRule& _moverule);
-		void SetFigureData(int figure_id, const FigureData& figuredata);
+		void setPlayerData(int playerId, std::string name);
+		void setSpecialFigure(int figureId);
+		void setFirstTurn(int firstTurnId);
+		void setBoardSize(int sizex, int sizey);
+		void setRulesName(std::string rulesName);
+		void setInitFigure(int playerId, const Figure& figure);
+		void setMoveRule(int figureId, const MoveRule& moverule);
+		void setFigureData(int figureId, const FigureData& figuredata);
 
-		const CastleRule& GetCastleRule(int dx,int dy, int player) const;
-		void SetCastleRule(const CastleRule& castlerule);
+		const CastleRule& getCastleRule(int dx,int dy, int player) const;
+		void setCastleRule(const CastleRule& castlerule);
 };
 
 #endif /* RULES_H_ */

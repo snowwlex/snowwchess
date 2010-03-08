@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rules name="grandchess">
+<rules name="grand">
 	<board sizex="10" sizey="10"/>
 	<players turns="1">
 		<player id="1" name="WHITE"/>
@@ -105,20 +105,20 @@
 			<jump dx="-1" dy="-1"/>
 		</figure>
 		<figure id="2">
-			<direction dx="1" dy="1"/>
-			<direction dx="1" dy="-1"/>
-			<direction dx="-1" dy="1"/>
-			<direction dx="-1" dy="-1"/>
-			<direction dx="1" dy="0"/>
-			<direction dx="-1" dy="0"/>
-			<direction dx="0" dy="1"/>
-			<direction dx="0" dy="-1"/>
+			<slide dx="1" dy="1"/>
+			<slide dx="1" dy="-1"/>
+			<slide dx="-1" dy="1"/>
+			<slide dx="-1" dy="-1"/>
+			<slide dx="1" dy="0"/>
+			<slide dx="-1" dy="0"/>
+			<slide dx="0" dy="1"/>
+			<slide dx="0" dy="-1"/>
 		</figure>
 		<figure id="3">
-			<direction dx="1" dy="0"/>
-			<direction dx="-1" dy="0"/>
-			<direction dx="0" dy="1"/>
-			<direction dx="0" dy="-1"/>
+			<slide dx="1" dy="0"/>
+			<slide dx="-1" dy="0"/>
+			<slide dx="0" dy="1"/>
+			<slide dx="0" dy="-1"/>
 		</figure>
 		<figure id="4">
 			<jump dx="2" dy="1"/>
@@ -131,26 +131,26 @@
 			<jump dx="-1" dy="-2"/>
 		</figure>
 		<figure id="5">
-			<direction dx="1" dy="1"/>
-			<direction dx="1" dy="-1"/>
-			<direction dx="-1" dy="1"/>
-			<direction dx="-1" dy="-1"/>
+			<slide dx="1" dy="1"/>
+			<slide dx="1" dy="-1"/>
+			<slide dx="-1" dy="1"/>
+			<slide dx="-1" dy="-1"/>
 		</figure>
 		<figure id="6">
 			<jump dx="0" dy="1" type="move" player="2"/>
-			<jump dx="1" dy="1" type="eat" player="2"/>
-			<jump dx="-1" dy="1" type="eat" player="2"/>
+			<jump dx="1" dy="1" type="capture" player="2"/>
+			<jump dx="-1" dy="1" type="capture" player="2"/>
 			<jump dx="0" dy="-1" type="move" player="1"/>
-			<jump dx="1" dy="-1" type="eat" player="1"/>
-			<jump dx="-1" dy="-1" type="eat" player="1"/>
-			<direction dx="0" dy="-2" limit="1" type="longmove" player="1"/>
-			<direction dx="0" dy="2" limit="1" type="longmove" player="2"/>
+			<jump dx="1" dy="-1" type="capture" player="1"/>
+			<jump dx="-1" dy="-1" type="capture" player="1"/>
+			<slide dx="0" dy="-2" limit="1" type="move" effect="longmove" player="1"/>
+			<slide dx="0" dy="2" limit="1" type="move" effect="longmove" player="2"/>
 		</figure>
 		<figure id="7">
-			<direction dx="1" dy="0"/>
-			<direction dx="-1" dy="0"/>
-			<direction dx="0" dy="1"/>
-			<direction dx="0" dy="-1"/>
+			<slide dx="1" dy="0"/>
+			<slide dx="-1" dy="0"/>
+			<slide dx="0" dy="1"/>
+			<slide dx="0" dy="-1"/>
 			<jump dx="2" dy="1"/>
 			<jump dx="2" dy="-1"/>
 			<jump dx="-2" dy="1"/>
@@ -161,10 +161,10 @@
 			<jump dx="-1" dy="-2"/>
 		</figure>
 		<figure id="8">
-			<direction dx="1" dy="1"/>
-			<direction dx="1" dy="-1"/>
-			<direction dx="-1" dy="1"/>
-			<direction dx="-1" dy="-1"/>
+			<slide dx="1" dy="1"/>
+			<slide dx="1" dy="-1"/>
+			<slide dx="-1" dy="1"/>
+			<slide dx="-1" dy="-1"/>
 			<jump dx="2" dy="1"/>
 			<jump dx="2" dy="-1"/>
 			<jump dx="-2" dy="1"/>
