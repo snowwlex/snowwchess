@@ -86,6 +86,7 @@ void XMLCALL rulesIOStartElementHandler(void *userData, const char *name, const 
 					if (attr == "name") {  figure_data.name = value; }
 					if (attr == "letter") {  figure_data.letter = value[0]; }
 					if (attr == "special") {  figure_data.special = true; }
+					if (attr == "explosion") {  if (value == "0") figure_data.explosion = false; }
 					storage->figuresData[id] = figure_data;
 				}
 
@@ -143,6 +144,7 @@ void XMLCALL rulesIOStartElementHandler(void *userData, const char *name, const 
 					if (attr == "effect") {
 						if (value == "longmove") moveRule.moveEffect =  LONGMOVE;
 						if (value =="castle") {  moveRule.moveEffect = CASTLE; }
+						if (value =="explosion") {  moveRule.moveEffect = EXPLOSION; }
 					}
 					if (attr == "player") { moveRule.player = (value == "1" ? WHITE:BLACK); }
 					if (attr == "limit") { moveRule.limit = makeInt(value); }

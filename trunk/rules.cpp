@@ -73,10 +73,10 @@ int Rules::getBoardSizeY() const {
 
 const CastleRule& Rules::getCastleRule(int x,int y, int player) const {
 	for (std::vector<CastleRule>::const_iterator it=myCastlesRules.begin(); it != myCastlesRules.end(); ++it) {
-		sprintf(buffer,"CastleRule: %d:%d =?= %d:%d pl=%d\n",x,y,it->kingCell.myX,it->kingCell.myY, it->player);
-		debugView->render(buffer);
+		//sprintf(buffer,"CastleRule: %d:%d =?= %d:%d pl=%d\n",x,y,it->kingCell.myX,it->kingCell.myY, it->player);
+		//debugView->render(buffer);
 		if (Position(x,y) == it->kingCell  && player == it->player) {
-			debugView->render("returning it\n");
+			//debugView->render("returning it\n");
 			return *it;
 		}
 	}

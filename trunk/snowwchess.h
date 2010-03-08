@@ -13,7 +13,7 @@ enum PlayerColor { WHITE = 0, BLACK = 1, ALL = 2 };
 
 enum RuleType {	JUMP, SLIDE };
 enum MoveType {	CAPTURE=1 , MOVE=2 , INPASSING=4 };
-enum MoveEffect { LONGMOVE=1, CASTLE=2, EXPLOSE=4 };
+enum MoveEffect { LONGMOVE=1, CASTLE=2, EXPLOSION=4 };
 
 enum PlayerCommand {NOTHING, TURN, SAVE, EXIT };
 enum GameMessage {NONE, WRONG_MOVE, GOT_CHECK, SAVED};
@@ -29,13 +29,15 @@ struct Figure {
 	int id;
 	Position position;
 	bool wasMoved;
-	inline Figure() { id=0; wasMoved = false; }
+	bool captured;
+	inline Figure() { id=0; wasMoved = false; captured = false;}
 };
 struct FigureData {
 	std::string name;
 	char letter;
 	bool special;
-	inline FigureData() { name=""; letter = 0; special=false;}
+	bool explosion;
+	inline FigureData() { name=""; letter = 0; special=false; explosion=true;}
 };
 struct Move {
 	int player;
