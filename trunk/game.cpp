@@ -20,7 +20,7 @@
 #include "player.h"
 
 
-void Game::Start(std::string file, int mode) {
+void Game::start(std::string file, int mode) {
 
 	Rules rules;
 	Model model(&rules);
@@ -29,62 +29,60 @@ void Game::Start(std::string file, int mode) {
 
 	if ( mode == 0) {
 		file = std::string("rules/") + file + std::string(".xml");
-		rules_io.Load(file);
-		rules_io.UpdateRules();
-		model.Init(0);
+		rules_io.load(file);
+		rules_io.updateRules();
+		model.init(0);
 	}
 	else {
 		file = std::string("saves/") + file + std::string(".xml");
-		model_io.Load(file);
-		file = std::string("rules/") + model_io.getStorage().rules_name + std::string(".xml");
-		rules_io.Load(file);
-		rules_io.UpdateRules();
-		model_io.UpdateModel();
-		model.Init(1);
+		model_io.load(file);
+		file = std::string("rules/") + model_io.getStorage().rulesName + std::string(".xml");
+		rules_io.load(file);
+		rules_io.updateRules();
+		model_io.updateModel();
+		model.init(1);
 	}
 
-	CLIView *choose_view;
-	CLIView *info_view = new CLIView(25, 30, 14,2,6, true);
-	BoardCLIView *board_view = new BoardCLIView(model.GetBoardSizeX()+2,model.GetBoardSizeY()+10,2,2,7, false, &model);
-	CLIView *user_view[2];
-	user_view[WHITE] = new CLIView(10,70,2,40,8,true);
-	user_view[BLACK] = new CLIView(10,70,13,40,9,true);
+	CLIView *infoView = new CLIView(25, 30, 14,2,6, true);
+	BoardCLIView *boardView = new BoardCLIView(model.getBoardSizeX()+2,model.getBoardSizeY()+10,2,2,7, false, &model);
+	CLIView *userView[2];
+	userView[WHITE] = new CLIView(10,70,2,40,8,true);
+	userView[BLACK] = new CLIView(10,70,13,40,9,true);
 
 
 	Player *players[2];
-	players[WHITE] = new HumanPlayer(WHITE, &model, board_view, user_view[WHITE]);
-	players[BLACK] = new HumanPlayer(BLACK, &model, board_view, user_view[BLACK]);
+	players[WHITE] = new HumanPlayer(WHITE, &model, boardView, userView[WHITE]);
+	players[BLACK] = new HumanPlayer(BLACK, &model, boardView, userView[BLACK]);
 
-	int cur_player;
-	int movetype;
-	bool isEndGame, correct_move;
+	int curPlayer;
+	bool isEndGame, isMoveCorrect;
 	char buffer[1024];
 	std::string string;
 	GameMessage message;
 	PlayerCommand command;
-	Move player_move;
+	Move playerMove;
 	GameStatus status;
 	message = NONE;
 	do {
-		cur_player = model.GetCurrentPlayer();
+		curPlayer = model.getCurrentPlayer();
 		isEndGame = false;
 
-		status = model.GetGameStatus(cur_player);
+		status = model.getGameStatus(curPlayer);
 		switch(status) {
 		case CHECK:
 			message = GOT_CHECK;
 			break;
 		case MATE:
 			isEndGame = true;
-			sprintf(buffer,"Player %s has got the MATE!", cur_player == WHITE ? "BLACK" : "WHITE");
-			info_view->Render(buffer);
-			info_view->Ask();
+			sprintf(buffer,"Player %s has got the MATE!", curPlayer == WHITE ? "BLACK" : "WHITE");
+			infoView->render(buffer);
+			infoView->ask();
 			break;
 		case STALEMATE:
 			isEndGame = true;
-			sprintf(buffer,"Player %s has got the STALEMATE!", cur_player == WHITE ? "BLACK" : "WHITE");
-			info_view->Render(buffer);
-			info_view->Ask();
+			sprintf(buffer,"Player %s has got the STALEMATE!", curPlayer == WHITE ? "BLACK" : "WHITE");
+			infoView->render(buffer);
+			infoView->ask();
 			break;
 		default:
 			break;
@@ -92,33 +90,32 @@ void Game::Start(std::string file, int mode) {
 
 		if (isEndGame == false) {
 			do {
-				command = players[cur_player]->YourTurn(player_move, message);
+				command = players[curPlayer]->makeTurn(playerMove, message);
 				if (command == TURN) {
-					correct_move = model.CanMove(player_move,&movetype);
-					if ( correct_move == false) {
+					isMoveCorrect = model.canMove(playerMove);
+					if ( isMoveCorrect == false) {
 						message = WRONG_MOVE;
 					}
 				}
 			}
-			while( command == TURN && correct_move == false );
+			while( command == TURN && isMoveCorrect == false );
 
 			message = NONE;
 			switch(command) {
 				case TURN:
-					player_move.type = movetype;
-					model.Remove(player_move);
-					model.SetCurrentPlayer( cur_player == WHITE ? BLACK : WHITE );
+					model.makeMove(playerMove);
+					model.setCurrentPlayer( curPlayer == WHITE ? BLACK : WHITE );
 					break;
 				case EXIT:
 					isEndGame = true;
 					break;
 				case SAVE:
-					choose_view = new CLIView(5,30,25,35,6);
-					choose_view->Render("Enter savename:\n");
-					string = choose_view->Ask("> ");
-					delete choose_view;
+					infoView = new CLIView(5,30,25,35,6);
+					infoView->render("Enter savename:\n");
+					string = infoView->ask("> ");
+					delete infoView;
 					string = std::string("saves/") + string + std::string(".xml");
-					model_io.Save(string);
+					model_io.save(string);
 					message = SAVED;
 					break;
 				default:
@@ -131,8 +128,8 @@ void Game::Start(std::string file, int mode) {
 	delete players[WHITE];
 	delete players[BLACK];
 
-	delete info_view;
-	delete board_view;
-	delete user_view[WHITE];
-	delete user_view[BLACK];
+	delete infoView;
+	delete boardView;
+	delete userView[WHITE];
+	delete userView[BLACK];
 }

@@ -12,72 +12,77 @@
 #include "snowwchess.h"
 #include "rules.h"
 
-void Rules::SetRulesName(std::string rules_name) {
-	myRulesName = rules_name;
+#include "view.h" // для debig view
+
+void Rules::setRulesName(std::string rulesName) {
+	myRulesName = rulesName;
 }
-std::string Rules::GetRulesName() const {
+std::string Rules::getRulesName() const {
 	return myRulesName;
 }
-void Rules::SetBoardSize(int sizex, int sizey) {
+void Rules::setBoardSize(int sizex, int sizey) {
 	myBoardSizeX = sizex;
 	myBoardSizeY = sizey;
 }
 
-void Rules::SetFirstTurn(int first_turn_id) {
-	myFirstTurn = first_turn_id;
+void Rules::setFirstTurn(int firstTurnId) {
+	myFirstTurn = firstTurnId;
 }
-int Rules::GetFirstTurn() const {
+int Rules::getFirstTurn() const {
 	return myFirstTurn;
 }
 
-void Rules::SetMoveRule(int figure_id, const MoveRule& _moverule) {
-	myMoveRules[figure_id].push_back(_moverule);
+void Rules::setMoveRule(int figureId, const MoveRule& moverule) {
+	myMoveRules[figureId].push_back(moverule);
 }
 
-void Rules::SetInitFigure(int player_id, const Figure& figure) {
-	myInitFigures[player_id].push_back(figure);
+void Rules::setInitFigure(int playerId, const Figure& figure) {
+	myInitFigures[playerId].push_back(figure);
 }
-void Rules::SetFigureData(int figure_id, const FigureData& figuredata) {
-	myFiguresData[figure_id] = figuredata;
+void Rules::setFigureData(int figureId, const FigureData& figureData) {
+	myFiguresData[figureId] = figureData;
 }
-const std::vector<Figure>& Rules::GetInitFigures(int player_id) const {
-	return myInitFigures[player_id];
+const std::vector<Figure>& Rules::getInitFigures(int playerId) const {
+	return myInitFigures[playerId];
 }
-const FigureData& Rules::GetFigureData(int figure_id) {
-	return myFiguresData[figure_id];
+const FigureData& Rules::getFigureData(int figureId) {
+	return myFiguresData[figureId];
 }
-const std::vector < MoveRule >& Rules::GetMoveRules(int figure_id) {
-	return myMoveRules[figure_id];
+const std::vector < MoveRule >& Rules::getMoveRules(int figureId) {
+	return myMoveRules[figureId];
 }
 
-std::string Rules::GetPlayerData(int player_id) {
-	return myPlayersData[player_id];
+std::string Rules::getPlayerData(int playerId) {
+	return myPlayersData[playerId];
 }
-int Rules::GetSpecialFigure() const {
+int Rules::getSpecialFigure() const {
 	return mySpecialFigure;
 }
-void Rules::SetPlayerData(int player_id, std::string name) {
-      myPlayersData[player_id] = name;
+void Rules::setPlayerData(int playerId, std::string name) {
+      myPlayersData[playerId] = name;
 }
-void Rules::SetSpecialFigure(int figure_id) {
-       mySpecialFigure = figure_id;
+void Rules::setSpecialFigure(int figureId) {
+       mySpecialFigure = figureId;
 }
-int Rules::GetBoardSizeX() const {
+int Rules::getBoardSizeX() const {
 	return myBoardSizeX;
 }
-int Rules::GetBoardSizeY() const {
+int Rules::getBoardSizeY() const {
 	return myBoardSizeY;
 }
 
-const CastleRule& Rules::GetCastleRule(int x,int y, int player) const {
+const CastleRule& Rules::getCastleRule(int x,int y, int player) const {
 	for (std::vector<CastleRule>::const_iterator it=myCastlesRules.begin(); it != myCastlesRules.end(); ++it) {
-		if (it->kingcell.x == x && it->kingcell.y == y && player == it->player) {
+		sprintf(buffer,"CastleRule: %d:%d =?= %d:%d pl=%d\n",x,y,it->kingCell.myX,it->kingCell.myY, it->player);
+		debugView->render(buffer);
+		if (Position(x,y) == it->kingCell  && player == it->player) {
+			debugView->render("returning it\n");
 			return *it;
 		}
 	}
 	return *(myCastlesRules.begin());
 }
 
-void Rules::SetCastleRule(const CastleRule& castlerule) {
+void Rules::setCastleRule(const CastleRule& castlerule) {
 	myCastlesRules.push_back(castlerule);
 }

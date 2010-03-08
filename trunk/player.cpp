@@ -16,54 +16,54 @@
 #include "player.h"
 
 
-HumanPlayer::HumanPlayer(int _color, Model* m, BoardCLIView *board_view, CLIView * user_view): myColor(_color), model(m), myBoardView(board_view), myUserView(user_view) { cursorPos.x = 0; cursorPos.y=0;}
+HumanPlayer::HumanPlayer(int color, Model* model, BoardCLIView *boardView, CLIView * userView): myColor(color), myModel(model), myBoardView(boardView), myUserView(userView) { myCursorPos.myX = 0; myCursorPos.myY=0;}
 
-PlayerCommand HumanPlayer::YourTurn(Move& move, GameMessage message) {
+PlayerCommand HumanPlayer::makeTurn(Move& move, GameMessage message) {
 
 	PlayerCommand command;
-	std::string input_command;
+	std::string inputCommand;
 	std::vector< Move > moves;
-	std::vector < Move >::iterator it;
+	std::vector < Move >::iterator itMove;
 	int key,mode;
 	switch(message) {
 		case WRONG_MOVE:
-				myUserView->Render("Wrong move!\n");
+				myUserView->render("Wrong move!\n");
 				break;
 		case GOT_CHECK:
-				myUserView->Render("You've gotta check!\n");
+				myUserView->render("You've gotta check!\n");
 				break;
 		case SAVED:
-				myUserView->Render("Game saved\n");
+				myUserView->render("Game saved\n");
 				break;
 		default:
 				break;
 	}
 
 
-	myBoardView->Render();
-	myBoardView->Highlight(cursorPos,13);
+	myBoardView->render();
+	myBoardView->highlight(myCursorPos,13);
 
 	command = NOTHING;
 	mode = 0;
 	do {
 
 
-		key = myUserView->GetKey();
+		key = myUserView->getKey();
 
-		myBoardView->Render();
+		myBoardView->render();
 
 		switch(key) {
 			case KEY_UP:
-				if (cursorPos.y > 0) cursorPos.y -= 1;
+				if (myCursorPos.myY > 0) myCursorPos.myY -= 1;
 				break;
 			case KEY_DOWN:
-				if (cursorPos.y < model->GetBoardSizeY()-1 ) cursorPos.y += 1;
+				if (myCursorPos.myY < myModel->getBoardSizeY()-1 ) myCursorPos.myY += 1;
 				break;
 			case KEY_LEFT:
-				if (cursorPos.x > 0 ) cursorPos.x -= 1;
+				if (myCursorPos.myX > 0 ) myCursorPos.myX -= 1;
 				break;
 			case KEY_RIGHT:
-				if (cursorPos.x < model->GetBoardSizeX()-1 ) cursorPos.x += 1;
+				if (myCursorPos.myX < myModel->getBoardSizeX()-1 ) myCursorPos.myX += 1;
 				break;
 			case 27:
 				command = EXIT;
@@ -72,25 +72,25 @@ PlayerCommand HumanPlayer::YourTurn(Move& move, GameMessage message) {
 				command = SAVE;
 				break;
 			case KEY_F(4):
-				moves = model->Moves(myColor);
-				for ( it=moves.begin() ; it != moves.end(); it++ ) {
-					myBoardView->Highlight(it->pos2,(it->type & EAT) ? 11 : 12);
+				moves = myModel->moves(myColor);
+				for ( itMove=moves.begin() ; itMove != moves.end(); itMove++ ) {
+					myBoardView->highlight(itMove->pos2,(itMove->type & MOVE) ? 12 : 11);
 				}
 				break;
 			case ' ':
 				if (mode == 0) {
-					move.pos1.x = cursorPos.x;
-					move.pos1.y = cursorPos.y;
-					moves = model->Moves(myColor, Position(move.pos1.x,move.pos1.y));
+					move.pos1.myX = myCursorPos.myX;
+					move.pos1.myY = myCursorPos.myY;
+					moves = myModel->moves(myColor, Position(move.pos1.myX,move.pos1.myY));
 					mode = 1;
-				} else if (cursorPos.x == move.pos1.x && cursorPos.y == move.pos1.y){
+				} else if (myCursorPos.myX == move.pos1.myX && myCursorPos.myY == move.pos1.myY){
 					mode = 0;
 				} else {
-					move.pos2.x = cursorPos.x;
-					move.pos2.y = cursorPos.y;
+					move.pos2.myX = myCursorPos.myX;
+					move.pos2.myY = myCursorPos.myY;
 					move.player = myColor;
-					move.type = EAT | MOVE;
-					move.figure_id = model->findFigure(myColor,move.pos1)->id;
+					move.type = CAPTURE | MOVE;
+					move.figureId = myModel->findFigure(myColor,move.pos1)->id;
 					command = TURN;
 				}
 				break;
@@ -100,12 +100,12 @@ PlayerCommand HumanPlayer::YourTurn(Move& move, GameMessage message) {
 
 
 		if (mode == 1) {
-			for ( it=moves.begin() ; it != moves.end(); ++it ) {
-			myBoardView->Highlight(it->pos2,(it->type & EAT) ? 11 : 12);
+			for ( itMove=moves.begin() ; itMove != moves.end(); ++itMove ) {
+			myBoardView->highlight(itMove->pos2,(itMove->type & CAPTURE) ? 11 : 12);
 			}
-			myBoardView->Highlight(Position(move.pos1.x,move.pos1.y),13);
+			myBoardView->highlight(Position(move.pos1.myX,move.pos1.myY),13);
 		}
-		myBoardView->Highlight(cursorPos,13);
+		myBoardView->highlight(myCursorPos,13);
 
 
 
@@ -118,12 +118,12 @@ PlayerCommand HumanPlayer::YourTurn(Move& move, GameMessage message) {
 
 
 
-HumanAltPlayer::HumanAltPlayer(int _color, Model* m, BoardCLIView *board_view, CLIView * user_view): myColor(_color), model(m), myBoardView(board_view), myUserView(user_view) { }
+HumanAltPlayer::HumanAltPlayer(int _color, Model* m, BoardCLIView *board_view, CLIView * user_view): myColor(_color), myModel(m), myBoardView(board_view), myUserView(user_view) { }
 
-PlayerCommand HumanAltPlayer::YourTurn(Move& move, GameMessage message) {
+PlayerCommand HumanAltPlayer::makeTurn(Move& move, GameMessage message) {
 
 	PlayerCommand command;
-	std::string input_command;
+	std::string inputCommand;
 	int x1,y1, x2,y2;
 	std::vector< Move > moves;
 	char buffer[1024];
@@ -131,68 +131,68 @@ PlayerCommand HumanAltPlayer::YourTurn(Move& move, GameMessage message) {
 
 	switch(message) {
 		case WRONG_MOVE:
-				myUserView->Render("Wrong move!\n");
+				myUserView->render("Wrong move!\n");
 				break;
 		case GOT_CHECK:
-				myUserView->Render("You've gotta check!\n");
+				myUserView->render("You've gotta check!\n");
 				break;
 		case SAVED:
-				myUserView->Render("Game saved\n");
+				myUserView->render("Game saved\n");
 				break;
 		default:
 				break;
 	}
 
-	myBoardView->Render();
+	myBoardView->render();
 
 	command = NOTHING;
 	do {
 
-		input_command = myUserView->Ask("> ");
-		if (input_command.length() == 2) {
+		inputCommand = myUserView->ask("> ");
+		if (inputCommand.length() == 2) {
 
-			x1 = input_command[0]-'a';
-			y1 = model->GetBoardSizeY()-input_command[1]+'0';
+			x1 = inputCommand[0]-'a';
+			y1 = myModel->getBoardSizeY()-inputCommand[1]+'0';
 
 			moves.clear();
 
-			moves = model->Moves(myColor, Position(x1,y1));
-			sprintf(buffer, "Available moves for %c%c:\n", x1+'a',model->GetBoardSizeY()-y1+'0');
-			myUserView->Render(buffer);
+			moves = myModel->moves(myColor, Position(x1,y1));
+			sprintf(buffer, "Available moves for %c%c:\n", x1+'a',myModel->getBoardSizeY()-y1+'0');
+			myUserView->render(buffer);
 			std::vector < Move >::iterator it;
 			for ( it=moves.begin() ; it != moves.end(); it++ ) {
-				sprintf(buffer, "[%c%c-%c%c (%s)] ", x1+'a',model->GetBoardSizeY() - y1+'0',it->pos2.x+'a', model->GetBoardSizeY() - it->pos2.y+'0', it->type == EAT ? "eat" : "move" );
-				myUserView->Render(buffer);
+				sprintf(buffer, "[%c%c-%c%c (%s)] ", x1+'a',myModel->getBoardSizeY() - y1+'0',it->pos2.myX+'a', myModel->getBoardSizeY() - it->pos2.myY+'0', it->type == CAPTURE ? "eat" : "move" );
+				myUserView->render(buffer);
 			}
-			myUserView->Render("\n");
-		} else if (input_command == "moves") {
+			myUserView->render("\n");
+		} else if (inputCommand == "moves") {
 
 			moves.clear();
 
-			moves = model->Moves(myColor);
+			moves = myModel->moves(myColor);
 			sprintf(buffer, "\n");
-			myUserView->Render("Available moves for all\n");
+			myUserView->render("Available moves for all\n");
 			std::vector < Move >::iterator it;
 			for ( it=moves.begin() ; it != moves.end(); it++ ) {
-				sprintf(buffer, "[%c%c-%c%c (%s)] ", it->pos1.x+'a',model->GetBoardSizeY() - it->pos1.y+'0',it->pos2.x+'a', model->GetBoardSizeY() - it->pos2.y+'0', it->type == EAT ? "eat" : "move" );
-				myUserView->Render(buffer);
+				sprintf(buffer, "[%c%c-%c%c (%s)] ", it->pos1.myX+'a',myModel->getBoardSizeY() - it->pos1.myY+'0',it->pos2.myX+'a', myModel->getBoardSizeY() - it->pos2.myY+'0', it->type == CAPTURE ? "eat" : "move" );
+				myUserView->render(buffer);
 			}
-			myUserView->Render("\n");
-		} else if (input_command == "exit") {
+			myUserView->render("\n");
+		} else if (inputCommand == "exit") {
 			command = EXIT;
-		} else if (input_command == "save") {
+		} else if (inputCommand == "save") {
 					command = SAVE;
 		} else {
-			x1 = input_command[0]-'a';
-			y1 = model->GetBoardSizeY() - input_command[1] + '0';
-			x2 = input_command[3]-'a';
-			y2 = model->GetBoardSizeY() - input_command[4] + '0';
-			move.pos1.x = x1;
-			move.pos1.y = y1;
-			move.pos2.x = x2;
-			move.pos2.y = y2;
+			x1 = inputCommand[0]-'a';
+			y1 = myModel->getBoardSizeY() - inputCommand[1] + '0';
+			x2 = inputCommand[3]-'a';
+			y2 = myModel->getBoardSizeY() - inputCommand[4] + '0';
+			move.pos1.myX = x1;
+			move.pos1.myY = y1;
+			move.pos2.myX = x2;
+			move.pos2.myY = y2;
 			move.player = myColor;
-			move.type = EAT | MOVE;
+			move.type = CAPTURE | MOVE;
 			command = TURN;
 		}
 

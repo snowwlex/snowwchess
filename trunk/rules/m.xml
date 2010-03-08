@@ -60,8 +60,8 @@
 			<jump dx="-1" dy="1" player="2"/>
 			<jump dx="1" dy="-1" player="2"/>
 			<jump dx="-1" dy="-1" player="2"/>
-			<castle dx="-2" dy="0" on="c8" with="a8" to="d8" player="2"/>
-			<castle dx="2" dy="0"  on="g8" with="h8" to="f8" player="2"/>
+			<slide dx="-2" dy="0" type="move" effect="castle" limit="1" on="c8" with="a8" to="d8" player="2"/>
+			<slide dx="2" dy="0"  type="move" effect="castle" limit="1" on="g8" with="h8" to="f8" player="2"/>
 			<jump dx="2" dy="1" player="1"/>
 			<jump dx="2" dy="-1" player="1"/>
 			<jump dx="-2" dy="1" player="1"/>
@@ -70,30 +70,30 @@
 			<jump dx="1" dy="-2" player="1"/>
 			<jump dx="1" dy="2" player="1"/>
 			<jump dx="-1" dy="-2" player="1"/>
-			<direction dx="1" dy="1" player="1"/>
-			<direction dx="1" dy="-1" player="1"/>
-			<direction dx="-1" dy="1" player="1"/>
-			<direction dx="-1" dy="-1" player="1"/>
-			<direction dx="1" dy="0" player="1"/>
-			<direction dx="-1" dy="0" player="1"/>
-			<direction dx="0" dy="1" player="1"/>
-			<direction dx="0" dy="-1" player="1"/>
+			<slide dx="1" dy="1" player="1"/>
+			<slide dx="1" dy="-1" player="1"/>
+			<slide dx="-1" dy="1" player="1"/>
+			<slide dx="-1" dy="-1" player="1"/>
+			<slide dx="1" dy="0" player="1"/>
+			<slide dx="-1" dy="0" player="1"/>
+			<slide dx="0" dy="1" player="1"/>
+			<slide dx="0" dy="-1" player="1"/>
 		</figure>
 		<figure id="2">
-			<direction dx="1" dy="1"/>
-			<direction dx="1" dy="-1"/>
-			<direction dx="-1" dy="1"/>
-			<direction dx="-1" dy="-1"/>
-			<direction dx="1" dy="0"/>
-			<direction dx="-1" dy="0"/>
-			<direction dx="0" dy="1"/>
-			<direction dx="0" dy="-1"/>
+			<slide dx="1" dy="1"/>
+			<slide dx="1" dy="-1"/>
+			<slide dx="-1" dy="1"/>
+			<slide dx="-1" dy="-1"/>
+			<slide dx="1" dy="0"/>
+			<slide dx="-1" dy="0"/>
+			<slide dx="0" dy="1"/>
+			<slide dx="0" dy="-1"/>
 		</figure>
 		<figure id="3">
-			<direction dx="1" dy="0"/>
-			<direction dx="-1" dy="0"/>
-			<direction dx="0" dy="1"/>
-			<direction dx="0" dy="-1"/>
+			<slide dx="1" dy="0"/>
+			<slide dx="-1" dy="0"/>
+			<slide dx="0" dy="1"/>
+			<slide dx="0" dy="-1"/>
 		</figure>
 		<figure id="4">
 			<jump dx="2" dy="1"/>
@@ -106,26 +106,26 @@
 			<jump dx="-1" dy="-2"/>
 		</figure>
 		<figure id="5">
-			<direction dx="1" dy="1"/>
-			<direction dx="1" dy="-1"/>
-			<direction dx="-1" dy="1"/>
-			<direction dx="-1" dy="-1"/>
+			<slide dx="1" dy="1"/>
+			<slide dx="1" dy="-1"/>
+			<slide dx="-1" dy="1"/>
+			<slide dx="-1" dy="-1"/>
 		</figure>
 		<figure id="6">
 			<jump dx="0" dy="1" type="move" player="2"/>
-			<jump dx="1" dy="1" type="eat" player="2"/>
-			<jump dx="-1" dy="1" type="eat" player="2"/>
+			<jump dx="1" dy="1" type="capture" player="2"/>
+			<jump dx="-1" dy="1" type="capture" player="2"/>
 			<jump dx="0" dy="-1" type="move" player="1"/>
-			<jump dx="1" dy="-1" type="eat" player="1"/>
-			<jump dx="-1" dy="-1" type="eat" player="1"/>
+			<jump dx="1" dy="-1" type="capture" player="1"/>
+			<jump dx="-1" dy="-1" type="capture" player="1"/>
 
-			<jump dx="1" dy="-1" type="enpassant" player="1"/>
-			<jump dx="-1" dy="-1" type="enpassant" player="1"/>
-			<jump dx="1" dy="1" type="enpassant" player="2"/>
-			<jump dx="-1" dy="1" type="enpassant" player="2"/>
+			<jump dx="1" dy="-1" type="inpassing" player="1"/>
+			<jump dx="-1" dy="-1" type="inpassing" player="1"/>
+			<jump dx="1" dy="1" type="inpassing" player="2"/>
+			<jump dx="-1" dy="1" type="inpassing" player="2"/>
 
-			<direction dx="0" dy="-2" limit="1" type="longmove" player="1"/>
-			<direction dx="0" dy="2" limit="1" type="longmove" player="2"/>
+			<slide dx="0" dy="-2" limit="1" type="move" effect="longmove" player="1"/>
+			<slide dx="0" dy="2" limit="1" type="move" effect="longmove" player="2"/>
 		</figure>
 	</moves>
 </rules>

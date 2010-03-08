@@ -15,7 +15,7 @@
 #include "view.h"
 #include "game.h"
 
-void init_graphic() {
+void initGraphic() {
 	initscr();	start_color();
 	//белые фигуры
 	init_pair(1,COLOR_RED,COLOR_BLACK);
@@ -34,51 +34,52 @@ void init_graphic() {
 	init_pair(13,COLOR_BLACK,COLOR_YELLOW); // highlight
 }
 
-CLIView *debug_view;
+CLIView *debugView;
+char buffer[1024] = {' '};
 /*
 char buffer[1024];
 sprintf(buffer,"Highlighted: %d\n",highlight);
-debug_view->Render(buffer);
+debug_view->render(buffer);
 */
 
 int main(int argc, char* argv[]) {
-	init_graphic();
+	initGraphic();
 	std::string option,name;
 	int mode=0;
 	Game game;
-	CLIView *menu_view = new MainMenuCLIView(8,30,2,20,6);
-	CLIView *choose_view;
-	debug_view = new CLIView(15,70,24,40,11,true);
-	debug_view->Render("debug view\n");
+	CLIView *menuView = new MainMenuCLIView(8,30,2,20,6);
+	CLIView *chooseView;
+	debugView = new CLIView(15,70,24,40,11,true);
+	debugView->render("debug view\n");
 
 	do {
-		menu_view->Render();
-		option = menu_view->Ask();
+		menuView->render();
+		option = menuView->ask();
 		if (option == "0") {
-			choose_view = new CLIView(5,30,15,20,6);
-			choose_view->Render("Enter name of rules:\n");
-			name = choose_view->Ask("> ");
+			chooseView = new CLIView(5,30,15,20,6);
+			chooseView->render("Enter name of rules:\n");
+			name = chooseView->ask("> ");
 			mode = 0;
-			delete choose_view;
+			delete chooseView;
 		}
 		else if (option == "1") {
-			choose_view = new CLIView(5,30,15,20,6);
-			choose_view->Render("Enter savename:\n");
-			name = choose_view->Ask("> ");
+			chooseView = new CLIView(5,30,15,20,6);
+			chooseView->render("Enter savename:\n");
+			name = chooseView->ask("> ");
 			mode = 1;
-			delete choose_view;
+			delete chooseView;
 		}
 
 		if (option != "2") {
-			menu_view->Hide();
-			game.Start(name,mode);
-			menu_view->Show();
+			menuView->hide();
+			game.start(name,mode);
+			menuView->show();
 		}
 
 	} while(option != "2");
 
-	delete menu_view;
-	delete debug_view;
+	delete menuView;
+	delete debugView;
 	endwin();
 	return 0;
 }

@@ -11,7 +11,7 @@
 class Game {
 	private:
 	public:
-		void Start(std::string file, int mode);
+		void start(std::string file, int mode);
 };
 
 #endif /* GAME_H_ */

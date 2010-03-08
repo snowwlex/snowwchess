@@ -10,9 +10,9 @@
 #include "io.h"
 
 int makeInt(std::string value) {
-	char* end_ptr;
-	long int val = strtol(value.c_str(), &end_ptr, 10);
-	if (*end_ptr) { end_ptr++; }
+	char* endPtr;
+	long int val = strtol(value.c_str(), &endPtr, 10);
+	if (*endPtr) { endPtr++; }
 	return (int)val;
 
 }

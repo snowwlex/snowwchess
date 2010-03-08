@@ -17,7 +17,7 @@
 
 Model::Board::Board(int buffer): myBufferSize(buffer), myBoardArray(0)  { }
 
-void Model::Board::Init(int sizex, int sizey) {
+void Model::Board::init(int sizex, int sizey) {
 	mySizeX = sizex;
 	mySizeY = sizey;
 	myBoardArray = new int*[mySizeX+2*myBufferSize];
@@ -81,15 +81,16 @@ Model::Board& Model::Board::operator=(const Board& board) {
 	return *this;
 }
 
-void Model::Board::Set(const Figure& figure) {
-	operator()(figure.position.x,figure.position.y) = figure.id;
+void Model::Board::set(const Figure& figure) {
+	operator()(figure.position.myX,figure.position.myY) = figure.id;
 }
 int& Model::Board::operator() (int x,int y) {
 	if ( (x+myBufferSize)<0 || x>=(mySizeX+myBufferSize) ||
 	     (y+myBufferSize)<0 || y>=(mySizeY+myBufferSize) ){
-		char buffer[1024];
+
 		sprintf(buffer,"Exception. Out of border: %d %d\n",x,y);
-		debug_view->Render(buffer); debug_view->Wait();
+		debugView->render(buffer); debugView->wait();
+
 		return myBoardArray[myBufferSize][myBufferSize];
 	}
 
@@ -97,312 +98,383 @@ int& Model::Board::operator() (int x,int y) {
 }
 
 
-Model::Model(Rules* _myRules): myRules(_myRules) { en_passant = false;  }
+Model::Model(Rules* _myRules): myRules(_myRules) { longmove = false;  }
 
-void Model::Init(int mode) {
-	myBoard.Init(myRules->GetBoardSizeX(),myRules->GetBoardSizeY());
+void Model::init(int mode) {
+	myBoard.init(myRules->getBoardSizeX(),myRules->getBoardSizeY());
 	if (mode == 0) {
-		myCurrentPlayer = myRules->GetFirstTurn();
-		mySpecialFigure = myRules->GetSpecialFigure();
+		myCurrentPlayer = myRules->getFirstTurn();
+		mySpecialFigure = myRules->getSpecialFigure();
 
-		mySetFigures[WHITE] = myRules->GetInitFigures(WHITE);
-		mySetFigures[BLACK] = myRules->GetInitFigures(BLACK);
+		mySetFigures[WHITE] = myRules->getInitFigures(WHITE);
+		mySetFigures[BLACK] = myRules->getInitFigures(BLACK);
 	}
 	for (int i=0; i < 2; ++i) {
 		for (std::vector<Figure>::iterator it = mySetFigures[i].begin(); it!=mySetFigures[i].end(); ++it) {
-			myBoard.Set(*it);
+			myBoard.set(*it);
 		}
 	}
 }
 
-void Model::SetFigure(int player_id, const Figure& figure) {
-	mySetFigures[player_id].push_back(figure);
+void Model::setFigure(int playerId, const Figure& figure) {
+	mySetFigures[playerId].push_back(figure);
 }
 
-int Model::GetCurrentPlayer() const {
+int Model::getCurrentPlayer() const {
 	return myCurrentPlayer;
 }
-int Model::GetBoard(int x, int y) {
+int Model::getBoard(int x, int y) {
 	return myBoard(x,y);
 }
 
-void Model::SetCurrentPlayer(int player_id) {
-	myCurrentPlayer = player_id;
+void Model::setCurrentPlayer(int playerId) {
+	myCurrentPlayer = playerId;
 }
 
-int Model::GetBoardSizeX() const {
-	return myRules->GetBoardSizeX();
+int Model::getBoardSizeX() const {
+	return myRules->getBoardSizeX();
 }
-int Model::GetBoardSizeY() const {
-	return myRules->GetBoardSizeY();
+int Model::getBoardSizeY() const {
+	return myRules->getBoardSizeY();
 }
-std::string Model::GetRulesName() const {
-	return myRules->GetRulesName();
+std::string Model::getRulesName() const {
+	return myRules->getRulesName();
 }
-GameStatus Model::GetGameStatus(int player) {
-	std::vector< Move > av_moves;
-	bool is_check;
-	av_moves = Moves(player);
+GameStatus Model::getGameStatus(int player) {
 
-	char buffer[1024];
-	sprintf(buffer,"------------------------\n");	debug_view->Render(buffer);
+	std::vector< Move > avMoves;
+	bool check;
+	avMoves = moves(player);
 
-	for (std::vector<Move>::iterator it=av_moves.begin(); it!=av_moves.end(); ++it) {
-		sprintf(buffer,"[%c on %d:%d]",myRules->GetFigureData(it->figure_id).letter,it->pos2.x,it->pos2.y);	debug_view->Render(buffer);
+	sprintf(buffer,"------------------------\n");	debugView->render(buffer);
+
+	for (std::vector<Move>::iterator it=avMoves.begin(); it!=avMoves.end(); ++it) {
+		sprintf(buffer,"[%c on %d:%d]",myRules->getFigureData(it->figureId).letter,it->pos2.myX,it->pos2.myY);	debugView->render(buffer);
 	}
-	sprintf(buffer,"\n"); debug_view->Render(buffer);
+	sprintf(buffer,"\n"); debugView->render(buffer);
 
-	is_check = IsCheck(player);
+	check = isCheck(player);
 
-	if (is_check) {
-		sprintf(buffer,"Check!\n");	debug_view->Render(buffer);
+	if (check) {
+		sprintf(buffer,"Check!\n");	debugView->render(buffer);
 	}
 
-	if ( av_moves.size() == 0 && is_check == true) {
+	if ( avMoves.size() == 0 && check == true) {
 		return MATE;
-	} else if (av_moves.size() == 0) {
+	} else if (avMoves.size() == 0) {
 		return STALEMATE;
-	} else if (is_check == true) {
+	} else if (check == true) {
 		return CHECK;
 	}
 	return USUAL;
 }
 
 
-bool Model::IsCheck(int player) {
-	bool is_check;
-	std::vector<Move> av_moves;
-	std::vector<Figure>::iterator it_figure;
-	std::vector<Figure>::iterator it_SpecialFigure;
-	std::vector <Move>::iterator it_move;
-	int opponent = player == WHITE ? BLACK : WHITE;
-	it_SpecialFigure = findFigure(player, mySpecialFigure );
-	for (is_check = false, it_figure = mySetFigures[opponent].begin(); !is_check &&  it_figure != mySetFigures[opponent].end(); ++it_figure) {
-		av_moves = Moves(opponent, it_figure, false);
-		for (it_move = av_moves.begin(); !is_check && it_move != av_moves.end(); ++it_move) {
-			if (it_move->pos2.x == it_SpecialFigure->position.x &&  it_move->pos2.y == it_SpecialFigure->position.y) {
-				is_check = true;
+bool Model::isCheck(int player) {
+	bool check;
+	std::vector<Move> avMoves;
+	std::vector<Figure>::iterator itFigure;
+	std::vector<Figure>::iterator itSpecialFigure;
+	std::vector <Move>::iterator itMove;
+	int opponent = 1-player;
+	itSpecialFigure = findFigure(player, mySpecialFigure );
+	for (check = false, itFigure = mySetFigures[opponent].begin(); !check &&  itFigure != mySetFigures[opponent].end(); ++itFigure) {
+		avMoves = moves(opponent, *itFigure, false);
+		for (itMove = avMoves.begin(); !check && itMove != avMoves.end(); ++itMove) {
+			if (itMove->pos2 == itSpecialFigure->position) {
+				check = true;
 			}
 		}
 	}
-	return is_check;
+	return check;
 }
-void Model::Remove(Move move) {
 
-	std::vector<Figure>::iterator it_figure, it_opp;
-	int opponent;
+void Model::makeMoveInpassing(const Move& move) {
+	myBoard(passant_figure.position.myX,passant_figure.position.myY) = 0;
+	int opponent = 1 - move.player;
+	std::vector<Figure>::iterator itOpponent = findFigure(opponent, passant_figure.position);
+	if ( itOpponent != mySetFigures[opponent].end() ) {
+		mySetFigures[opponent].erase(itOpponent); //
+	}
+}
+void  Model::makeMoveCapture(const Move& move) {
+	int opponent = 1 - move.player;
+	std::vector<Figure>::iterator itOpponent = findFigure(opponent, move.pos2);
+	if ( itOpponent != mySetFigures[opponent].end() ) {
+		mySetFigures[opponent].erase(itOpponent); //
+	}
+}
 
-	char buffer[1024];
-	sprintf(buffer,"Removing %c '%d:%d' on '%d:%d'\n",myRules->GetFigureData(move.figure_id).letter,move.pos1.x,move.pos1.y,move.pos2.x,move.pos2.y);
-	debug_view->Render(buffer);
+void Model::makeMoveEffectLongMove(const Move& move) {
+	longmove = true;
+	if (move.player == WHITE) {
+		passant_cell.myX = move.pos2.myX;
+		passant_cell.myY = move.pos2.myY+1;
+	} else {
+		passant_cell.myX = move.pos2.myX;
+		passant_cell.myY = move.pos2.myY-1;
+	}
+	 passant_figure.id = move.figureId;
+	 passant_figure.position = move.pos2;
+}
 
-	it_figure = findFigure(move.player, move.pos1);
+void Model::makeMoveEffectCastle(const Move& move) {
+	//sprintf(buffer,"Making castle %d:%d pl=%d\n",move.pos2.myX,move.pos2.myY,move.player);
+	//debugView->render(buffer);
 
-	if (move.type & EN_PASSANT) {
-			myBoard(passant_figure.position.x,passant_figure.position.y) = 0;
-			opponent = move.player == WHITE ? BLACK : WHITE;
-			it_opp = findFigure(opponent, passant_figure.position);
-			if ( it_opp != mySetFigures[opponent].end() ) {
-				mySetFigures[opponent].erase(it_opp); //
-			}
-	} else if (move.type & EAT) {
-		opponent = move.player == WHITE ? BLACK : WHITE;
-		it_opp = findFigure(opponent, move.pos2);
-		if ( it_opp != mySetFigures[opponent].end() ) {
-			mySetFigures[opponent].erase(it_opp); //
-		}
+	Move rookMove;
+	CastleRule castleRule = myRules->getCastleRule(move.pos2.myX,move.pos2.myY,move.player);
+	rookMove.pos1 = castleRule.rookCellStart;
+	rookMove.pos2 = castleRule.rookCellEnd;
+	rookMove.player = move.player;
+	std::vector<Figure>::iterator itRook = findFigure(move.player, castleRule.rookCellStart);
+	rookMove.figureId = itRook->id;
+	rookMove.type = MOVE;
+
+	//sprintf(buffer,"[%c%c-%c%c fId=%d, pl=%d]\n",rookMove.pos1.myX+'a',myRules->getBoardSizeY() - rookMove.pos1.myY+'0',rookMove.pos2.myX+'a',myRules->getBoardSizeY() - rookMove.pos2.myY+'0',rookMove.figureId,rookMove.player);
+	//debugView->render(buffer);
+	makeMove(rookMove);
+}
+
+void Model::makeMove(Move move) {
+
+	std::vector<Figure>::iterator itFigure, itOpponent;
+
+
+	//sprintf(buffer,"Removing %c '%d:%d' on '%d:%d'\n",myRules->getFigureData(move.figureId).letter,move.pos1.myX,move.pos1.myY,move.pos2.myX,move.pos2.myY);
+	//debug_view->render(buffer);
+
+	itFigure = findFigure(move.player, move.pos1);
+
+	if (move.type ==INPASSING) {
+		makeMoveInpassing(move);
+	} else if (move.type == CAPTURE) {
+		makeMoveCapture(move);
 	}
 
 
-	if (move.type & LONGMOVE) {
-		longmove = true;
-		if (move.player == WHITE) {
-			passant_cell.x = move.pos2.x;
-			passant_cell.y = move.pos2.y+1;
-		} else {
-			passant_cell.x =move.pos2.x;
-			passant_cell.y = move.pos2.y-1;
-		}
-		 passant_figure.id = move.figure_id;
-		 passant_figure.position = move.pos2;
+	myBoard(move.pos2.myX,move.pos2.myY) = myBoard(move.pos1.myX,move.pos1.myY);
+	myBoard(move.pos1.myX,move.pos1.myY) = 0;
+
+	itFigure->position =  move.pos2;
+	itFigure->wasMoved = true;
+
+	if (move.effect == LONGMOVE) {
+		makeMoveEffectLongMove(move);
 	} else {
 		longmove = false;
 	}
 
-	if (move.type & CASTLE) {
-		Move rookmove;
-		CastleRule cr = myRules->GetCastleRule(move.pos2.x,move.pos2.y,move.player);
-		rookmove.pos1 = cr.rookcell_start;
-		rookmove.pos2 = cr.rookcell_end;
-		rookmove.player = move.player;
-		std::vector<Figure>::iterator it_rook = findFigure(move.player, cr.rookcell_start);
-		rookmove.figure_id = it_rook->id;
-		rookmove.type = MOVE;
-
-		Remove(rookmove);
+	if (move.effect == CASTLE) {
+		makeMoveEffectCastle(move);
 	}
 
-	myBoard(move.pos2.x,move.pos2.y) = myBoard(move.pos1.x,move.pos1.y);
-	myBoard(move.pos1.x,move.pos1.y) = 0;
 
-	it_figure->position.x = move.pos2.x;
-	it_figure->position.y = move.pos2.y;
-	it_figure->unmoved = false;
 }
 
-bool Model::CanMove(Move move, int* movetype_ptr) {
+std::vector< Move > Model::moves(int player, const Figure& figure,  bool needCheck) {
+	bool accepted;
+	int curLimit;
+	std::vector< Move > avMoves;
+	Move move;
+	std::vector<MoveRule>::iterator itRule;
+	Position curPos;
+	std::vector < MoveRule > curRules = myRules->getMoveRules(figure.id);
+
+	//sprintf(buffer,"-----AV MOVES---------------\n");
+	//debug_view->render(buffer);
+
+	for ( itRule=curRules.begin() ; itRule != curRules.end(); ++itRule ) {
+		if  ( itRule->player == ALL || itRule->player == player ) 	{
+			if (itRule->ruleType == JUMP) {
+				accepted = false;
+				move.pos1 = figure.position;
+				move.pos2.myX = move.pos1.myX + itRule->dx;
+				move.pos2.myY = move.pos1.myY + itRule->dy;
+				move.player = player;
+				accepted = checkPosition(*itRule,figure,move,needCheck);
+				if (accepted == true) {
+					avMoves.push_back(move);
+				}
+			} else if (itRule->ruleType == SLIDE) {
+				curLimit = 0;
+				move.pos1 = figure.position;
+				move.pos2 = move.pos1;
+				do  {
+					accepted = false;
+
+					if (checkIsFree(*itRule, move.pos2) == true) {
+						move.pos2.myX += itRule->dx;
+						move.pos2.myY += itRule->dy;
+						move.player = player;
+						accepted = checkPosition(*itRule,figure,move,needCheck);
+						if (accepted == true) {
+							avMoves.push_back(move);
+						}
+						++curLimit;
+					}
+				} while (myBoard(move.pos2.myX,move.pos2.myY) == 0 && (itRule->limit == 0 || curLimit < itRule->limit ) );
+			}
+		}
+	}
+	return avMoves;
+}
+
+bool Model::checkIsFree(MoveRule moveRule, Position curPos) {
+	bool isFree = true;
+	Position endPos;
+	int dx,dy;
+	endPos = curPos;
+	endPos.myX += moveRule.dx;
+	endPos.myY += moveRule.dy;
+	dx = getDirection(moveRule.dx);
+	dy = getDirection(moveRule.dy);
+	do {
+		curPos.myX += dx;
+		curPos.myY += dy;
+		if ( curPos != endPos &&  myBoard(curPos.myX,curPos.myY) != 0 ) {
+				isFree = false;
+		}
+	} while (curPos != endPos && isFree == true );
+	return isFree;
+}
+
+
+
+bool Model::checkPosition(MoveRule moveRule, const Figure& figure, Move& move, bool needCheck) {
+	//sprintf(buffer,"[%c%c, %d %d, l=%d, eff=%d, type=%d,pl=%d, %s] ",move.pos1.myX+'a',myRules->getBoardSizeY() - move.pos1.myY + '0',moveRule.dx,moveRule.dy,moveRule.limit,moveRule.moveEffect,moveRule.moveType,moveRule.player,moveRule.ruleType==JUMP?"JUMP":"SLIDE");
+	//debugView->render(buffer);
+	if (myBoard(move.pos2.myX,move.pos2.myY) == -1) {
+		return false;
+	}
+	Position curPos = move.pos2;
+	bool accepted = false;
+
+	move.figureId = figure.id;
+
+
+
+	if ( myBoard(move.pos2.myX,move.pos2.myY) == 0 && (moveRule.moveType & MOVE) ) {
+		accepted = checkMove(moveRule, figure, move);
+	} else if ( myBoard(curPos.myX,curPos.myY) > 0 && (moveRule.moveType & CAPTURE) ) {
+		accepted = checkCapture(moveRule, figure, move);
+	} else	if ( myBoard(curPos.myX,curPos.myY) == 0 && (moveRule.moveType == INPASSING)) {
+		accepted = checkInpassing(moveRule, figure, move);
+	}
+	if (accepted == true && needCheck == true) {
+		accepted = !checkIfCheck(moveRule, figure, move);
+	}
+	//sprintf(buffer," %s\n",accepted==true?"is accepted":"");
+	//debugView->render(buffer);
+	return accepted;
+}
+
+
+bool Model::checkLongMove(MoveRule moveRule, const Figure& figure, Move& move) {
+	if (figure.wasMoved == true) {
+		return false;
+	}
+	move.type = MOVE;
+	move.effect = LONGMOVE;
+	return true;
+}
+bool Model::checkCastle(MoveRule moveRule, const Figure& figure, Move& move) {
+
+	//sprintf(buffer,"[%c%c, %d %d, l=%d, eff=%d, type=%d,pl=%d, %s]\n",move.pos1.myX+'a',myRules->getBoardSizeY() - move.pos1.myY + '0',moveRule.dx,moveRule.dy,moveRule.limit,moveRule.moveEffect,moveRule.moveType,moveRule.player,moveRule.ruleType==JUMP?"JUMP":"SLIDE");
+	//debugView->render(buffer);
+
+	if (figure.wasMoved == true) {
+		return false;
+	}
+	CastleRule castleRule = myRules->getCastleRule(move.pos2.myX,move.pos2.myY,move.player);
+	std::vector<Figure>::iterator itRook = findFigure(move.player, castleRule.rookCellStart);
+	if (itRook->wasMoved == true) {
+		return false;
+	}
+	move.type = MOVE;
+	move.effect = CASTLE;
+
+	//sprintf(buffer," is accepted\n");
+	//debugView->render(buffer);
+	return true;
+}
+
+bool Model::checkCapture(MoveRule moveRule, const Figure& figure, Move& move) {
+	std::vector<Figure>::iterator itDestFigure = findFigure(move.player, move.pos2);
+	if ( itDestFigure != mySetFigures[move.player].end() ) {
+		return false;
+	}
+	move.type = CAPTURE;
+	return true;
+}
+bool Model::checkIfCheck(MoveRule moveRule, const Figure& figure, Move& move) {
+	Model m = *this;
+	m.makeMove(move);
+	return m.isCheck(move.player);
+}
+bool Model::checkMove(MoveRule moveRule, const Figure& figure, Move& move)  {
+	bool accepted;
+	if (moveRule.moveEffect == LONGMOVE) {
+		accepted = checkLongMove(moveRule, figure, move);
+	} else if (moveRule.moveEffect == CASTLE) {
+		accepted = checkCastle(moveRule, figure, move);
+	} else {
+		move.type = MOVE;
+		accepted = true;
+	}
+	return accepted;
+}
+bool Model::checkInpassing(MoveRule moveRule, const Figure& figure, Move& move) {
+	if (longmove != true || passant_cell != move.pos2) {
+		return false;
+	}
+	move.type = INPASSING;
+	return true;
+}
+
+bool Model::canMove(Move& move) {
 
 	bool accepted;
-	std::vector< Move > av_moves;
-	std::vector < Move >::iterator it;
+	std::vector< Move > avMoves;
+	std::vector < Move >::iterator itMove;
 
-	av_moves = Moves(move.player, move.pos1);
-	for ( accepted = false, it = av_moves.begin() ; !accepted && it != av_moves.end(); ++it ) {
-		if ( it->pos1.x == move.pos1.x && it->pos1.y == move.pos1.y && it->pos2.x == move.pos2.x && it->pos2.y == move.pos2.y && (it->type & move.type) ) {
-			if (movetype_ptr != 0) *movetype_ptr = it->type;
+	avMoves = moves(move.player, move.pos1);
+	for ( accepted = false, itMove = avMoves.begin() ; !accepted && itMove != avMoves.end(); ++itMove ) {
+		if ( itMove->pos1 == move.pos1 && itMove->pos2 == move.pos2) { // && (it->type & move.type) ) {
+			move.effect = itMove->effect;
+			move.type = itMove->type;
 			accepted = true;
 		}
 	}
 	return accepted;
 }
 
-std::vector< Move > Model::Moves(int player, Position pos1) {
+std::vector< Move > Model::moves(int player, Position pos1) {
 
-	std::vector< Move > av_moves;
-	std::vector<Figure>::iterator it_figure;
+	std::vector< Move > avMoves;
+	std::vector<Figure>::iterator itFigure;
 
-	it_figure = findFigure(player, pos1);
-	if (it_figure == mySetFigures[player].end()) {
-		return av_moves; // на исходной точке нет фигуры
+	itFigure = findFigure(player, pos1);
+	if (itFigure == mySetFigures[player].end()) {
+		return avMoves;
 	}
 
-	av_moves = Moves(player,it_figure);
-	return av_moves;
+	avMoves = moves(player,*itFigure);
+	return avMoves;
 }
 
-std::vector< Move > Model::Moves(int player, std::vector<Figure>::iterator it_figure,  bool check) {
-	bool accepted,free;
-	std::vector< Move > av_moves;
-	Move move;
-	int cur_limit;
-	int dx,dy;
-	std::vector < MoveRule >::iterator it_rule;
-	std::vector<Figure>::iterator it_dest_figure;
-	Position cur_pos, prev_pos;
-	std::vector < MoveRule > curRules = myRules->GetMoveRules(it_figure->id);
+std::vector< Move > Model::moves(int player) {
 
-	for ( it_rule=curRules.begin() ; it_rule != curRules.end(); ++it_rule ) {
-		cur_limit = 0;
-		if  ( ((it_rule->player+1) & (player+1)) ) 	{
-
-			cur_pos = it_figure->position;
-
-			dx = getDirection( it_rule->delta_x);
-			dy = getDirection( it_rule->delta_y);
-
-			do  {
-				accepted = false;
-				free = true;
-				prev_pos = cur_pos;
-				cur_pos.x += it_rule->delta_x;
-				cur_pos.y += it_rule->delta_y;
-
-				if (it_rule->rule_type != JUMP) {
-					Position check_pos = prev_pos;
-					do {
-						check_pos.x += dx;
-						check_pos.y += dy;
-						if ( check_pos != cur_pos) {
-							if ( myBoard(check_pos.x,check_pos.y) != 0 ) {
-								free = false;
-							}
-						}
-
-					} while (check_pos != cur_pos && free );
-				}
-
-
-				if (free && myBoard(cur_pos.x,cur_pos.y) != -1) {
-
-
-
-					move.figure_id = it_figure->id;
-					move.pos1 = it_figure->position;
-					move.pos2 = cur_pos;
-					move.player = player;
-					++cur_limit;
-					if ( myBoard(cur_pos.x,cur_pos.y) == 0 && (it_rule->move_type & MOVE) ) {
-						if (it_rule->move_type & LONGMOVE) {
-							if (it_figure->unmoved == true) {
-								move.type = MOVE | LONGMOVE;
-								accepted = true;
-							}
-						} else if (it_rule->move_type & CASTLE) {
-							if (it_figure->unmoved == true) {
-								CastleRule cr = myRules->GetCastleRule(cur_pos.x,cur_pos.y,player);
-								std::vector<Figure>::iterator it_rook = findFigure(player, cr.rookcell_start);
-								if (it_rook->unmoved == true) {
-									accepted = true;
-									move.type = MOVE | CASTLE;
-								}
-							}
-						}
-						else {
-							move.type = MOVE;
-							accepted = true;
-						}
-					}
-
-					if ( myBoard(cur_pos.x,cur_pos.y) == 0 && (it_rule->move_type & EN_PASSANT)) {
-						accepted = false;
-						if (longmove == true && passant_cell == cur_pos) {
-							move.type = EAT | EN_PASSANT;
-							accepted = true;
-						}
-
-					}
-					if ( myBoard(cur_pos.x,cur_pos.y) != 0 ) {
-						it_dest_figure = findFigure(player, cur_pos);
-						if (it_dest_figure == mySetFigures[player].end() && (it_rule->move_type & EAT) ) {
-							move.type = EAT;
-							accepted = true;
-						}
-					}
-					if(check == true && accepted == true) {
-						Model m = *this;
-						m.Remove(move);
-						if ( m.IsCheck(player) ) {
-							accepted = false;
-						}
-					}
-
-					if (accepted == true) {
-						av_moves.push_back(move);
-					}
-
-				}
-			} while (
-					myBoard(cur_pos.x,cur_pos.y) == 0 &&
-					it_rule->rule_type == DIRECTION &&
-					(it_rule->limit == 0 || cur_limit < it_rule->limit )
-					); }
-	}
-	return av_moves;
-}
-std::vector< Move > Model::Moves(int player) {
-
-	std::vector< Move > av_moves, all_moves;
-	std::vector<Figure>::iterator it_figure;
-	std::vector<Move>::iterator it_move;
-
-	for (it_figure = mySetFigures[player].begin();  it_figure != mySetFigures[player].end(); ++it_figure) {
-		av_moves = Moves(player, it_figure);
-		for (it_move = av_moves.begin(); it_move != av_moves.end(); ++it_move) {
-			all_moves.push_back(*it_move);
+	std::vector< Move > avMoves, allMoves;
+	std::vector<Figure>::iterator itFigure;
+	std::vector<Move>::iterator itMove;
+	for (itFigure = mySetFigures[player].begin();  itFigure != mySetFigures[player].end(); ++itFigure) {
+		avMoves = moves(player, *itFigure);
+		for (itMove = avMoves.begin(); itMove != avMoves.end(); ++itMove) {
+			allMoves.push_back(*itMove);
 		}
 	}
-
-	return all_moves;
+	return allMoves;
 }
 
 int Model::getDirection(int dir) const {
@@ -411,34 +483,33 @@ int Model::getDirection(int dir) const {
 	return 0;
 }
 
-std::vector<Figure>::iterator Model::findFigure(int player , Position find_pos) {
+std::vector<Figure>::iterator Model::findFigure(int player , Position findPos) {
 
-	std::vector < Figure >::iterator it_figure;
+	std::vector < Figure >::iterator itFigure;
 
-	for ( it_figure = mySetFigures[player].begin() ; it_figure != mySetFigures[player].end(); ++it_figure ) {
-		if (it_figure->position.x == find_pos.x && it_figure->position.y == find_pos.y)
+	for ( itFigure = mySetFigures[player].begin() ; itFigure != mySetFigures[player].end(); ++itFigure ) {
+		if (itFigure->position.myX == findPos.myX && itFigure->position.myY == findPos.myY)
 			break;
 	}
-	return it_figure;
+	return itFigure;
 
 }
 
-std::vector<Figure>::iterator Model::findFigure(int player , int figure_id) {
-	std::vector < Figure >::iterator it_figure;
-	for ( it_figure = mySetFigures[player].begin() ; it_figure != mySetFigures[player].end(); ++it_figure ) {
-		if (it_figure->id == figure_id)
+std::vector<Figure>::iterator Model::findFigure(int player , int figureId) {
+	std::vector < Figure >::iterator itFigure;
+	for ( itFigure = mySetFigures[player].begin() ; itFigure != mySetFigures[player].end(); ++itFigure ) {
+		if (itFigure->id == figureId)
 			break;
 	}
-	return it_figure;
-
+	return itFigure;
 }
 
 const std::vector<Figure>& Model::getSetFigures(int player) const {
 	return mySetFigures[player];
 }
 
-const FigureData& Model::GetFigureData(int figure_id) const {
-	return myRules->GetFigureData(figure_id);
+const FigureData& Model::getFigureData(int figureId) const {
+	return myRules->getFigureData(figureId);
 }
 
 

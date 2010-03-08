@@ -14,25 +14,25 @@ struct RulesIOXMLStorage {
 		std::string cell;
 	};
 	struct CastleRuleInfo {
-		int delta_x;
-		int delta_y;
+		int dx;
+		int dy;
 		int player;
-		std::string  kingcell;
-		std::string rookcell_start,rookcell_end;
+		std::string  kingCell;
+		std::string rookCellStart,rookCellEnd;
 	};
-	int cur_player_id;
-	int cur_figure_id;
-	int first_turn;
-	int special_figure;
-	std::string rules_name;
+	int curPlayerId;
+	int curFigureId;
+	int firstTurn;
+	int specialFigure;
+	std::string rulesName;
 	std::string section;
-	int boardsize_x;
-	int boardsize_y;
-	std::vector<MoveRule> tmp_move_rule;
-	std::map < int , std::string > PlayersData;
-	std::map < int , FigureData > FiguresData;
-	std::vector<FigureInfo> SetFiguresInfo[2];
-	std::vector<CastleRuleInfo> CastlesRules;
+	int boardSizeX;
+	int boardSizeY;
+	std::vector<MoveRule> tmpMoveRule;
+	std::map < int , std::string > playersData;
+	std::map < int , FigureData > figuresData;
+	std::vector<FigureInfo> setFiguresInfo[2];
+	std::vector<CastleRuleInfo> castleRules;
 	std::map< int, std::vector<MoveRule> > myMoveRulesIO;
 };
 
@@ -43,14 +43,14 @@ class RulesIO {
 		Rules *myRules;
 		RulesIOXMLStorage myStorage;
 	public:
-		RulesIO(Rules *_rules);
-		void Load(std::string file);
-		void UpdateRules();
+		RulesIO(Rules *rules);
+		void load(std::string file);
+		void updateRules();
 
 		const RulesIOXMLStorage& getStorage() const;
 
-		friend void RulesIOstartElementHandler(void *userData, const char *name, const char **atts);
-		friend void RulesIOendElementHandler(void *userData, const char *name);
+		friend void rulesIOStartElementHandler(void *userData, const char *name, const char **atts);
+		friend void rulesIOEndElementHandler(void *userData, const char *name);
 };
 
 
