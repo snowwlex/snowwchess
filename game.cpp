@@ -46,8 +46,8 @@ void Game::start(std::string file, int mode) {
 	CLIView *infoView = new CLIView(25, 30, 14,2,6, true);
 	BoardCLIView *boardView = new BoardCLIView(model.getBoardSizeX()+2,model.getBoardSizeY()+10,2,2,7, false, &model);
 	CLIView *userView[2];
-	userView[WHITE] = new CLIView(10,70,2,40,8,true);
-	userView[BLACK] = new CLIView(10,70,13,40,9,true);
+	userView[WHITE] = new CLIView(10,20,2,40,8,true);
+	userView[BLACK] = new CLIView(10,20,13,40,9,true);
 
 
 	Player *players[2];
@@ -67,7 +67,9 @@ void Game::start(std::string file, int mode) {
 		curPlayer = model.getCurrentPlayer();
 		isEndGame = false;
 
+		sprintf(buffer,"start() getting game status\n"); debugView->render(buffer);
 		status = model.getGameStatus(curPlayer);
+		sprintf(buffer,"start() game status received\n\n"); debugView->render(buffer);
 		switch(status) {
 		case CHECK:
 			message = GOT_CHECK;
@@ -92,7 +94,9 @@ void Game::start(std::string file, int mode) {
 			do {
 				command = players[curPlayer]->makeTurn(playerMove, message);
 				if (command == TURN) {
+					sprintf(buffer,"start() check if move is correct\n"); debugView->render(buffer);
 					isMoveCorrect = model.canMove(playerMove);
+					sprintf(buffer,"start() end of check if move is correct\n\n"); debugView->render(buffer);
 					if ( isMoveCorrect == false) {
 						message = WRONG_MOVE;
 					}

@@ -48,21 +48,29 @@ class Model {
 		bool isCheck(int player);
 
 		std::vector<Figure>::iterator findFigure(int player, int figure);
+		bool isFigureOnPosition(Position findPos, std::vector<Figure>::iterator& itFindFigure);
 
 		int getDirection(int dir) const;
 
 		bool checkIsFree(MoveRule moveRule, Position startPos);
 		bool checkPosition(MoveRule moveRule, const Figure& figure, Move& move, bool needCheck);
-		bool checkLongMove(MoveRule moveRule, const Figure& figure,  Move& move);
-		bool checkCastle(MoveRule moveRule, const Figure& figure, Move& move);
+
+		bool checkMove(MoveRule moveRule, const Figure& figure, Move& move);
 		bool checkCapture(MoveRule moveRule, const Figure& figure, Move& move);
 		bool checkInpassing(MoveRule moveRule, const Figure& figure, Move& move);
-		bool checkMove(MoveRule moveRule, const Figure& figure, Move& move);
 		bool checkIfCheck(MoveRule moveRule, const Figure& figure, Move& move);
+
+		bool checkLongMoveEffect(MoveRule moveRule, const Figure& figure,  Move& move);
+		bool checkCastleEffect(MoveRule moveRule, const Figure& figure, Move& move);
+		bool checkExplosionEffect(MoveRule moveRule, const Figure& figure, Move& move);
+
+
 
 
 		void makeMoveInpassing(const Move& move);
 		void makeMoveCapture(const Move& move);
+
+		void makeMoveEffectExplosion(const Move& move);
 		void makeMoveEffectLongMove(const Move& move);
 		void makeMoveEffectCastle(const Move& move);
 

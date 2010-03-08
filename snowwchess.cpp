@@ -37,9 +37,7 @@ void initGraphic() {
 CLIView *debugView;
 char buffer[1024] = {' '};
 /*
-char buffer[1024];
-sprintf(buffer,"Highlighted: %d\n",highlight);
-debug_view->render(buffer);
+sprintf(buffer,"Highlighted: %d\n",highlight); debugView->render(buffer);
 */
 
 int main(int argc, char* argv[]) {
@@ -49,7 +47,7 @@ int main(int argc, char* argv[]) {
 	Game game;
 	CLIView *menuView = new MainMenuCLIView(8,30,2,20,6);
 	CLIView *chooseView;
-	debugView = new CLIView(15,70,24,40,11,true);
+	debugView = new CLIView(38,80,2,70,11,true);
 	debugView->render("debug view\n");
 
 	do {

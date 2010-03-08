@@ -138,12 +138,16 @@ void ModelIO::save(std::string file) {
 				fputs(bufferStr.c_str(),outfile);
 				++depth;
 			}
-			posX = it->position.myX+'a';
-			posY = myModel->getBoardSizeY() - it->position.myY+'0';
-			bufferStr = std::string(depth,TAB) + "<position cell='"+posX + posY +"'";
-			if (it->wasMoved == true) bufferStr += " unmoved='1'";
-			bufferStr += "/>\n";
-			fputs(bufferStr.c_str(),outfile);
+
+			if (it->captured == false) {
+				posX = it->position.myX+'a';
+				posY = myModel->getBoardSizeY() - it->position.myY+'0';
+				bufferStr = std::string(depth,TAB) + "<position cell='"+posX + posY +"'";
+				if (it->wasMoved == true) bufferStr += " unmoved='1'";
+				bufferStr += "/>\n";
+				fputs(bufferStr.c_str(),outfile);
+			}
+
 		}
 		--depth;
 		bufferStr = std::string(depth,TAB) + "</figure>\n";
