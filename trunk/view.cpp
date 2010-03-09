@@ -33,6 +33,10 @@ void CLIView::show() {
 	wrefresh(myWindow);
 	refresh();
 }
+void CLIView::clear() {
+	wclear(myWindow);
+	wrefresh(myWindow);
+}
 void CLIView::hide() {
 	wbkgd(myWindow,COLOR_PAIR(10));
 	wrefresh(myWindow);

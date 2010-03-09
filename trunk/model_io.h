@@ -13,6 +13,7 @@ struct ModelIOXMLStorage {
 		int id;
 		std::string cell;
 		bool wasMoved;
+		bool captured;
 	};
 	int curPlayerId;
 	int curFigureId;

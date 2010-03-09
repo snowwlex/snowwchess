@@ -29,16 +29,7 @@ class HumanPlayer : public Player {
 		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE);
 };
 
-class HumanAltPlayer : public Player {
-	private:
-		int myColor;
-		Model *myModel;
-		BoardCLIView *myBoardView;
-		CLIView *myUserView;
-	public:
-		HumanAltPlayer(int color, Model* model, BoardCLIView *boardView, CLIView * userView);
-		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE);
-};
+
 
 
 #endif /* PLAYER_H_ */

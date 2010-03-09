@@ -48,10 +48,12 @@ void XMLCALL modelIOStartElementHandler(void *userData, const char *name, const 
 		ModelIOXMLStorage::FigureInfo figure_info;
 		figure_info.id = storage->curFigureId;
 		figure_info.wasMoved = false;
+		figure_info.captured = false;
 		for (i = 0; atts[i]; i += 2)  {
 			attr = atts[i]; value = atts[i+1];
 			if (attr == "cell") {  figure_info.cell = value; }
 			if (attr == "unmoved") { figure_info.wasMoved = false; }
+			if (attr == "captured") { figure_info.captured = true; }
 		}
 		storage->setFiguresInfo[storage->curPlayerId].push_back(figure_info);
 	}
@@ -79,6 +81,7 @@ void ModelIO::updateModel() {
 			tmpFigure.position.myX = it->cell[0]-'a';
 			tmpFigure.position.myY = boardSizeY - makeInt(it->cell.substr(1,2));
 			tmpFigure.wasMoved = it->wasMoved;
+			tmpFigure.captured = it->captured;
 			myModel->setFigure(i, tmpFigure);
 		}
 	}
@@ -139,14 +142,14 @@ void ModelIO::save(std::string file) {
 				++depth;
 			}
 
-			if (it->captured == false) {
-				posX = it->position.myX+'a';
-				posY = myModel->getBoardSizeY() - it->position.myY+'0';
-				bufferStr = std::string(depth,TAB) + "<position cell='"+posX + posY +"'";
-				if (it->wasMoved == true) bufferStr += " unmoved='1'";
-				bufferStr += "/>\n";
-				fputs(bufferStr.c_str(),outfile);
-			}
+			posX = it->position.myX+'a';
+			posY = myModel->getBoardSizeY() - it->position.myY+'0';
+			bufferStr = std::string(depth,TAB) + "<position cell='"+posX + posY +"'";
+			if (it->wasMoved == false) bufferStr += " unmoved='1'";
+			if (it->captured == true) bufferStr += " captured='1'";
+			bufferStr += "/>\n";
+			fputs(bufferStr.c_str(),outfile);
+
 
 		}
 		--depth;

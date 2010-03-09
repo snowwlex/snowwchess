@@ -11,8 +11,9 @@
 class Model;
 
 class CLIView {
-	protected:
+	public:
 		Model *myModel;
+	protected:
 		WINDOW *myWindow;
 		int myColor;
 	public:
@@ -20,6 +21,7 @@ class CLIView {
 		virtual void show();
 		virtual void hide();
 		virtual void wait();
+		virtual void clear();
 		virtual std::string ask(std::string msg = "");
 		virtual int getKey();
 		virtual void render(std::string msg = "");

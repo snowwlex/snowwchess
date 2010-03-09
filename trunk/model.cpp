@@ -150,7 +150,6 @@ GameStatus Model::getGameStatus(int player) {
 	std::vector< Move > avMoves;
 	bool check;
 	avMoves = moves(player);
-
 	check = isCheck(player);
 
 	if (check) {
@@ -298,8 +297,8 @@ std::vector< Move > Model::moves(int player, const Figure& figure,  bool needChe
 				move.player = player;
 				accepted = checkPosition(*itRule,figure,move,needCheck);
 				if (accepted == true) {
-					sprintf(buffer,"[JUMP  %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c']\n",move.pos1.myX+'a',myRules->getBoardSizeY() - move.pos1.myY + '0',move.pos2.myX+'a',myRules->getBoardSizeY() - move.pos2.myY + '0',move.effect,move.type,move.player,getFigureData(move.figureId).letter);
-					if (needCheck == true) debugView->render(buffer);
+					//sprintf(buffer,"[JUMP  %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c']\n",move.pos1.myX+'a',myRules->getBoardSizeY() - move.pos1.myY + '0',move.pos2.myX+'a',myRules->getBoardSizeY() - move.pos2.myY + '0',move.effect,move.type,move.player,getFigureData(move.figureId).letter);
+					//if (needCheck == true) debugView->render(buffer);
 					avMoves.push_back(move);
 				}
 			} else if (itRule->ruleType == SLIDE) {
@@ -315,8 +314,8 @@ std::vector< Move > Model::moves(int player, const Figure& figure,  bool needChe
 						move.player = player;
 						accepted = checkPosition(*itRule,figure,move,needCheck);
 						if (accepted == true) {
-							sprintf(buffer,"[SLIDE %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c']\n",move.pos1.myX+'a',myRules->getBoardSizeY() - move.pos1.myY + '0',move.pos2.myX+'a',myRules->getBoardSizeY() - move.pos2.myY + '0',move.effect,move.type,move.player,getFigureData(move.figureId).letter);
-							if (needCheck == true) debugView->render(buffer);
+							//sprintf(buffer,"[SLIDE %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c']\n",move.pos1.myX+'a',myRules->getBoardSizeY() - move.pos1.myY + '0',move.pos2.myX+'a',myRules->getBoardSizeY() - move.pos2.myY + '0',move.effect,move.type,move.player,getFigureData(move.figureId).letter);
+							//if (needCheck == true) debugView->render(buffer);
 							avMoves.push_back(move);
 						}
 						++curLimit;
@@ -507,7 +506,7 @@ std::vector<Figure>::iterator Model::findFigure(int player , Position findPos) {
 	std::vector < Figure >::iterator itFigure;
 
 	for ( itFigure = mySetFigures[player].begin() ; itFigure != mySetFigures[player].end(); ++itFigure ) {
-		if (itFigure->position == findPos)
+		if (itFigure->captured == false && itFigure->position == findPos)
 			break;
 	}
 	return itFigure;
@@ -543,6 +542,10 @@ const std::vector<Figure>& Model::getSetFigures(int player) const {
 
 const FigureData& Model::getFigureData(int figureId) const {
 	return myRules->getFigureData(figureId);
+}
+
+std::string Model::getPlayerData(int playerId) const {
+	return myRules->getPlayerData(playerId);
 }
 
 

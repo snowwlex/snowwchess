@@ -94,6 +94,7 @@ class Model {
 		const std::vector<Figure>& getSetFigures(int player) const;
 		const FigureData& getFigureData(int figureId) const;
 		int getCurrentPlayer() const;
+		std::string getPlayerData(int playerId) const;
 
 		void setFigure(int playerId, const Figure& figure);
 		void setCurrentPlayer(int playerId);
