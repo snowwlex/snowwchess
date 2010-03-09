@@ -77,17 +77,18 @@ void XMLCALL rulesIOStartElementHandler(void *userData, const char *name, const 
 			}
 		}else if (storage->section == "figures") {
 			if (tag == "figure") {
-				FigureData figure_data;
+				FigureData figureData;
 				int id = 0;
-				figure_data.special = false;
+				figureData.special = false;
 				for (i = 0; atts[i]; i += 2)  {
 					attr = atts[i]; value = atts[i+1];
 					if (attr == "id") {  id = makeInt(value); }
-					if (attr == "name") {  figure_data.name = value; }
-					if (attr == "letter") {  figure_data.letter = value[0]; }
-					if (attr == "special") {  figure_data.special = true; }
-					if (attr == "explosion") {  if (value == "0") figure_data.explosion = false; }
-					storage->figuresData[id] = figure_data;
+					if (attr == "name") {  figureData.name = value; }
+					if (attr == "letter") {  figureData.letter = value[0]; }
+					if (attr == "special") {  figureData.special = true; }
+					if (attr == "explosion") {  if (value == "0") figureData.explosion = false; }
+					if (attr == "weight") {  figureData.weight = makeInt(value);  }
+					storage->figuresData[id] = figureData;
 				}
 
 			}

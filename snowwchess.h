@@ -37,7 +37,8 @@ struct FigureData {
 	char letter;
 	bool special;
 	bool explosion;
-	inline FigureData() { name=""; letter = 0; special=false; explosion=true;}
+	int weight;
+	inline FigureData() { name=""; letter = 0; weight = 0; special=false; explosion=true;}
 };
 struct Move {
 	int player;
