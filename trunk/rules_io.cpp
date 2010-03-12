@@ -23,11 +23,9 @@
 RulesIO::RulesIO(Rules *rules): myRules(rules) { }
 
 
-void XMLCALL rulesIOStartElementHandler(void *userData, const char *name, const char **atts) {
+void rulesIOStartElementHandler(void *userData, const char *name, const char **atts) {
 	RulesIOXMLStorage *storage = (RulesIOXMLStorage *)userData;
 	int i;
-
-
 
 	std::string tag = name, attr, value;
 	if (tag == "rules") {
@@ -72,7 +70,7 @@ void XMLCALL rulesIOStartElementHandler(void *userData, const char *name, const 
 					attr = atts[i]; value = atts[i+1];
 					if (attr == "id") {  id = makeInt(value); }
 					if (attr == "name") { name  = value; }
-					storage->playersData[id] = name;
+					storage->playersData[id-1] = name;
 				}
 			}
 		}else if (storage->section == "figures") {
@@ -161,6 +159,17 @@ void XMLCALL rulesIOStartElementHandler(void *userData, const char *name, const 
 					castleRule.player = moveRule.player;
 					storage->castleRules.push_back(castleRule);
 				}
+			} else if (tag == "promotion") {
+				RulesIOXMLStorage::PromotionInfo promotionInfo;
+				promotionInfo.player = ALL;
+				for (i = 0; atts[i]; i += 2)  {
+					attr = atts[i]; value = atts[i+1];
+					if (attr == "horizontal") {  promotionInfo.horizontal = makeInt(value); }
+					if (attr == "figure") {  promotionInfo.promotionFigure = makeInt(value); }
+					if (attr == "player") { promotionInfo.player = (value == "1" ? WHITE:BLACK); }
+				}
+				promotionInfo.figure = storage->curFigureId;
+				storage->promotionData.push_back(promotionInfo);
 			}
 		}
 	}
@@ -213,6 +222,17 @@ void RulesIO::updateRules() {
 		myRules->setCastleRule(castleRule);
 	}
 
+	for (std::vector<RulesIOXMLStorage::PromotionInfo>::iterator itPromotion = myStorage.promotionData.begin();itPromotion !=  myStorage.promotionData.end(); ++itPromotion) {
+		if (itPromotion->player != ALL) {
+			myStorage.figuresData[itPromotion->figure].promoting[itPromotion->player].figure = itPromotion->promotionFigure;
+			myStorage.figuresData[itPromotion->figure].promoting[itPromotion->player].horizontal = myStorage.boardSizeY - itPromotion->horizontal;
+		} else {
+			for (int i=0; i<2; ++i) {
+				myStorage.figuresData[itPromotion->figure].promoting[i].figure = itPromotion->promotionFigure;
+				myStorage.figuresData[itPromotion->figure].promoting[i].horizontal = myStorage.boardSizeY - itPromotion->horizontal;
+			}
+		}
+	}
 	for (std::map < int , FigureData >::iterator it=myStorage.figuresData.begin(); it!=myStorage.figuresData.end(); ++it) {
 		myRules->setFigureData(it->first, it->second);
 	}

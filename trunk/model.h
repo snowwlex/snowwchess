@@ -65,7 +65,7 @@ class Model {
 		bool checkExplosionEffect(MoveRule moveRule, const Figure& figure, Move& move);
 
 
-
+		void makeMovePromotion(const Move& move);
 
 		void makeMoveInpassing(const Move& move);
 		void makeMoveCapture(const Move& move);

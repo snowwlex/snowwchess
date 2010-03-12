@@ -12,6 +12,14 @@ struct RulesIOXMLStorage {
 	struct FigureInfo {
 		int id;
 		std::string cell;
+		inline FigureInfo() {id=0; }
+	};
+	struct PromotionInfo {
+		int figure;
+		int horizontal;
+		int player;
+		int promotionFigure;
+		inline PromotionInfo () {figure = 0; horizontal = 0; player = 0; promotionFigure=0; }
 	};
 	struct CastleRuleInfo {
 		int dx;
@@ -19,6 +27,7 @@ struct RulesIOXMLStorage {
 		int player;
 		std::string  kingCell;
 		std::string rookCellStart,rookCellEnd;
+		inline CastleRuleInfo () {dx=0; dy=0; player=0; }
 	};
 	int curPlayerId;
 	int curFigureId;
@@ -28,6 +37,7 @@ struct RulesIOXMLStorage {
 	std::string section;
 	int boardSizeX;
 	int boardSizeY;
+	std::vector<PromotionInfo> promotionData;
 	std::vector<MoveRule> tmpMoveRule;
 	std::map < int , std::string > playersData;
 	std::map < int , FigureData > figuresData;

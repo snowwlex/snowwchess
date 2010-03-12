@@ -145,6 +145,9 @@
 			<jump dx="-1" dy="-1" type="capture" player="1"/>
 			<slide dx="0" dy="-2" limit="1" type="move" effect="longmove" player="1"/>
 			<slide dx="0" dy="2" limit="1" type="move" effect="longmove" player="2"/>
+			
+			<promotion horizontal="10" figure="2" player="1"/>
+			<promotion horizontal="1" figure="2" player="2"/>
 		</figure>
 		<figure id="7">
 			<slide dx="1" dy="0"/>

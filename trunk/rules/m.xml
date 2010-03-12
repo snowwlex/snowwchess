@@ -6,12 +6,12 @@
 		<player id="2" name="BLACK"/>
 	</players>
 	<figures special="1">
-		<figure id="1" name="KING" letter="K" special="1"/>
-		<figure id="2" name="QUEEN" letter="Q"/>
-		<figure id="3" name="ROOK" letter="R"/>
-		<figure id="4" name="KNIGHT" letter="N"/>
-		<figure id="5" name="BISHOP" letter="B"/>
-		<figure id="6" name="PAWN" letter="P"/>
+		<figure id="1" name="KING"   weight="18" letter="K" special="1"/>
+		<figure id="2" name="QUEEN"  weight="9"letter="Q"/>
+		<figure id="3" name="ROOK"   weight="5"letter="R"/>
+		<figure id="4" name="KNIGHT" weight="3"letter="N"/>
+		<figure id="5" name="BISHOP" weight="3" letter="B"/>
+		<figure id="6" name="PAWN"   weight="1"letter="P"/>
 	</figures>
 	<positions>
 		<player id="1">
@@ -126,6 +126,8 @@
 
 			<slide dx="0" dy="-2" limit="1" type="move" effect="longmove" player="1"/>
 			<slide dx="0" dy="2" limit="1" type="move" effect="longmove" player="2"/>
+
+			<promotion horizontal="1" figure="2" player="2"/>
 		</figure>
 	</moves>
 </rules>

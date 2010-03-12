@@ -18,10 +18,11 @@
 #include "player.h"
 #include "ai.h"
 
-AIPlayer::AIPlayer(int color, Model* model, BoardCLIView *boardView, CLIView * userView): myColor(color), myModel(model),
+AIPlayer::AIPlayer(int color, Model* model, BoardCLIView *boardView, CLIView * userView, int depth): myColor(color), myModel(model),
 					myBoardView(boardView), myUserView(userView) {
 	srand ( time(0) );
-	myDepth = 3;
+	myDepth = depth;
+	myTurnsCounter = 0;
 }
 
 PlayerCommand AIPlayer::makeTurn(Move& move, GameMessage message) {
@@ -39,7 +40,13 @@ PlayerCommand AIPlayer::makeTurn(Move& move, GameMessage message) {
 				break;
 	}
 
+	++myTurnsCounter;
+	//if (myDepth < 15) myDepth = (int)(myTurnsCounter / 4) ;
+	//if (myDepth == 0) myDepth = 1;
+
 	move = search();
+
+
 
 	sprintf(buffer, "My move: [%c%c-%c%c (%s+%d)]\n ", move.pos1.myX+'a',myModel->getBoardSizeY() - move.pos1.myY+'0',move.pos2.myX+'a', myModel->getBoardSizeY() - move.pos2.myY+'0', move.type == CAPTURE ? "capture" : "move", move.effect );
 	myUserView->render(buffer);
@@ -62,20 +69,24 @@ Move AIPlayer::search() {
 	for (scored = false, max = i = 0, itMove = moves.begin(); itMove != moves.end(); ++itMove, ++i) {
 		++myCounter;
 		score = searchRecurs(*myModel, *itMove, 1, 0);
+		//if (itMove->type == CAPTURE) score += 50;
 		sprintf(buffer,"[%c%c-%c%c, eff=%d, type=%d,pl=%d, '%c' SCORE %d]\n",itMove->pos1.myX+'a',myModel->getBoardSizeY() - itMove->pos1.myY + '0',itMove->pos2.myX+'a',myModel->getBoardSizeY() - itMove->pos2.myY + '0',itMove->effect,itMove->type,itMove->player,myModel->getFigureData(itMove->figureId).letter,score);
 		debugView->render(buffer);
 		if (scored == false) {
 			maxScore = score;
 			scored = true;
 			max = i;
-		} else if (score > maxScore){
+		} else if (score >= maxScore){
 			maxScore = score;
 			max = i;
 		}
+		/*} else if (score == maxScore && rand()%2 == 1) {
+			max = i;
+		}*/
 	}
 
 	myBoardView->myModel = myModel;
-	sprintf(buffer,"My counter = %d\n",myCounter); debugView->render(buffer);
+	sprintf(buffer,"My counter = %d, myDepth = %d, turns = %d\n",myCounter, myDepth, myTurnsCounter); debugView->render(buffer);
 	return moves[max];
 }
 
@@ -91,7 +102,7 @@ int AIPlayer::searchRecurs(Model m, Move move, int curDepth, int max ) {
 
 	m.makeMove(move);
 
-	if (curDepth == myDepth) {
+	if (curDepth >= myDepth) {
 		return sef(&m);
 	}
 
@@ -99,7 +110,7 @@ int AIPlayer::searchRecurs(Model m, Move move, int curDepth, int max ) {
 	moves = m.moves(curPlayerId);
 
 	if (moves.size() == 0) {
-		return sef(&m)-100;
+		return sef(&m);//-100;
 	}
 
 	for (scored = false, optScore=0, itMove = moves.begin(); itMove != moves.end(); ++itMove) {
@@ -110,12 +121,13 @@ int AIPlayer::searchRecurs(Model m, Move move, int curDepth, int max ) {
 			optScore = score;
 			scored = true;
 			bestMove = *itMove;
-			if (itMove->type == CAPTURE) optScore += 30;
+			//if (itMove->type == CAPTURE) optScore += 30;
 			//sprintf(buffer,"%s[SLIDE %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c' SCORE %d]\n",std::string(curDepth*2,' ').c_str(),itMove->pos1.myX+'a',myModel->getBoardSizeY() - itMove->pos1.myY + '0',itMove->pos2.myX+'a',myModel->getBoardSizeY() - itMove->pos2.myY + '0',itMove->effect,itMove->type,itMove->player,myModel->getFigureData(itMove->figureId).letter,score);
 			//debugView->render(buffer);
 		} else if ( (max == 1 && score > optScore) || (max == 0 && score < optScore) ) {
 				optScore = score;
-				if (itMove->type == CAPTURE) optScore += 30;
+				//if (itMove->type == CAPTURE && max == 1) optScore += (int)(100/curDepth);
+				//if (itMove->type == CAPTURE && max == 0) optScore -= (int)(100/curDepth);
 				bestMove = *itMove;
 				//sprintf(buffer,"%s[SLIDE %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c' SCORE %d]\n",std::string(curDepth*2,' ').c_str(),itMove->pos1.myX+'a',myModel->getBoardSizeY() - itMove->pos1.myY + '0',itMove->pos2.myX+'a',myModel->getBoardSizeY() - itMove->pos2.myY + '0',itMove->effect,itMove->type,itMove->player,myModel->getFigureData(itMove->figureId).letter,score);
 				//debugView->render(buffer);
