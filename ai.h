@@ -11,6 +11,7 @@
 class AIPlayer : public Player {
 	private:
 		int myColor;
+		int myTurnsCounter;
 		int myDepth;
 		int myCounter;
 		Model *myModel;
@@ -21,7 +22,7 @@ class AIPlayer : public Player {
 		int searchRecurs(Model m, Move move, int curDepth, int max);
 		int sef(Model *m) const;
 	public:
-		AIPlayer(int color, Model* m, BoardCLIView *boardView, CLIView * userView);
+		AIPlayer(int color, Model* m, BoardCLIView *boardView, CLIView * userView, int depth);
 		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE);
 };
 

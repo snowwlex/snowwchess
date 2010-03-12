@@ -137,6 +137,9 @@
 
 			<slide dx="0" dy="-2" limit="1" type="move" effect="longmove" player="1"/>
 			<slide dx="0" dy="2" limit="1" type="move" effect="longmove" player="2"/>
+			
+			<promotion horizontal="8" figure="2" player="1"/>
+			<promotion horizontal="1" figure="2" player="2"/>
 		</figure>
 	</moves>
 </rules>

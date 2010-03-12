@@ -13,7 +13,7 @@
 #include "rules.h"
 #include "model.h"
 
-#include "view.h" //for debug_view
+#include "view.h" //for debugView
 
 Model::Board::Board(int buffer): myBufferSize(buffer), myBoardArray(0)  { }
 
@@ -116,8 +116,10 @@ void Model::init(int mode) {
 		mySetFigures[BLACK] = myRules->getInitFigures(BLACK);
 	}
 	for (int i=0; i < 2; ++i) {
-		for (std::vector<Figure>::iterator it = mySetFigures[i].begin(); it!=mySetFigures[i].end(); ++it) {
-			myBoard.set(*it);
+		for (std::vector<Figure>::iterator itFigure = mySetFigures[i].begin(); itFigure!=mySetFigures[i].end(); ++itFigure) {
+			if (itFigure->captured == false) {
+				myBoard.set(*itFigure);
+			}
 		}
 	}
 }
@@ -147,6 +149,7 @@ std::string Model::getRulesName() const {
 	return myRules->getRulesName();
 }
 GameStatus Model::getGameStatus(int player) {
+
 	std::vector< Move > avMoves;
 	bool check;
 	avMoves = moves(player);
@@ -200,6 +203,13 @@ void  Model::makeMoveCapture(const Move& move) {
 	itOpponent->captured = true;
 }
 
+void  Model::makeMovePromotion(const Move& move) {
+	int promotionToFigure = myRules->getFigureData(move.figureId).promoting[move.player].figure;
+	std::vector<Figure>::iterator itFigure = findFigure(move.player, move.pos2);
+	itFigure->id = promotionToFigure ;
+	myBoard(move.pos2.myX,move.pos2.myY) = myRules->getFigureData(promotionToFigure).letter;
+}
+
 void Model::makeMoveEffectLongMove(const Move& move) {
 	longmove = true;
 	if (move.player == WHITE) {
@@ -244,22 +254,27 @@ void Model::makeMove(Move move) {
 
 	std::vector<Figure>::iterator itFigure, itOpponent;
 
-
 	itFigure = findFigure(move.player, move.pos1);
 
 	if (move.type ==INPASSING) {
 		makeMoveInpassing(move);
 	} else if (move.type == CAPTURE) {
-
 		makeMoveCapture(move);
 	}
 
+	itFigure->position =  move.pos2;
+	itFigure->wasMoved = true;
 
 	myBoard(move.pos2.myX,move.pos2.myY) = myBoard(move.pos1.myX,move.pos1.myY);
 	myBoard(move.pos1.myX,move.pos1.myY) = 0;
 
-	itFigure->position =  move.pos2;
-	itFigure->wasMoved = true;
+
+
+	if (myRules->getFigureData(itFigure->id).promoting[move.player].figure != 0 &&
+		myRules->getFigureData(itFigure->id).promoting[move.player].horizontal == move.pos2.myY) {
+		makeMovePromotion(move);
+	}
+
 
 	if (move.effect == LONGMOVE) {
 		makeMoveEffectLongMove(move);

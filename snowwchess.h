@@ -32,13 +32,20 @@ struct Figure {
 	bool captured;
 	inline Figure() { id=0; wasMoved = false; captured = false;}
 };
+struct Promoting {
+	int horizontal;
+	int figure;
+	inline Promoting() { horizontal = 0; figure = 0; }
+
+};
 struct FigureData {
 	std::string name;
 	char letter;
 	bool special;
 	bool explosion;
 	int weight;
-	inline FigureData() { name=""; letter = 0; weight = 0; special=false; explosion=true;}
+	Promoting promoting[2];
+	inline FigureData() { name=""; letter = 0; weight = 0; special=false; explosion=true; }
 };
 struct Move {
 	int player;

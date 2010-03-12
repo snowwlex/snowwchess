@@ -1,62 +1,66 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<positions rules='classic' turn='1'>
+<positions rules='classic' turn='2'>
 	<player id='1'>
 		<figure id='1'>
-			<position cell='e1'/>
+			<position cell='e1' unmoved='1'/>
 		</figure>
 		<figure id='2'>
-			<position cell='c2' unmoved='1'/>
+			<position cell='d2'/>
 		</figure>
 		<figure id='3'>
-			<position cell='a1'/>
-			<position cell='h1'/>
+			<position cell='a1' unmoved='1'/>
+			<position cell='h1' unmoved='1'/>
 		</figure>
 		<figure id='4'>
-			<position cell='a3' unmoved='1'/>
-			<position cell='g1'/>
+			<position cell='b1' unmoved='1'/>
+			<position cell='g1' unmoved='1'/>
 		</figure>
 		<figure id='5'>
-			<position cell='b2' unmoved='1'/>
-			<position cell='f1'/>
+			<position cell='c1' unmoved='1'/>
+			<position cell='f1' unmoved='1'/>
 		</figure>
 		<figure id='6'>
-			<position cell='a2'/>
-			<position cell='b4' unmoved='1'/>
-			<position cell='c3' unmoved='1'/>
-			<position cell='d2'/>
-			<position cell='e2'/>
-			<position cell='f2'/>
-			<position cell='g2'/>
-			<position cell='h2'/>
+			<position cell='a4'/>
+		</figure>
+		<figure id='2'>
+			<position cell='b8'/>
+		</figure>
+		<figure id='6'>
+			<position cell='c2' unmoved='1'/>
+			<position cell='d2' unmoved='1' captured='1'/>
+			<position cell='e3' captured='1'/>
+			<position cell='f2' unmoved='1'/>
+			<position cell='g2' unmoved='1'/>
+			<position cell='h2' unmoved='1'/>
 		</figure>
 	</player>
 	<player id='2'>
 		<figure id='1'>
-			<position cell='e8'/>
+			<position cell='e8' unmoved='1'/>
 		</figure>
 		<figure id='2'>
-			<position cell='c7' unmoved='1'/>
+			<position cell='d8'/>
 		</figure>
 		<figure id='3'>
-			<position cell='a8'/>
-			<position cell='h8'/>
+			<position cell='a8' unmoved='1'/>
+			<position cell='h8' unmoved='1'/>
 		</figure>
 		<figure id='4'>
-			<position cell='c6' unmoved='1'/>
-			<position cell='g8'/>
+			<position cell='a6'/>
+			<position cell='g8' unmoved='1'/>
 		</figure>
 		<figure id='5'>
-			<position cell='b7' unmoved='1'/>
-			<position cell='f8'/>
+			<position cell='c8' unmoved='1' captured='1'/>
+			<position cell='f8' unmoved='1'/>
 		</figure>
 		<figure id='6'>
-			<position cell='a7'/>
-			<position cell='b5' unmoved='1'/>
-			<position cell='c5' unmoved='1'/>
-			<position cell='d7'/>
-			<position cell='e7'/>
-			<position cell='f7'/>
-			<position cell='g7'/>
-			<position cell='h7'/>
+			<position cell='a7' unmoved='1'/>
+			<position cell='b7' unmoved='1' captured='1'/>
+			<position cell='c5' captured='1'/>
+			<position cell='d5'/>
+			<position cell='e7' unmoved='1'/>
+			<position cell='d2' captured='1'/>
+			<position cell='g7' unmoved='1'/>
+			<position cell='h7' unmoved='1'/>
 		</figure>
 	</player>

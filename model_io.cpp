@@ -18,7 +18,7 @@
 
 ModelIO::ModelIO(Model *model): myModel(model) { }
 
-void XMLCALL modelIOStartElementHandler(void *userData, const char *name, const char **atts) {
+void modelIOStartElementHandler(void *userData, const char *name, const char **atts) {
 	ModelIOXMLStorage *storage = (ModelIOXMLStorage *)userData;
 	int i;
 
@@ -59,7 +59,7 @@ void XMLCALL modelIOStartElementHandler(void *userData, const char *name, const 
 	}
 }
 
-void XMLCALL modelIOEndElementHandler(void *userData, const char *name) {
+void modelIOEndElementHandler(void *userData, const char *name) {
 	return;
 }
 

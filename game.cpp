@@ -53,8 +53,8 @@ void Game::start(std::string file, int mode) {
 
 	Player *players[2];
 	//players[WHITE] = new HumanPlayer(WHITE, &model, boardView, userView[WHITE]);
-	players[WHITE] = new AIPlayer(WHITE, &model, boardView, userView[WHITE]);
-	players[BLACK] = new AIPlayer(BLACK, &model, boardView, userView[BLACK]);
+	players[WHITE] = new HumanPlayer(WHITE, &model, boardView, userView[WHITE]);
+	players[BLACK] = new HumanPlayer(BLACK, &model, boardView, userView[BLACK]);
 
 	int curPlayer;
 	int key;
@@ -66,22 +66,29 @@ void Game::start(std::string file, int mode) {
 	Move playerMove;
 	GameStatus status;
 	message = NONE;
+
+	int counter=0;
 	do {
 
 		isEndGame = false;
 
-		key = boardView->getKey();
-		if (key == KEY_F(5) ) {
-			infoView = new CLIView(5,30,25,35,6);
-			infoView->render("Enter savename:\n");
-			string = infoView->ask("> ");
-			delete infoView;
-			string = std::string("saves/") + string + std::string(".xml");
-			model_io.save(string);
-			message = SAVED;
-		} else if (key == 27) {
-			isEndGame = true;
+		++counter;
+		if (counter > 15) {
+			key = boardView->getKey();
+			if (key == KEY_F(5) ) {
+				infoView = new CLIView(5,30,25,35,6);
+				infoView->render("Enter savename:\n");
+				string = infoView->ask("> ");
+				delete infoView;
+				string = std::string("saves/") + string + std::string(".xml");
+				model_io.save(string);
+				message = SAVED;
+			} else if (key == 27) {
+				isEndGame = true;
+			}
 		}
+
+
 		curPlayer = model.getCurrentPlayer();
 
 		boardView->render();
@@ -96,7 +103,7 @@ void Game::start(std::string file, int mode) {
 			isEndGame = true;
 			sprintf(buffer,"Player %s has got the MATE!", model.getPlayerData(curPlayer).c_str());
 			infoView->render(buffer);
-			infoView->ask();
+			infoView->wait();
 			break;
 		case STALEMATE:
 			isEndGame = true;
@@ -110,6 +117,7 @@ void Game::start(std::string file, int mode) {
 
 		if (isEndGame == false) {
 			do {
+
 				command = players[curPlayer]->makeTurn(playerMove, message);
 				if (command == TURN) {
 					sprintf(buffer,"start() check if move is correct\n"); debugView->render(buffer);
