@@ -165,7 +165,7 @@ void BoardCLIView::render(std::string msg) {
 
 	//рендерим фигуры
 
-	std::vector<Figure>::const_iterator itFigure;
+	FIGURES::const_iterator itFigure;
 
 	for ( itFigure=myModel->getSetFigures(WHITE).begin(); itFigure != myModel->getSetFigures(WHITE).end(); ++itFigure ) {
 		if (itFigure->captured == false) {

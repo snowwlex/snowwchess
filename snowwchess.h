@@ -8,6 +8,7 @@
 #ifndef SNOWWCHESS_H_
 #define SNOWWCHESS_H_
 
+		
 enum GameStatus {USUAL, CHECK, MATE, STALEMATE };
 enum PlayerColor { WHITE = 0, BLACK = 1, ALL = 2 };
 
@@ -18,19 +19,21 @@ enum MoveEffect { LONGMOVE=1, CASTLE=2, EXPLOSION=4 };
 enum PlayerCommand {NOTHING, TURN, SAVE, EXIT };
 enum GameMessage {NONE, WRONG_MOVE, GOT_CHECK, SAVED};
 
+
 struct Position {
 	int myX;
 	int myY;
-	inline Position(int x=0, int y=0) : myX(x), myY(y) { }
-	inline bool operator!=(const Position& pos) { return myX != pos.myX || myY!= pos.myY; }
-	inline bool operator==(const Position& pos) { return myX == pos.myX && myY == pos.myY; }
+	Position(int x=0, int y=0) : myX(x), myY(y) { }
+	bool operator!=(const Position& pos) const{ return myX != pos.myX || myY!= pos.myY; }
+	bool operator==(const Position& pos) const { return myX == pos.myX && myY == pos.myY; }
 };
 struct Figure {
 	int id;
 	Position position;
 	bool wasMoved;
 	bool captured;
-	inline Figure() { id=0; wasMoved = false; captured = false;}
+	Figure() { id=0; wasMoved = false; captured = false;}
+	bool operator<(const Figure& figure) const { return id<figure.id; }
 };
 struct Promoting {
 	int horizontal;
@@ -45,7 +48,7 @@ struct FigureData {
 	bool explosion;
 	int weight;
 	Promoting promoting[2];
-	inline FigureData() { name=""; letter = 0; weight = 0; special=false; explosion=true; }
+	FigureData() { name=""; letter = 0; weight = 0; special=false; explosion=true; }
 };
 struct Move {
 	int player;
@@ -54,7 +57,7 @@ struct Move {
 	int type;
 	int effect;
 	int figureId;
-	inline Move() { player = 0; type=0; effect = 0; figureId=0;}
+	Move() { player = 0; type=0; effect = 0; figureId=0;}
 };
 
 struct MoveRule {
@@ -65,7 +68,7 @@ struct MoveRule {
 	int player;
 	int limit;
 	int moveEffect;
-	inline MoveRule() { dx=0; dy=0; ruleType=SLIDE; moveType=0; player=0; limit=0; moveEffect=0;}
+	MoveRule() { dx=0; dy=0; ruleType=SLIDE; moveType=0; player=0; limit=0; moveEffect=0;}
 };
 struct CastleRule {
 	int dx;
@@ -73,6 +76,15 @@ struct CastleRule {
 	int player;
 	Position kingCell;
 	Position rookCellStart,rookCellEnd;
-	inline CastleRule() { dx=0; dy=0; player=0;}
+	CastleRule() { dx=0; dy=0; player=0;}
 };
+
+typedef std::vector<Move> MOVES;
+typedef std::vector<Figure> FIGURES;
+typedef std::vector<MoveRule> MOVERULES;
+typedef std::map<int,MOVERULES > FIGURES_RULES;
+typedef	std::map<int,FigureData > FIGURES_DATA;
+typedef	std::map<int, std::string> PLAYERS_DATA;
+typedef	std::vector<CastleRule> CASTLERULES;
+
 #endif /* SNOWWCHESS_H_ */

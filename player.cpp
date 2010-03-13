@@ -24,8 +24,8 @@ PlayerCommand HumanPlayer::makeTurn(Move& move, GameMessage message) {
 
 	PlayerCommand command;
 	std::string inputCommand;
-	std::vector< Move > moves;
-	std::vector < Move >::iterator itMove;
+	MOVES moves;
+	MOVES::iterator itMove;
 	int key,mode;
 	switch(message) {
 		case WRONG_MOVE:

@@ -70,7 +70,7 @@ const ModelIOXMLStorage& ModelIO::getStorage() const {
 void ModelIO::updateModel() {
 	int boardSizeY = myModel->getBoardSizeY();
 
-	std::vector<ModelIOXMLStorage::FigureInfo>::iterator it;
+	ModelIOXMLStorage::FIGURES_INFO::iterator it;
 	Figure tmpFigure;
 
 	myModel->setCurrentPlayer(myStorage.firstTurn);
@@ -123,7 +123,7 @@ void ModelIO::save(std::string file) {
 	bufferStr = "<positions rules='"+myModel->getRulesName()+"' turn='"+player+"'>\n";
 	fputs(bufferStr.c_str(),outfile);
 
-	std::vector<Figure>::const_iterator it;
+	FIGURES::const_iterator it;
 	for (i=0, depth=1; i<2; ++i) {
 		player = i+1+'0';
 		bufferStr = std::string(depth,TAB) + "<player id='"+player+"'>\n";

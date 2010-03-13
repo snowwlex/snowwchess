@@ -56,8 +56,8 @@ PlayerCommand AIPlayer::makeTurn(Move& move, GameMessage message) {
 
 Move AIPlayer::search() {
 	Move move;
-	std::vector< Move > moves;
-	std::vector < Move >::iterator itMove;
+	MOVES moves;
+	MOVES::iterator itMove;
 
 	int maxScore=0, score,i,max;
 	bool scored;
@@ -76,13 +76,13 @@ Move AIPlayer::search() {
 			maxScore = score;
 			scored = true;
 			max = i;
-		} else if (score >= maxScore){
+		} else if (score > maxScore){
 			maxScore = score;
 			max = i;
 		}
-		/*} else if (score == maxScore && rand()%2 == 1) {
+		else if (score == maxScore && rand()%2 == 1) {
 			max = i;
-		}*/
+		}
 	}
 
 	myBoardView->myModel = myModel;
@@ -91,8 +91,8 @@ Move AIPlayer::search() {
 }
 
 int AIPlayer::searchRecurs(Model m, Move move, int curDepth, int max ) {
-	std::vector< Move > moves;
-	std::vector < Move >::iterator itMove;
+	MOVES moves;
+	MOVES::iterator itMove;
 	int curPlayerId;
 	int optScore, score;
 	bool scored;
@@ -110,7 +110,7 @@ int AIPlayer::searchRecurs(Model m, Move move, int curDepth, int max ) {
 	moves = m.moves(curPlayerId);
 
 	if (moves.size() == 0) {
-		return sef(&m);//-100;
+		return sef(&m)-100;
 	}
 
 	for (scored = false, optScore=0, itMove = moves.begin(); itMove != moves.end(); ++itMove) {
@@ -138,19 +138,20 @@ int AIPlayer::searchRecurs(Model m, Move move, int curDepth, int max ) {
 	//sprintf(buffer,"%s[BM] %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c' SCORE %d\n",std::string(curDepth*2,' ').c_str(),bestMove.pos1.myX+'a',myModel->getBoardSizeY() - bestMove.pos1.myY + '0',bestMove.pos2.myX+'a',myModel->getBoardSizeY() - bestMove.pos2.myY + '0',bestMove.effect,bestMove.type,bestMove.player,myModel->getFigureData(bestMove.figureId).letter,optScore);
 	//debugView->render(buffer);
 
-
-	//m.makeMove(bestMove);
-	//myBoardView->myModel = &m;
-	//myBoardView->render();
-	//myBoardView->highlight(bestMove.pos1,13);
-	//myBoardView->highlight(bestMove.pos2,11);
-	//myBoardView->wait();
+	if (myTurnsCounter > 500) {
+		m.makeMove(bestMove);
+		myBoardView->myModel = &m;
+		myBoardView->render();
+		myBoardView->highlight(bestMove.pos1,13);
+		myBoardView->highlight(bestMove.pos2,11);
+		//myBoardView->wait();
+	}
 
 	return optScore;
 }
 
 int AIPlayer::sef(Model *m) const {
-	std::vector<Figure>::const_iterator itFigure;
+	FIGURES::const_iterator itFigure;
 	int myScore, oppScore;
 	for (myScore = 0, itFigure = m->getSetFigures(myColor).begin(); itFigure != m->getSetFigures(myColor).end(); ++itFigure ) {
 		if (itFigure->captured == false) {

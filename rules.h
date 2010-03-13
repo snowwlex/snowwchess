@@ -10,20 +10,21 @@
 
 class Rules {
 	private:
-		std::map<int, std::vector<MoveRule> > myMoveRules;
-		std::map < int , FigureData > myFiguresData;
-		std::map <int, std::string> myPlayersData;
-		std::vector<Figure> myInitFigures[2];
-		std::vector<CastleRule> myCastlesRules;
+	
+		FIGURES_RULES myMoveRules;
+		FIGURES_DATA myFiguresData;
+		PLAYERS_DATA myPlayersData;
+		FIGURES myInitFigures[2];
+		CASTLERULES myCastlesRules;
 		std::string myRulesName;
 		int myFirstTurn;
 		int mySpecialFigure;
 		int myBoardSizeX, myBoardSizeY;
 	public:
 
-		const std::vector < MoveRule >& getMoveRules(int figureId);
+		const MOVERULES& getMoveRules(int figureId);
 		const FigureData& getFigureData(int figureId);
-		const std::vector<Figure>& getInitFigures(int playerId) const;
+		const FIGURES& getInitFigures(int playerId) const;
 		std::string getRulesName() const;
 		int getFirstTurn() const;
 		std::string getPlayerData(int playerId);

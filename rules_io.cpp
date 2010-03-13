@@ -196,7 +196,7 @@ void RulesIO::updateRules() {
 	myRules->setSpecialFigure(myStorage.specialFigure);
 	myRules->setBoardSize(myStorage.boardSizeX, myStorage.boardSizeY);
 
-	std::vector<RulesIOXMLStorage::FigureInfo>::iterator it;
+	RulesIOXMLStorage::FIGURES_INFO::iterator it;
 	Figure tmpFigure;
 	for (int i=0; i<2; ++i) {
 		for ( it=myStorage.setFiguresInfo[i].begin(); it != myStorage.setFiguresInfo[i].end(); ++it ) {
@@ -208,7 +208,7 @@ void RulesIO::updateRules() {
 		}
 	}
 
-	for (std::vector<RulesIOXMLStorage::CastleRuleInfo>::iterator it=myStorage.castleRules.begin(); it != myStorage.castleRules.end(); ++it) {
+	for (RulesIOXMLStorage::CASTLERULES_INFO::iterator it=myStorage.castleRules.begin(); it != myStorage.castleRules.end(); ++it) {
 		CastleRule castleRule;
 		castleRule.dx=it->dx;
 		castleRule.dy=it->dy;
@@ -222,7 +222,7 @@ void RulesIO::updateRules() {
 		myRules->setCastleRule(castleRule);
 	}
 
-	for (std::vector<RulesIOXMLStorage::PromotionInfo>::iterator itPromotion = myStorage.promotionData.begin();itPromotion !=  myStorage.promotionData.end(); ++itPromotion) {
+	for (RulesIOXMLStorage::PROMOTIONS_INFO::iterator itPromotion = myStorage.promotionData.begin();itPromotion !=  myStorage.promotionData.end(); ++itPromotion) {
 		if (itPromotion->player != ALL) {
 			myStorage.figuresData[itPromotion->figure].promoting[itPromotion->player].figure = itPromotion->promotionFigure;
 			myStorage.figuresData[itPromotion->figure].promoting[itPromotion->player].horizontal = myStorage.boardSizeY - itPromotion->horizontal;
@@ -233,14 +233,14 @@ void RulesIO::updateRules() {
 			}
 		}
 	}
-	for (std::map < int , FigureData >::iterator it=myStorage.figuresData.begin(); it!=myStorage.figuresData.end(); ++it) {
+	for (FIGURES_DATA::iterator it=myStorage.figuresData.begin(); it!=myStorage.figuresData.end(); ++it) {
 		myRules->setFigureData(it->first, it->second);
 	}
-	for (std::map < int , std::string >::iterator it=myStorage.playersData.begin(); it!=myStorage.playersData.end(); ++it) {
+	for (PLAYERS_DATA::iterator it=myStorage.playersData.begin(); it!=myStorage.playersData.end(); ++it) {
 		myRules->setPlayerData(it->first, it->second);
 	}
-	for (std::map< int, std::vector<MoveRule> >::iterator itMap=myStorage.myMoveRulesIO.begin(); itMap!=myStorage.myMoveRulesIO.end(); ++itMap) {
-		for (std::vector<MoveRule>::iterator itVector = itMap->second.begin(); itVector!=itMap->second.end(); ++itVector) {
+	for (FIGURES_RULES::iterator itMap=myStorage.myMoveRulesIO.begin(); itMap!=myStorage.myMoveRulesIO.end(); ++itMap) {
+		for (MOVERULES::iterator itVector = itMap->second.begin(); itVector!=itMap->second.end(); ++itVector) {
 			myRules->setMoveRule(itMap->first,*itVector);
 		}
 

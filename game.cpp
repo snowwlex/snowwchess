@@ -53,8 +53,8 @@ void Game::start(std::string file, int mode) {
 
 	Player *players[2];
 	//players[WHITE] = new HumanPlayer(WHITE, &model, boardView, userView[WHITE]);
-	players[WHITE] = new HumanPlayer(WHITE, &model, boardView, userView[WHITE]);
-	players[BLACK] = new HumanPlayer(BLACK, &model, boardView, userView[BLACK]);
+	players[WHITE] = new AIPlayer(WHITE, &model, boardView, userView[WHITE],3);
+	players[BLACK] = new AIPlayer(BLACK, &model, boardView, userView[BLACK],3);
 
 	int curPlayer;
 	int key;
@@ -73,7 +73,7 @@ void Game::start(std::string file, int mode) {
 		isEndGame = false;
 
 		++counter;
-		if (counter > 15) {
+		if (counter > 600) {
 			key = boardView->getKey();
 			if (key == KEY_F(5) ) {
 				infoView = new CLIView(5,30,25,35,6);

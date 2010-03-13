@@ -15,11 +15,12 @@ struct ModelIOXMLStorage {
 		bool wasMoved;
 		bool captured;
 	};
+	typedef std::vector<FigureInfo> FIGURES_INFO;
 	int curPlayerId;
 	int curFigureId;
 	int firstTurn;
 	std::string rulesName;
-	std::vector<FigureInfo> setFiguresInfo[2];
+	ModelIOXMLStorage::FIGURES_INFO setFiguresInfo[2];
 };
 
 
