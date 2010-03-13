@@ -16,7 +16,7 @@ class Model {
 		class Board {
 			private:
 				int myBufferSize;
-				int** myBoardArray;
+				int* myBoardArray;
 				int mySizeX, mySizeY;
 			public:
 				Board(int buffer=4); // 4 - размер буферной зоны
@@ -41,14 +41,14 @@ class Model {
 
 		int myCurrentPlayer;
 		int mySpecialFigure;
-		std::vector<Figure> mySetFigures[2];
+		FIGURES mySetFigures[2];
 
-		std::vector<Move> moves(int player, const Figure& figure,  bool needCheck=true);
+		MOVES moves(int player, const Figure& figure,  bool needCheck=true);
 
 		bool isCheck(int player);
 
-		std::vector<Figure>::iterator findFigure(int player, int figure);
-		bool isFigureOnPosition(Position findPos, std::vector<Figure>::iterator& itFindFigure);
+		FIGURES::iterator findFigure(int player, int figure);
+		bool isFigureOnPosition(Position findPos, FIGURES::iterator& itFindFigure);
 
 		int getDirection(int dir) const;
 
@@ -83,15 +83,15 @@ class Model {
 
 		void makeMove(Move move);
 		bool canMove(Move& move);
-		std::vector< Move > moves(int player, Position pos1);
-		std::vector< Move > moves(int player);
+		MOVES moves(int player, Position pos1);
+		MOVES moves(int player);
 
 		int getBoard(int x, int y);
 		int getBoardSizeX() const;
 		int getBoardSizeY() const;
 		std::string getRulesName() const;
 		GameStatus getGameStatus(int player);
-		const std::vector<Figure>& getSetFigures(int player) const;
+		const FIGURES& getSetFigures(int player) const;
 		const FigureData& getFigureData(int figureId) const;
 		int getCurrentPlayer() const;
 		std::string getPlayerData(int playerId) const;
@@ -99,7 +99,7 @@ class Model {
 		void setFigure(int playerId, const Figure& figure);
 		void setCurrentPlayer(int playerId);
 
-		std::vector<Figure>::iterator findFigure(int player, Position findPos);
+		FIGURES::iterator findFigure(int player, Position findPos);
 
 
 
