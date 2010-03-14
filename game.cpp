@@ -47,14 +47,16 @@ void Game::start(std::string file, int mode) {
 	CLIView *infoView = new CLIView(25, 30, 14,2,6, true);
 	BoardCLIView *boardView = new BoardCLIView(model.getBoardSizeX()+2,model.getBoardSizeY()+10,2,2,7, false, &model);
 	CLIView *userView[2];
-	userView[WHITE] = new CLIView(10,28,2,40,8,true);
-	userView[BLACK] = new CLIView(10,28,13,40,9,true);
+	userView[WHITE] = new CLIView(10,37,2,35,8,true);
+	userView[BLACK] = new CLIView(10,37,13,35,9,true);
 
 
 	Player *players[2];
-	//players[WHITE] = new HumanPlayer(WHITE, &model, boardView, userView[WHITE]);
-	players[WHITE] = new AIPlayer(WHITE, &model, boardView, userView[WHITE],3);
-	players[BLACK] = new AIPlayer(BLACK, &model, boardView, userView[BLACK],3);
+	players[WHITE] = new HumanPlayer(WHITE, &model, boardView, userView[WHITE]);
+	//players[WHITE] = new AlphaBetaAIPlayer(WHITE, &model, boardView, userView[WHITE],5);
+	//players[2] = new AIPlayer(WHITE, &model, boardView, userView[WHITE],3);
+	players[BLACK] = new AlphaBetaAIPlayer(BLACK, &model, boardView, userView[BLACK],5);
+	//players[3] = new AIPlayer(BLACK, &model, boardView, userView[BLACK],3);
 
 	int curPlayer;
 	int key;
@@ -68,12 +70,15 @@ void Game::start(std::string file, int mode) {
 	message = NONE;
 
 	int counter=0;
+
+	sprintf(buffer,"Hello) Use arrows to\nselect figure,\nthen SPACE - choose figure\nthen select destination cell!\nGood luck)\n"); infoView->render(buffer);
 	do {
 
 		isEndGame = false;
 
 		++counter;
-		if (counter > 600) {
+		//if (counter > 1000) {
+/*
 			key = boardView->getKey();
 			if (key == KEY_F(5) ) {
 				infoView = new CLIView(5,30,25,35,6);
@@ -86,30 +91,36 @@ void Game::start(std::string file, int mode) {
 			} else if (key == 27) {
 				isEndGame = true;
 			}
-		}
+		//	*/
+		//	isEndGame = true;
+		//	sprintf(buffer,"Stop the game\n");
+		//	fputs(buffer, statfile);
+		//}
 
 
 		curPlayer = model.getCurrentPlayer();
 
 		boardView->render();
-		sprintf(buffer,"start() getting game status\n"); debugView->render(buffer);
+		//sprintf(buffer,"start() getting game status\n"); debugView->render(buffer);
 		status = model.getGameStatus(curPlayer);
-		sprintf(buffer,"start() game status received\n\n"); debugView->render(buffer);
+		//sprintf(buffer,"start() game status received\n\n"); debugView->render(buffer);
 		switch(status) {
 		case CHECK:
 			message = GOT_CHECK;
 			break;
 		case MATE:
 			isEndGame = true;
-			sprintf(buffer,"Player %s has got the MATE!", model.getPlayerData(curPlayer).c_str());
+			sprintf(buffer,"Player %s has got the MATE!\n", model.getPlayerData(curPlayer).c_str());
+			fputs(buffer, statfile);
 			infoView->render(buffer);
-			infoView->wait();
+			//infoView->wait();
 			break;
 		case STALEMATE:
 			isEndGame = true;
-			sprintf(buffer,"Player %s has got the STALEMATE!", model.getPlayerData(curPlayer).c_str());
+			sprintf(buffer,"Player %s has got the STALEMATE!\n", model.getPlayerData(curPlayer).c_str());
+			fputs(buffer, statfile);
 			infoView->render(buffer);
-			infoView->ask();
+			//infoView->wait();
 			break;
 		default:
 			break;
@@ -119,10 +130,11 @@ void Game::start(std::string file, int mode) {
 			do {
 
 				command = players[curPlayer]->makeTurn(playerMove, message);
+				//command = players[curPlayer+2]->makeTurn(playerMove, message);
 				if (command == TURN) {
-					sprintf(buffer,"start() check if move is correct\n"); debugView->render(buffer);
+					//sprintf(buffer,"start() check if move is correct\n"); debugView->render(buffer);
 					isMoveCorrect = model.canMove(playerMove);
-					sprintf(buffer,"start() end of check; move is %scorrect\n\n",isMoveCorrect?"":"not "); debugView->render(buffer);
+					//sprintf(buffer,"start() end of check; move is %scorrect\n\n",isMoveCorrect?"":"not "); debugView->render(buffer);
 					if ( isMoveCorrect == false) {
 						message = WRONG_MOVE;
 					}

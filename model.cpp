@@ -216,10 +216,10 @@ void Model::makeMoveEffectCastle(const Move& move) {
 	rookMove.pos1 = castleRule.rookCellStart;
 	rookMove.pos2 = castleRule.rookCellEnd;
 	rookMove.player = move.player;
-	FIGURES::iterator itRook = findFigure(move.player, castleRule.rookCellStart);
-	rookMove.figureId = itRook->id;
-	rookMove.type = MOVE;
-	makeMove(rookMove);
+	//FIGURES::iterator itRook = findFigure(move.player, castleRule.rookCellStart);
+	//rookMove.figureId = itRook->id;
+	//rookMove.type = MOVE;
+	//makeMove(rookMove);
 }
 
 void Model::makeMoveEffectExplosion(const Move& move) {

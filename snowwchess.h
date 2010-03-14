@@ -87,4 +87,7 @@ typedef	std::map<int,FigureData > FIGURES_DATA;
 typedef	std::map<int, std::string> PLAYERS_DATA;
 typedef	std::vector<CastleRule> CASTLERULES;
 
+extern int randomizator;
+extern FILE* statfile;
+
 #endif /* SNOWWCHESS_H_ */

@@ -5,6 +5,11 @@
  *      Author: snowwlex
  */
 
+//for randomizator
+#include <cstdlib>
+#include <ctime>
+
+
 #include <ncurses.h>
 #include <vector>
 #include <map>
@@ -36,6 +41,8 @@ void initGraphic() {
 
 CLIView *debugView;
 char buffer[1024] = {' '};
+int randomizator=0;
+FILE* statfile = 0;
 /*
 sprintf(buffer,"Highlighted: %d\n",highlight); debugView->render(buffer);
 */
@@ -47,7 +54,7 @@ int main(int argc, char* argv[]) {
 	Game game;
 	CLIView *menuView = new MainMenuCLIView(8,30,2,20,6);
 	CLIView *chooseView;
-	debugView = new CLIView(38,80,2,70,11,true);
+	debugView = new CLIView(38,70,2,75,11,true);
 	debugView->render("debug view\n");
 
 	do {
@@ -69,8 +76,14 @@ int main(int argc, char* argv[]) {
 		}
 
 		if (option != "2") {
+			srand (time(0));
+			statfile = fopen("statfile2.txt", "wt");
 			menuView->hide();
-			game.start(name,mode);
+			for (int i=0; i< 1; ++i) {
+				randomizator = rand()%10000+200;
+				game.start(name,mode);
+			}
+			fclose(statfile);
 			menuView->show();
 		}
 
