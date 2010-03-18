@@ -74,7 +74,7 @@ PlayerCommand HumanPlayer::makeTurn(Move& move, GameMessage message) {
 				command = SAVE;
 				break;
 			case KEY_F(4):
-				moves = myModel->moves(myColor);
+				moves = myModel->allMoves(myColor);
 				for ( itMove=moves.begin() ; itMove != moves.end(); itMove++ ) {
 					myBoardView->highlight(itMove->pos2,(itMove->type & MOVE) ? 12 : 11);
 				}
@@ -83,7 +83,7 @@ PlayerCommand HumanPlayer::makeTurn(Move& move, GameMessage message) {
 				if (mode == 0) {
 					move.pos1.myX = myCursorPos.myX;
 					move.pos1.myY = myCursorPos.myY;
-					moves = myModel->moves(myColor, Position(move.pos1.myX,move.pos1.myY));
+					moves = myModel->movesFromPosition(myColor, Position(move.pos1.myX,move.pos1.myY));
 					mode = 1;
 				} else if (myCursorPos.myX == move.pos1.myX && myCursorPos.myY == move.pos1.myY){
 					mode = 0;
@@ -92,7 +92,7 @@ PlayerCommand HumanPlayer::makeTurn(Move& move, GameMessage message) {
 					move.pos2.myY = myCursorPos.myY;
 					move.player = myColor;
 					move.type = CAPTURE | MOVE;
-					move.figureId = myModel->findFigure(myColor,move.pos1)->id;
+					move.figureId = myModel->findFigureByPosition(myColor,move.pos1)->id;
 					command = TURN;
 				}
 				break;
@@ -103,7 +103,7 @@ PlayerCommand HumanPlayer::makeTurn(Move& move, GameMessage message) {
 
 		if (mode == 1) {
 			for ( itMove=moves.begin() ; itMove != moves.end(); ++itMove ) {
-			myBoardView->highlight(itMove->pos2,(itMove->type & MOVE) ? 12 : 11);
+				myBoardView->highlight(itMove->pos2,(itMove->type & MOVE) ? 12 : 11);
 			}
 			myBoardView->highlight(Position(move.pos1.myX,move.pos1.myY),13);
 		}

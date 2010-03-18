@@ -6,7 +6,7 @@
 		<player id="2" name="BLACK"/>
 	</players>
 	<figures special="1">
-		<figure id="1" name="KING" weight="18" letter="K" special="1"/>
+		<figure id="1" name="KING" weight="1000" letter="K" special="1"/>
 		<figure id="2" name="QUEEN"  weight="9" letter="Q"/>
 		<figure id="3" name="ROOK"  weight="5" letter="R"/>
 		<figure id="4" name="KNIGHT" weight="3"  letter="N"/>

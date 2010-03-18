@@ -11,7 +11,7 @@
 		<figure id="3" name="KNIGHT" weight="3" letter="N"/>
 		<figure id="4" name="BISHOP" weight="3" letter="B"/>
 		<figure id="5" name="PAWN" weight="1" letter="P"/>
-		<figure id="6" name="KING" weight="18" letter="K" special="1"/>
+		<figure id="6" name="KING" weight="1000" letter="K" special="1"/>
 	</figures>
 	<positions>
 		<player id="1">

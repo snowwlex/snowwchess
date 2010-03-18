@@ -22,14 +22,14 @@ void Model::Board::init(int sizex, int sizey) {
 	mySizeX = sizex;
 	mySizeY = sizey;
 	myBoardArray = new int[ (mySizeY+2*myBufferSize) * (mySizeX+2*myBufferSize) ];
-	for (int i=0; i<(mySizeY+2*myBufferSize); ++i) {
-		for (int j=0; j<(mySizeX+2*myBufferSize); ++j) {
-			myBoardArray[ (mySizeY+2*myBufferSize)*i+j] = -1;
+	for (int i = -myBufferSize; i < (mySizeY+myBufferSize); ++i) {
+		for (int j = -myBufferSize; j < (mySizeX+myBufferSize); ++j) {
+			myBoardArray[ getCoordinates(j,i) ] = -1;
 		}
 	}
 	for (int i=0; i<mySizeY; ++i) {
 		for (int j=0; j<mySizeX; ++j) {
-			operator()(i,j) = 0;
+			myBoardArray[getCoordinates(i,j)]=0;
 		}
 	}
 }
@@ -44,9 +44,10 @@ Model::Board::Board(const Board& board) {
 	mySizeX=board.mySizeX;
 	mySizeY=board.mySizeY;
 	myBoardArray = new int[ (mySizeX+2*myBufferSize) * (mySizeY+2*myBufferSize) ];
-	for (int i=0; i<(mySizeY+2*myBufferSize); ++i) {
-		for (int j=0; j<(mySizeX+2*myBufferSize); ++j) {
-			myBoardArray[ (mySizeY+2*myBufferSize)*i+j] = board.myBoardArray[ (mySizeY+2*myBufferSize)*i+j ] ;
+	for (int i = -myBufferSize; i < (mySizeY+myBufferSize); ++i) {
+		for (int j = -myBufferSize; j < (mySizeX+myBufferSize); ++j) {
+			myBoardArray[ getCoordinates(j,i) ] = board.myBoardArray[ getCoordinates(j,i) ] ;
+
 		}
 	}
 }
@@ -59,37 +60,44 @@ Model::Board& Model::Board::operator=(const Board& board) {
 	mySizeX=board.mySizeX;
 	mySizeY=board.mySizeY;
 	myBoardArray = new int[ (mySizeX+2*myBufferSize) * (mySizeY+2*myBufferSize) ];
-	for (int i=0; i<(mySizeY+2*myBufferSize); ++i) {
-		for (int j=0; j<(mySizeX+2*myBufferSize); ++j) {
-			myBoardArray[ (mySizeY+2*myBufferSize)*i+j] = board.myBoardArray[ (mySizeY+2*myBufferSize)*i+j ] ;
+	for (int i = -myBufferSize; i < (mySizeY+myBufferSize); ++i) {
+		for (int j = -myBufferSize; j < (mySizeX+myBufferSize); ++j) {
+			myBoardArray[ getCoordinates(j,i) ] = board.myBoardArray[ getCoordinates(j,i) ] ;
+
 		}
 	}
 	return *this;
 }
 
-void Model::Board::set(const Figure& figure) {
+void Model::Board::setFigureOnBoard(const Figure& figure) {
 	if ( (figure.position.myX+myBufferSize)<0 || figure.position.myX>=(mySizeX+myBufferSize) ||
 		 (figure.position.myY+myBufferSize)<0 || figure.position.myY>=(mySizeY+myBufferSize) ){
 			sprintf(buffer,"Exception. Trying to put figure out of border: %d %d\n",figure.position.myX,figure.position.myY);
 			debugView->render(buffer); debugView->wait();
 			return;
 	}
-	operator()(figure.position.myX,figure.position.myY) = figure.id;
+	setBoardCell(figure.position.myX, figure.position.myY, figure.id);
 }
-int& Model::Board::operator() (int x,int y) {
+int Model::Board::operator() (int x,int y) const {
 	if ( (x+myBufferSize)<0 || x>=(mySizeX+myBufferSize) ||
 	     (y+myBufferSize)<0 || y>=(mySizeY+myBufferSize) ){
 
 		sprintf(buffer,"Exception. Out of border: %d %d\n",x,y);
 		debugView->render(buffer); debugView->wait();
 
-		return myBoardArray[(0+myBufferSize)*(mySizeY+2*myBufferSize)+0+myBufferSize];
+		return myBoardArray[getCoordinates(0,0)];
 	}
 
-	return myBoardArray[(x+myBufferSize)*(mySizeY+2*myBufferSize)+y+myBufferSize];
+	return myBoardArray[getCoordinates(x,y)];
 }
 
+int Model::Board::getCoordinates(int x,int y) const {
+	return (x+myBufferSize)*(mySizeY+2*myBufferSize)+y+myBufferSize;
+}
 
+void Model::Board::setBoardCell(int x,int y,int value) {
+	myBoardArray[getCoordinates(x,y)] = value;
+}
 Model::Model(Rules* _myRules): myRules(_myRules) { longmove = false;  }
 
 void Model::init(int mode) {
@@ -104,7 +112,7 @@ void Model::init(int mode) {
 	for (int i=0; i < 2; ++i) {
 		for (FIGURES::iterator itFigure = mySetFigures[i].begin(); itFigure!=mySetFigures[i].end(); ++itFigure) {
 			if (itFigure->captured == false) {
-				myBoard.set(*itFigure);
+				myBoard.setFigureOnBoard(*itFigure);
 			}
 		}
 	}
@@ -117,7 +125,7 @@ void Model::setFigure(int playerId, const Figure& figure) {
 int Model::getCurrentPlayer() const {
 	return myCurrentPlayer;
 }
-int Model::getBoard(int x, int y) {
+int Model::getBoardCell(int x, int y) const {
 	return myBoard(x,y);
 }
 
@@ -134,11 +142,11 @@ int Model::getBoardSizeY() const {
 std::string Model::getRulesName() const {
 	return myRules->getRulesName();
 }
-GameStatus Model::getGameStatus(int player) {
+GameStatus Model::getGameStatus(int player) const {
 
 	MOVES avMoves;
 	bool check;
-	avMoves = moves(player);
+	avMoves = allMoves(player);
 	check = isCheck(player);
 
 	if (check) {
@@ -156,17 +164,18 @@ GameStatus Model::getGameStatus(int player) {
 }
 
 
-bool Model::isCheck(int player) {
+bool Model::isCheck(int player) const {
 	bool check;
 	MOVES avMoves;
-	FIGURES::iterator itFigure;
-	FIGURES::iterator itSpecialFigure;
-	MOVES::iterator itMove;
+	FIGURES::const_iterator itFigure;
+	FIGURES::const_iterator itSpecialFigure;
+	MOVES::const_iterator itMove;
 	int opponent = 1-player;
-	itSpecialFigure = findFigure(player, mySpecialFigure );
+	itSpecialFigure = findFigureById(player, mySpecialFigure );
+	//if (itSpecialFigure->captured == true) { return true; }
 	for (check = false, itFigure = mySetFigures[opponent].begin(); !check &&  itFigure != mySetFigures[opponent].end(); ++itFigure) {
 		if (itFigure->captured == false) {
-			avMoves = moves(opponent, *itFigure, false);
+			avMoves = movesFigure(opponent, *itFigure, false);
 			for (itMove = avMoves.begin(); !check && itMove != avMoves.end(); ++itMove) {
 				if (itMove->pos2 == itSpecialFigure->position) {
 					check = true;
@@ -178,23 +187,23 @@ bool Model::isCheck(int player) {
 }
 
 void Model::makeMoveInpassing(const Move& move) {
-	myBoard(passant_figure.position.myX,passant_figure.position.myY) = 0;
+	myBoard.setBoardCell(passant_figure.position.myX,passant_figure.position.myY, 0);
 	int opponent = 1 - move.player;
-	FIGURES::iterator itOpponent = findFigure(opponent, passant_figure.position);
+	FIGURES::iterator itOpponent = getFigureByPosition(opponent, passant_figure.position);
 	itOpponent->captured = true;
 }
 void  Model::makeMoveCapture(const Move& move) {
 	int opponent = 1 - move.player;
-	FIGURES::iterator itOpponent = findFigure(opponent, move.pos2);
+	FIGURES::iterator itOpponent = getFigureByPosition(opponent, move.pos2);
 	itOpponent->captured = true;
 }
 
 void  Model::makeMovePromotion(const Move& move) {
 	int promotionToFigure = myRules->getFigureData(move.figureId).promoting[move.player].figure;
-	FIGURES::iterator itFigure = findFigure(move.player, move.pos2);
+	FIGURES::iterator itFigure = getFigureByPosition(move.player, move.pos2);
 	itFigure->id = promotionToFigure ;
 	std::sort( mySetFigures[move.player].begin(),mySetFigures[move.player].end() );
-	myBoard(move.pos2.myX,move.pos2.myY) = myRules->getFigureData(promotionToFigure).letter;
+	myBoard.setBoardCell(move.pos2.myX,move.pos2.myY, myRules->getFigureData(promotionToFigure).letter);
 }
 
 void Model::makeMoveEffectLongMove(const Move& move) {
@@ -216,10 +225,12 @@ void Model::makeMoveEffectCastle(const Move& move) {
 	rookMove.pos1 = castleRule.rookCellStart;
 	rookMove.pos2 = castleRule.rookCellEnd;
 	rookMove.player = move.player;
-	//FIGURES::iterator itRook = findFigure(move.player, castleRule.rookCellStart);
-	//rookMove.figureId = itRook->id;
-	//rookMove.type = MOVE;
-	//makeMove(rookMove);
+	FIGURES::iterator itRook = getFigureByPosition(move.player, castleRule.rookCellStart);
+	if (itRook != mySetFigures[move.player].end()) {
+		rookMove.figureId = itRook->id;
+		rookMove.type = MOVE;
+		makeMove(rookMove);
+	}
 }
 
 void Model::makeMoveEffectExplosion(const Move& move) {
@@ -231,7 +242,7 @@ void Model::makeMoveEffectExplosion(const Move& move) {
 			curPos.myY = move.pos2.myY + j;
 			if ( isFigureOnPosition(curPos, itFigure) && ( curPos == move.pos2 || getFigureData(itFigure->id).explosion == true) ) {
 					itFigure->captured = true;
-					myBoard(curPos.myX,curPos.myY) = 0;
+					myBoard.setBoardCell(curPos.myX,curPos.myY, 0);
 			}
 		}
 	}
@@ -241,7 +252,7 @@ void Model::makeMove(Move move) {
 
 	FIGURES::iterator itFigure, itOpponent;
 
-	itFigure = findFigure(move.player, move.pos1);
+	itFigure = getFigureByPosition(move.player, move.pos1);
 
 	if (move.type ==INPASSING) {
 		makeMoveInpassing(move);
@@ -252,8 +263,8 @@ void Model::makeMove(Move move) {
 	itFigure->position =  move.pos2;
 	itFigure->wasMoved = true;
 
-	myBoard(move.pos2.myX,move.pos2.myY) = myBoard(move.pos1.myX,move.pos1.myY);
-	myBoard(move.pos1.myX,move.pos1.myY) = 0;
+	myBoard.setBoardCell(move.pos2.myX, move.pos2.myY, myBoard(move.pos1.myX,move.pos1.myY));
+	myBoard.setBoardCell(move.pos1.myX,move.pos1.myY,0);
 
 
 
@@ -280,7 +291,7 @@ void Model::makeMove(Move move) {
 
 }
 
-MOVES Model::moves(int player, const Figure& figure,  bool needCheck) {
+MOVES Model::movesFigure(int player, const Figure& figure,  bool needCheck) const {
 	bool accepted;
 	int curLimit;
 	MOVES avMoves;
@@ -309,7 +320,6 @@ MOVES Model::moves(int player, const Figure& figure,  bool needCheck) {
 				move.pos2 = move.pos1;
 				do  {
 					accepted = false;
-
 					if (checkIsFree(*itRule, move.pos2) == true) {
 						move.pos2.myX += itRule->dx;
 						move.pos2.myY += itRule->dy;
@@ -329,7 +339,7 @@ MOVES Model::moves(int player, const Figure& figure,  bool needCheck) {
 	return avMoves;
 }
 
-bool Model::checkIsFree(MoveRule moveRule, Position curPos) {
+bool Model::checkIsFree(MoveRule moveRule, Position curPos) const{
 	bool isFree = true;
 	Position endPos;
 	int dx,dy;
@@ -350,7 +360,7 @@ bool Model::checkIsFree(MoveRule moveRule, Position curPos) {
 
 
 
-bool Model::checkPosition(MoveRule moveRule, const Figure& figure, Move& move, bool needCheck) {
+bool Model::checkPosition(MoveRule moveRule, const Figure& figure, Move& move, bool needCheck) const{
 
 	if (myBoard(move.pos2.myX,move.pos2.myY) == -1) {
 		return false;
@@ -375,24 +385,25 @@ bool Model::checkPosition(MoveRule moveRule, const Figure& figure, Move& move, b
 	return accepted;
 }
 
-bool Model::checkExplosionEffect(MoveRule moveRule, const Figure& figure, Move& move) {
+bool Model::checkExplosionEffect(MoveRule moveRule, const Figure& figure, Move& move) const{
 	move.effect = EXPLOSION;
 	return true;
 }
-bool Model::checkLongMoveEffect(MoveRule moveRule, const Figure& figure, Move& move) {
+bool Model::checkLongMoveEffect(MoveRule moveRule, const Figure& figure, Move& move) const {
 	if (figure.wasMoved == true) {
 		return false;
 	}
 	move.effect = LONGMOVE;
 	return true;
 }
-bool Model::checkCastleEffect(MoveRule moveRule, const Figure& figure, Move& move) {
+bool Model::checkCastleEffect(MoveRule moveRule, const Figure& figure, Move& move) const {
 
 	if (figure.wasMoved == true) {
 		return false;
 	}
 	CastleRule castleRule = myRules->getCastleRule(move.pos2.myX,move.pos2.myY,move.player);
-	FIGURES::iterator itRook = findFigure(move.player, castleRule.rookCellStart);
+	FIGURES::const_iterator itRook = findFigureByPosition(move.player, castleRule.rookCellStart);
+	if (itRook == mySetFigures[move.player].end() ) return false;
 	if (itRook->wasMoved == true || itRook->captured == true) {
 		return false;
 	}
@@ -400,10 +411,10 @@ bool Model::checkCastleEffect(MoveRule moveRule, const Figure& figure, Move& mov
 	return true;
 }
 
-bool Model::checkCapture(MoveRule moveRule, const Figure& figure, Move& move) {
+bool Model::checkCapture(MoveRule moveRule, const Figure& figure, Move& move) const {
 	bool accepted;
-	FIGURES::iterator itDestFigure = findFigure(move.player, move.pos2);
-	if ( itDestFigure != mySetFigures[move.player].end() ) {
+	FIGURES::const_iterator itDestFigure = findFigureByPosition(move.player, move.pos2);
+	if ( itDestFigure != mySetFigures[move.player].end() || itDestFigure == mySetFigures[1-move.player].end() ) {
 		return false;
 	}
 	move.type = CAPTURE;
@@ -416,12 +427,12 @@ bool Model::checkCapture(MoveRule moveRule, const Figure& figure, Move& move) {
 	}
 	return accepted;
 }
-bool Model::checkIfCheck(MoveRule moveRule, const Figure& figure, Move& move) {
+bool Model::checkIfCheck(MoveRule moveRule, const Figure& figure, Move& move) const{
 	Model m = *this;
 	m.makeMove(move);
 	return m.isCheck(move.player);
 }
-bool Model::checkMove(MoveRule moveRule, const Figure& figure, Move& move)  {
+bool Model::checkMove(MoveRule moveRule, const Figure& figure, Move& move) const {
 	bool accepted;
 	move.type = MOVE;
 	move.effect = 0;
@@ -434,7 +445,7 @@ bool Model::checkMove(MoveRule moveRule, const Figure& figure, Move& move)  {
 	}
 	return accepted;
 }
-bool Model::checkInpassing(MoveRule moveRule, const Figure& figure, Move& move) {
+bool Model::checkInpassing(MoveRule moveRule, const Figure& figure, Move& move) const {
 	bool accepted;
 	if (longmove != true || passant_cell != move.pos2) {
 		return false;
@@ -450,13 +461,13 @@ bool Model::checkInpassing(MoveRule moveRule, const Figure& figure, Move& move) 
 	return accepted;
 }
 
-bool Model::canMove(Move& move) {
+bool Model::canMove(Move& move) const {
 
 	bool accepted;
 	MOVES avMoves;
 	MOVES::iterator itMove;
 
-	avMoves = moves(move.player, move.pos1);
+	avMoves = movesFromPosition(move.player, move.pos1);
 	for ( accepted = false, itMove = avMoves.begin() ; !accepted && itMove != avMoves.end(); ++itMove ) {
 		if ( itMove->pos1 == move.pos1 && itMove->pos2 == move.pos2) { // && (it->type & move.type) ) {
 			move.effect = itMove->effect;
@@ -467,33 +478,34 @@ bool Model::canMove(Move& move) {
 	return accepted;
 }
 
-MOVES Model::moves(int player, Position pos1) {
+MOVES Model::movesFromPosition(int player, Position pos1) const {
 
 	MOVES avMoves;
-	FIGURES::iterator itFigure;
+	FIGURES::const_iterator itFigure;
 
-	itFigure = findFigure(player, pos1);
+	itFigure = findFigureByPosition(player, pos1);
 	if (itFigure == mySetFigures[player].end() || itFigure->captured == true) {
 		return avMoves;
 	}
 
-	avMoves = moves(player,*itFigure);
+	avMoves = movesFigure(player,*itFigure);
 	return avMoves;
 }
 
-MOVES Model::moves(int player) {
+MOVES Model::allMoves(int player) const {
 
 	MOVES avMoves, allMoves;
-	FIGURES::iterator itFigure;
-	MOVES::iterator itMove;
+	FIGURES::const_iterator itFigure;
+	MOVES::const_iterator itMove;
 	for (itFigure = mySetFigures[player].begin();  itFigure != mySetFigures[player].end(); ++itFigure) {
 		if (itFigure->captured == false) {
-			avMoves = moves(player, *itFigure);
+			avMoves = movesFigure(player, *itFigure);
 			for (itMove = avMoves.begin(); itMove != avMoves.end(); ++itMove) {
 				allMoves.push_back(*itMove);
 			}
 		}
 	}
+	//sort(allMoves.begin(), allMoves.end());
 	return allMoves;
 }
 
@@ -503,7 +515,21 @@ int Model::getDirection(int dir) const {
 	return 0;
 }
 
-FIGURES::iterator Model::findFigure(int player , Position findPos) {
+FIGURES::const_iterator Model::findFigureByPosition(int player , Position findPos) const {
+
+	FIGURES::const_iterator itFigure;
+
+	for ( itFigure = mySetFigures[player].begin() ; itFigure != mySetFigures[player].end(); ++itFigure ) {
+		if (itFigure->captured == false && itFigure->position == findPos)
+			return itFigure;
+	}
+	//if (itFigure == mySetFigures[player].end()) {
+	//sprintf(buffer, "EXCEPTION! find figure by position:  player %d, %d-%d\n", player, findPos.myX,findPos.myY); debugView->render(buffer);
+	return itFigure;
+
+}
+
+FIGURES::iterator Model::getFigureByPosition(int player , Position findPos) {
 
 	FIGURES::iterator itFigure;
 
@@ -511,12 +537,14 @@ FIGURES::iterator Model::findFigure(int player , Position findPos) {
 		if (itFigure->captured == false && itFigure->position == findPos)
 			break;
 	}
+	if (itFigure == mySetFigures[player].end()) {
+			sprintf(buffer, "EXCEPTION! GET figure by position:  player %d, %d-%d\n", player, findPos.myX,findPos.myY); debugView->render(buffer); }
 	return itFigure;
 
 }
 
-bool Model::isFigureOnPosition(Position findPos, FIGURES::iterator& itFindFigure) {
-	FIGURES::iterator itFigure;
+bool Model::isFigureOnPosition(Position findPos, FIGURES::const_iterator itFindFigure) const{
+	FIGURES::const_iterator itFigure;
 
 	for (int i=0; i<2; ++i) {
 		for ( itFigure = mySetFigures[i].begin() ; itFigure != mySetFigures[i].end(); ++itFigure ) {
@@ -529,12 +557,14 @@ bool Model::isFigureOnPosition(Position findPos, FIGURES::iterator& itFindFigure
 	return false;
 }
 
-FIGURES::iterator Model::findFigure(int player , int figureId) {
-	FIGURES::iterator itFigure;
+FIGURES::const_iterator Model::findFigureById(int player , int figureId) const{
+	FIGURES::const_iterator itFigure;
 	for ( itFigure = mySetFigures[player].begin() ; itFigure != mySetFigures[player].end(); ++itFigure ) {
 		if (itFigure->id == figureId)
 			break;
 	}
+	if (itFigure == mySetFigures[player].end()) {
+		sprintf(buffer, "EXCEPTION! find figure by id:  player %d, %d\n", player, figureId); debugView->render(buffer); }
 	return itFigure;
 }
 

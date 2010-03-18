@@ -18,6 +18,7 @@ class Model {
 				int myBufferSize;
 				int* myBoardArray;
 				int mySizeX, mySizeY;
+				int getCoordinates(int x,int y) const;
 			public:
 				Board(int buffer=4); // 4 - размер буферной зоны
 				~Board();
@@ -25,8 +26,9 @@ class Model {
 				Board& operator=(const Board& board);
 
 				void init(int sizex, int sizey);
-				void set(const Figure& figure);
-				int& operator() (int x,int y);
+				void setFigureOnBoard(const Figure& figure);
+				void setBoardCell(int x,int y,int value);
+				int operator() (int x,int y) const;
 		};
 
 		/********************/
@@ -43,26 +45,27 @@ class Model {
 		int mySpecialFigure;
 		FIGURES mySetFigures[2];
 
-		MOVES moves(int player, const Figure& figure,  bool needCheck=true);
+		MOVES movesFigure(int player, const Figure& figure,  bool needCheck=true) const;
 
-		bool isCheck(int player);
+		bool isCheck(int player) const;
 
-		FIGURES::iterator findFigure(int player, int figure);
-		bool isFigureOnPosition(Position findPos, FIGURES::iterator& itFindFigure);
+		FIGURES::const_iterator findFigureById(int player, int figure) const;
+		FIGURES::iterator getFigureByPosition(int player, Position findPos);
+		bool isFigureOnPosition(Position findPos, FIGURES::const_iterator itFindFigure) const;
 
 		int getDirection(int dir) const;
 
-		bool checkIsFree(MoveRule moveRule, Position startPos);
-		bool checkPosition(MoveRule moveRule, const Figure& figure, Move& move, bool needCheck);
+		bool checkIsFree(MoveRule moveRule, Position startPos) const;
+		bool checkPosition(MoveRule moveRule, const Figure& figure, Move& move, bool needCheck) const;
 
-		bool checkMove(MoveRule moveRule, const Figure& figure, Move& move);
-		bool checkCapture(MoveRule moveRule, const Figure& figure, Move& move);
-		bool checkInpassing(MoveRule moveRule, const Figure& figure, Move& move);
-		bool checkIfCheck(MoveRule moveRule, const Figure& figure, Move& move);
+		bool checkMove(MoveRule moveRule, const Figure& figure, Move& move) const;
+		bool checkCapture(MoveRule moveRule, const Figure& figure, Move& move) const;
+		bool checkInpassing(MoveRule moveRule, const Figure& figure, Move& move) const;
+		bool checkIfCheck(MoveRule moveRule, const Figure& figure, Move& move) const;
 
-		bool checkLongMoveEffect(MoveRule moveRule, const Figure& figure,  Move& move);
-		bool checkCastleEffect(MoveRule moveRule, const Figure& figure, Move& move);
-		bool checkExplosionEffect(MoveRule moveRule, const Figure& figure, Move& move);
+		bool checkLongMoveEffect(MoveRule moveRule, const Figure& figure,  Move& move) const;
+		bool checkCastleEffect(MoveRule moveRule, const Figure& figure, Move& move) const;
+		bool checkExplosionEffect(MoveRule moveRule, const Figure& figure, Move& move) const;
 
 
 		void makeMovePromotion(const Move& move);
@@ -82,15 +85,15 @@ class Model {
 		void init(int mode);
 
 		void makeMove(Move move);
-		bool canMove(Move& move);
-		MOVES moves(int player, Position pos1);
-		MOVES moves(int player);
+		bool canMove(Move& move) const;
+		MOVES movesFromPosition(int player, Position pos1) const;
+		MOVES allMoves(int player) const;
 
-		int getBoard(int x, int y);
+		int getBoardCell(int x, int y) const;
 		int getBoardSizeX() const;
 		int getBoardSizeY() const;
 		std::string getRulesName() const;
-		GameStatus getGameStatus(int player);
+		GameStatus getGameStatus(int player) const;
 		const FIGURES& getSetFigures(int player) const;
 		const FigureData& getFigureData(int figureId) const;
 		int getCurrentPlayer() const;
@@ -99,7 +102,7 @@ class Model {
 		void setFigure(int playerId, const Figure& figure);
 		void setCurrentPlayer(int playerId);
 
-		FIGURES::iterator findFigure(int player, Position findPos);
+		FIGURES::const_iterator findFigureByPosition(int player, Position findPos) const;
 
 
 

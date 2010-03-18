@@ -11,7 +11,7 @@
 class Model;
 
 class CLIView {
-	public:
+	public:  // временно, для показа ходов при обсчете компьютера
 		Model *myModel;
 	protected:
 		WINDOW *myWindow;

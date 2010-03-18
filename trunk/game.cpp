@@ -44,19 +44,21 @@ void Game::start(std::string file, int mode) {
 		model.init(1);
 	}
 
-	CLIView *infoView = new CLIView(25, 30, 14,2,6, true);
+	CLIView* infoView = new CLIView(25, 30, 14,2,6, true);
 	BoardCLIView *boardView = new BoardCLIView(model.getBoardSizeX()+2,model.getBoardSizeY()+10,2,2,7, false, &model);
-	CLIView *userView[2];
+	CLIView* userView[2];
 	userView[WHITE] = new CLIView(10,37,2,35,8,true);
 	userView[BLACK] = new CLIView(10,37,13,35,9,true);
+	CLIView* askView;
 
 
 	Player *players[2];
-	players[WHITE] = new HumanPlayer(WHITE, &model, boardView, userView[WHITE]);
-	//players[WHITE] = new AlphaBetaAIPlayer(WHITE, &model, boardView, userView[WHITE],5);
-	//players[2] = new AIPlayer(WHITE, &model, boardView, userView[WHITE],3);
+	//players[WHITE] = new HumanPlayer(WHITE, &model, boardView, userView[WHITE]);
+	players[WHITE] = new BruteForceAIPlayer(WHITE, &model, boardView, userView[WHITE],4);
+	//players[2] = new miniMaxAIPlayer(WHITE, &model, boardView, userView[WHITE],3);
 	players[BLACK] = new AlphaBetaAIPlayer(BLACK, &model, boardView, userView[BLACK],5);
-	//players[3] = new AIPlayer(BLACK, &model, boardView, userView[BLACK],3);
+	//players[BLACK] = new HumanPlayer(BLACK, &model, boardView, userView[BLACK]);
+	//players[3] = new miniMaxAIPlayer(BLACK, &model, boardView, userView[BLACK],3);
 
 	int curPlayer;
 	int key;
@@ -78,7 +80,7 @@ void Game::start(std::string file, int mode) {
 
 		++counter;
 		//if (counter > 1000) {
-/*
+
 			key = boardView->getKey();
 			if (key == KEY_F(5) ) {
 				infoView = new CLIView(5,30,25,35,6);
@@ -91,7 +93,8 @@ void Game::start(std::string file, int mode) {
 			} else if (key == 27) {
 				isEndGame = true;
 			}
-		//	*/
+
+		//
 		//	isEndGame = true;
 		//	sprintf(buffer,"Stop the game\n");
 		//	fputs(buffer, statfile);
@@ -102,7 +105,7 @@ void Game::start(std::string file, int mode) {
 
 		boardView->render();
 		//sprintf(buffer,"start() getting game status\n"); debugView->render(buffer);
-		status = model.getGameStatus(curPlayer);
+		status = USUAL;//model.getGameStatus(curPlayer);
 		//sprintf(buffer,"start() game status received\n\n"); debugView->render(buffer);
 		switch(status) {
 		case CHECK:
@@ -113,14 +116,14 @@ void Game::start(std::string file, int mode) {
 			sprintf(buffer,"Player %s has got the MATE!\n", model.getPlayerData(curPlayer).c_str());
 			fputs(buffer, statfile);
 			infoView->render(buffer);
-			//infoView->wait();
+			infoView->wait();
 			break;
 		case STALEMATE:
 			isEndGame = true;
 			sprintf(buffer,"Player %s has got the STALEMATE!\n", model.getPlayerData(curPlayer).c_str());
 			fputs(buffer, statfile);
 			infoView->render(buffer);
-			//infoView->wait();
+			infoView->wait();
 			break;
 		default:
 			break;
@@ -130,7 +133,7 @@ void Game::start(std::string file, int mode) {
 			do {
 
 				command = players[curPlayer]->makeTurn(playerMove, message);
-				//command = players[curPlayer+2]->makeTurn(playerMove, message);
+				//players[curPlayer+2]->makeTurn(playerMove, message);
 				if (command == TURN) {
 					//sprintf(buffer,"start() check if move is correct\n"); debugView->render(buffer);
 					isMoveCorrect = model.canMove(playerMove);
@@ -152,10 +155,10 @@ void Game::start(std::string file, int mode) {
 					isEndGame = true;
 					break;
 				case SAVE:
-					infoView = new CLIView(5,30,25,35,6);
-					infoView->render("Enter savename:\n");
-					string = infoView->ask("> ");
-					delete infoView;
+					askView = new CLIView(5,30,25,35,6);
+					askView->render("Enter savename:\n");
+					string = askView->ask("> ");
+					delete askView;
 					string = std::string("saves/") + string + std::string(".xml");
 					model_io.save(string);
 					message = SAVED;
