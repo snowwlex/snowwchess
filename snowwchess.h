@@ -54,10 +54,16 @@ struct Move {
 	int player;
 	Position pos1;
 	Position pos2;
+	// взятая фигура (id)
+	// значение на новом месте (id)
+	// координата для взятой фигуры
+	// фигуры для рокировки (указатели?)
+	// координаты хода ладьи при рокировке
 	int type;
 	int effect;
 	int figureId;
 	Move() { player = 0; type=0; effect = 0; figureId=0;}
+	bool operator<(const Move& move) const { return type<move.type; }
 };
 
 struct MoveRule {

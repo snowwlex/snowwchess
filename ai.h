@@ -9,7 +9,7 @@
 #define AI_H_
 
 class AIPlayer : public Player {
-	private:
+	protected:
 		int myColor;
 		int myTurnsCounter;
 		int myDepth;
@@ -18,35 +18,42 @@ class AIPlayer : public Player {
 		BoardCLIView *myBoardView;
 		CLIView *myUserView;
 
-		Move search();
-		int searchRecurs(Model m, Move move, int curDepth, int max);
-		int sef(Model *m) const;
+		int sefMaterial(const Model& model, int player) const;
 	public:
 		AIPlayer(int color, Model* m, BoardCLIView *boardView, CLIView * userView, int depth);
+};
+
+class BruteForceAIPlayer : public AIPlayer {
+	private:
+		int miniMaxSearch(Move& returnMove, int curDepth, int curPlayer, const Model& model);
+	public:
+		BruteForceAIPlayer(int color, Model* m, BoardCLIView *boardView, CLIView * userView, int depth);
 		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE);
 };
 
-class AlphaBetaAIPlayer : public Player {
+class AlphaBetaAIPlayer : public AIPlayer {
 	private:
-		struct AlphaBetaBorder {
-			bool isLower;
-			bool isUpper;
-			int lower;
-			int upper;
-			AlphaBetaBorder() { isLower=false; isUpper = false; lower=0; upper=0; }
+		enum Infinity { INF=1 };
+		struct Border {
+			int myIsInfinity;
+			int myValue;
+			Border(int value, int isInfinity=0) : myIsInfinity(isInfinity), myValue(value) { }
+			Border operator-() const {
+				return Border(-myValue, -myIsInfinity);
+			}
+			bool operator<(const Border& border) const {
+				if (myIsInfinity > border.myIsInfinity) return false;
+				if (myIsInfinity < border.myIsInfinity) return true;
+				if (myIsInfinity == 0 && myValue < border.myValue) return true;
+				return false;
+			}
+			bool operator==(const Border& border) const {
+				return myIsInfinity==border.myIsInfinity && myValue==border.myValue;
+			}
 		};
-		int myColor;
-		int myTurnsCounter;
-		int myDepth;
-		int myCounter;
-		Model *myModel;
-		BoardCLIView *myBoardView;
-		CLIView *myUserView;
 
-		Move search();
-		int searchRecurs(Model m, Move move, int curDepth, int max, AlphaBetaBorder borders);
-		int sef(Model *m) const;
-		bool alphaBetaPruning(int max, AlphaBetaBorder & borders, int score);
+		int alphaBetaNegaMaxSearch(Move& returnMove, Border alpha, Border beta, int curPlayer, int curDepth, const Model& model);
+
 	public:
 		AlphaBetaAIPlayer(int color, Model* m, BoardCLIView *boardView, CLIView * userView, int depth);
 		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE);

@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
 		}
 
 		if (option != "2") {
-			srand (time(0));
+			srand ( 123 );
 			statfile = fopen("statfile2.txt", "wt");
 			menuView->hide();
 			for (int i=0; i< 1; ++i) {
