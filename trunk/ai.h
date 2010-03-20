@@ -23,15 +23,15 @@ class AIPlayer : public Player {
 		AIPlayer(int color, Model* m, BoardCLIView *boardView, CLIView * userView, int depth);
 };
 
-class BruteForceAIPlayer : public AIPlayer {
+class FullSearchAIPlayer : public AIPlayer {
 	private:
 		int miniMaxSearch(Move& returnMove, int curDepth, int curPlayer, const Model& model);
 	public:
-		BruteForceAIPlayer(int color, Model* m, BoardCLIView *boardView, CLIView * userView, int depth);
+		FullSearchAIPlayer(int color, Model* m, BoardCLIView *boardView, CLIView * userView, int depth);
 		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE);
 };
 
-class AlphaBetaAIPlayer : public AIPlayer {
+class AlphaBetaSearchAIPlayer : public AIPlayer {
 	private:
 		enum Infinity { INF=1 };
 		struct Border {
@@ -47,6 +47,12 @@ class AlphaBetaAIPlayer : public AIPlayer {
 				if (myIsInfinity == 0 && myValue < border.myValue) return true;
 				return false;
 			}
+			bool operator>(const Border& border) const {
+				if (myIsInfinity > border.myIsInfinity) return true;
+				if (myIsInfinity < border.myIsInfinity) return false;
+				if (myIsInfinity == 0 && myValue > border.myValue) return true;
+				return false;
+			}
 			bool operator==(const Border& border) const {
 				return myIsInfinity==border.myIsInfinity && myValue==border.myValue;
 			}
@@ -55,7 +61,7 @@ class AlphaBetaAIPlayer : public AIPlayer {
 		int alphaBetaNegaMaxSearch(Move& returnMove, Border alpha, Border beta, int curPlayer, int curDepth, const Model& model);
 
 	public:
-		AlphaBetaAIPlayer(int color, Model* m, BoardCLIView *boardView, CLIView * userView, int depth);
+		AlphaBetaSearchAIPlayer(int color, Model* m, BoardCLIView *boardView, CLIView * userView, int depth);
 		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE);
 };
 #endif /* AI_H_ */
