@@ -61,6 +61,7 @@ class AlphaBetaSearchAIPlayer : public AIPlayer {
 		int alphaBetaNegaMaxSearch(Move& returnMove, Border alpha, Border beta, int curPlayer, int curDepth, const Model& model);
 
 	public:
+		bool operator()(const Move& move1,const Move& move2);
 		AlphaBetaSearchAIPlayer(int color, Model* m, BoardCLIView *boardView, CLIView * userView, int depth);
 		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE);
 };

@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <ncurses.h>
+#include <algorithm>
 #include <vector>
 #include <string>
 #include <map>
@@ -145,6 +146,8 @@ PlayerCommand AlphaBetaSearchAIPlayer::makeTurn(Move& move, GameMessage message)
 	srand ( myTurnsCounter*randomizator );
 	debugView->clear();
 
+
+	sprintf(buffer,"Turn #%d, player %s\n",myTurnsCounter, myColor==0?"WHITE":"BLACK"); fputs(buffer,statfile);
 	time(&start);
 	score = alphaBetaNegaMaxSearch( move, Border(0,-INF), Border(0,INF), myColor, myDepth, *myModel);
 	time(&end);
@@ -167,22 +170,31 @@ int AlphaBetaSearchAIPlayer::alphaBetaNegaMaxSearch(Move& returnMove, Border alp
 	++myCounter;
 
 	if (curDepth <= 0) {
-		//fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"sef = %d\n",sef(&m,curPlayer)); fputs(buffer,statfile);
+		fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"sef = %d\n",sefMaterial(model, curPlayer)); fputs(buffer,statfile);
 		return sefMaterial(model, curPlayer);
 	}
 	moves = model.allMoves(curPlayer);
 	if (moves.empty()) {
-		//fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"sef = %d\n",sef(&m,curPlayer)); fputs(buffer,statfile);
+		fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"sef = %d\n",sefMaterial(model, curPlayer)); fputs(buffer,statfile);
 		return sefMaterial(model, curPlayer);
 	}
 
-	//fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"[%d] BEFORE: %d:%d\n",curDepth, alpha.myIsInfinity==0?alpha.myValue:999, beta.myIsInfinity==0?beta.myValue:999); fputs(buffer,statfile);
+
+	fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"[%d] BEFORE: %d:%d\n",curDepth, alpha.myIsInfinity==0?alpha.myValue:999, beta.myIsInfinity==0?beta.myValue:999); fputs(buffer,statfile);
 	Border score(0, -INF);
+
+	std::sort(moves.begin(),moves.end(), *this);
 
 	for (pruning = false, itMove = moves.begin(); !pruning &&  itMove != moves.end(); ++itMove) {
 
 		Model curModel = model;
 		curModel.makeMove(*itMove);
+
+
+		if (curDepth == myDepth) {
+			alpha = Border(0,-INF);
+			beta = Border(0, INF);
+		}
 
 
 		if ( alpha.myIsInfinity == 0) {
@@ -195,26 +207,30 @@ int AlphaBetaSearchAIPlayer::alphaBetaNegaMaxSearch(Move& returnMove, Border alp
 			}
 			if (curDepth == myDepth) {
 				sprintf(buffer,"[++] %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c' SCORE %d]\n",itMove->pos1.myX+'a',myModel->getBoardSizeY() - itMove->pos1.myY + '0',itMove->pos2.myX+'a',myModel->getBoardSizeY() - itMove->pos2.myY + '0',itMove->effect,itMove->type,itMove->player,myModel->getFigureData(itMove->figureId).letter,tmpScore); debugView->render(buffer);
+				fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); fputs(buffer,statfile);
 				//debugView->wait();
 			}
 		} else {
+
+
 			tmpScore = -alphaBetaNegaMaxSearch(bestMove, -beta,-alpha,1-curPlayer, curDepth-1,curModel);
 			if (curDepth == myDepth) {
 				sprintf(buffer,"[AB] %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c' SCORE %d]\n",itMove->pos1.myX+'a',myModel->getBoardSizeY() - itMove->pos1.myY + '0',itMove->pos2.myX+'a',myModel->getBoardSizeY() - itMove->pos2.myY + '0',itMove->effect,itMove->type,itMove->player,myModel->getFigureData(itMove->figureId).letter,tmpScore); debugView->render(buffer);
+				fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); fputs(buffer,statfile);
 				//debugView->wait();
 			}
 		}
 
-		//if (result == score && rand()%2) { returnMove = *itMove;}
+		if (score == tmpScore && rand()%2) { returnMove = *itMove;}
 		if (score  < tmpScore)  { score = tmpScore; returnMove = *itMove; }
 		if (alpha  < score)  alpha = score;
 		if (beta   < alpha ) pruning = true;
-		//if (/*curDepth < myDepth &&*/  beta == alpha) pruning = true;
+		if (beta == alpha) pruning = true;
 
-		//fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"[%d] AFTER: result=%d, %d:%d\n",curDepth, result.myIsInfinity==0?result.myValue:999,alpha.myIsInfinity==0?alpha.myValue:999, beta.myIsInfinity==0?beta.myValue:999);fputs(buffer,statfile);
+		fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"[%d] AFTER: score=%d, %d:%d\n",curDepth, score.myIsInfinity==0?score.myValue:999,alpha.myIsInfinity==0?alpha.myValue:999, beta.myIsInfinity==0?beta.myValue:999);fputs(buffer,statfile);
 
 	}
-	//fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile);sprintf(buffer,"[%d] RETURN: %d\n",curDepth, result.myIsInfinity==0?result.myValue:999); fputs(buffer,statfile);
+	fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile);sprintf(buffer,"[%d]%s RETURN: %d\n",curDepth, pruning==true?"pruninged":"", score.myIsInfinity==0?score.myValue:999); fputs(buffer,statfile);
 
 
 	if (score.myIsInfinity != 0)
@@ -223,4 +239,32 @@ int AlphaBetaSearchAIPlayer::alphaBetaNegaMaxSearch(Move& returnMove, Border alp
 	return score.myValue;
 }
 
+bool AlphaBetaSearchAIPlayer::operator()(const Move& move1,const Move& move2) {
+	//MVV - LVA
+	if (move1.type == MOVE && move2.type == MOVE) {
+		int movingFigure1 = myModel->getBoardCell(move1.pos1.myX,move1.pos1.myY);
+		int movingFigure2 = myModel->getBoardCell(move2.pos1.myX,move2.pos1.myY);
+		if (myModel->getFigureData(movingFigure1).weight > myModel->getFigureData(movingFigure2).weight) return true;
+		return false;
+	}
+	if (move1.type == CAPTURE && move2.type == MOVE) return true;
+	if (move1.type == MOVE && move2.type == CAPTURE) return false;
+
+	if (move1.type == INPASSING || move2.type == INPASSING) return false;
+
+	int movingFigure1 = myModel->getBoardCell(move1.pos1.myX,move1.pos1.myY);
+	int capturingFigure1 = myModel->getBoardCell(move1.pos2.myX,move1.pos2.myY);
+	int movingFigure2 = myModel->getBoardCell(move2.pos1.myX,move2.pos1.myY);
+	int capturingFigure2 = myModel->getBoardCell(move2.pos2.myX,move2.pos2.myY);
+
+	if (myModel->getFigureData(capturingFigure1).weight > myModel->getFigureData(capturingFigure2).weight) return true;
+	if (myModel->getFigureData(capturingFigure1).weight < myModel->getFigureData(capturingFigure2).weight) return false;
+
+	if (myModel->getFigureData(movingFigure1).weight < myModel->getFigureData(movingFigure2).weight) return true;
+	if (myModel->getFigureData(movingFigure1).weight > myModel->getFigureData(movingFigure2).weight) return false;
+
+	return false;
+
+
+}
 
