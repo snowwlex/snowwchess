@@ -143,6 +143,7 @@ PlayerCommand AlphaBetaSearchAIPlayer::makeTurn(Move& move, GameMessage message)
 
 	++myTurnsCounter;
 	myCounter = 0;
+	myQCounter = 0;
 	srand ( myTurnsCounter*randomizator );
 	debugView->clear();
 
@@ -153,7 +154,7 @@ PlayerCommand AlphaBetaSearchAIPlayer::makeTurn(Move& move, GameMessage message)
 	time(&end);
 
 	sprintf(buffer, "My AB move #%d: [%c%c-%c%c (%s+%d)]\n",myTurnsCounter, move.pos1.myX+'a',myModel->getBoardSizeY() - move.pos1.myY+'0',move.pos2.myX+'a', myModel->getBoardSizeY() - move.pos2.myY+'0', move.type == CAPTURE ? "capture" : "move", move.effect ); myUserView->render(buffer);
-	sprintf(buffer,"[AB] My counter = %d, myDepth = %d, turns = %d\n",myCounter, myDepth, myTurnsCounter); debugView->render(buffer);
+	sprintf(buffer,"[AB] My counter = %d, qcounter=%d,myDepth = %d, turns = %d\n",myCounter, myQCounter, myDepth, myTurnsCounter); debugView->render(buffer);
 	sprintf(buffer,"Time for AB searching: %f\n",difftime(end,start)); debugView->render(buffer);
 	fflush(statfile);
 	command = TURN;
@@ -161,26 +162,99 @@ PlayerCommand AlphaBetaSearchAIPlayer::makeTurn(Move& move, GameMessage message)
 }
 
 
-int AlphaBetaSearchAIPlayer::alphaBetaNegaMaxSearch(Move& returnMove, Border alpha, Border beta, int curPlayer, int curDepth , const Model& model) {
+int AlphaBetaSearchAIPlayer::quiesSearch(Move& returnMove, Border alpha, Border beta, int curPlayer, int curDepth , const Model& model) {
+
 	MOVES moves;
 	Move bestMove;
 	MOVES::iterator itMove;
 	int tmpScore;
 	bool pruning;
+	++myQCounter;
+
+
+	if (model.isCheck(curPlayer) == true) {
+		return alphaBetaNegaMaxSearch(bestMove, alpha, beta, curPlayer, 1 , model);
+	}
+
+	Border score = sefMaterial(model,curPlayer);
+
+	if (curDepth < -3) return score.myValue;
+	moves = model.allMoves(curPlayer, CAPTURE);
+
+	//sprintf(buffer,"[%d]",curDepth); debugView->render(buffer);
+	//sprintf(buffer,"CAPTURE MOVES, deep=%d:\n",curDepth); debugView->render(buffer);
+	//DEBUG_DISPLAY_BEFORE
+	for (MOVES::const_iterator itMove = moves.begin(); itMove != moves.end(); ++itMove ) {
+		//DEBUG_DISPLAY_MOVE
+	}
+	//if (curDepth == -4) debugView->wait();
+
+	if (moves.empty()) {
+		//DEBUG_DISPLAY("MOVES ARE OFF:\n");
+		return score.myValue;
+	}
+	sort(moves.begin(),moves.end(),*this);
+	if (alpha < score) alpha = score;
+
+	for (pruning = false, itMove = moves.begin(); !pruning &&  itMove != moves.end(); ++itMove) {
+
+		Model curModel = model;
+		curModel.makeMove(*itMove);
+
+		tmpScore = -quiesSearch(bestMove, -beta,-alpha,1-curPlayer, curDepth-1,curModel);
+
+		if (alpha  < tmpScore)  { alpha = tmpScore; returnMove = *itMove; }
+		if (beta   < alpha ) pruning = true;
+		if (beta == alpha) pruning = true;
+
+
+	}
+
+	if (alpha.myIsInfinity != 0)
+		{ sprintf(buffer,"[%d] Exception! infinity return at quies search\n",curDepth); debugView->render(buffer); }
+	//sprintf(buffer,"Returning alpha, deep=%d\n",curDepth); debugView->render(buffer);
+	return alpha.myValue;
+
+}
+
+
+int AlphaBetaSearchAIPlayer::alphaBetaNegaMaxSearch(Move& returnMove, Border alpha, Border beta, int curPlayer, int curDepth , const Model& model) {
+	MOVES moves;
+	Move bestMove;
+	MOVES::iterator itMove;
+	int tmpScore, tmp;
+	bool pruning;
 	++myCounter;
 
 	if (curDepth <= 0) {
-		fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"sef = %d\n",sefMaterial(model, curPlayer)); fputs(buffer,statfile);
-		return sefMaterial(model, curPlayer);
+		DEBUG_LOG_SEF
+		//tmp = sefMaterial(model, curPlayer);
+		//return tmp;
+		tmpScore = quiesSearch(bestMove, alpha,beta,curPlayer, curDepth,model);
+		return tmpScore;
+
 	}
+
+	//null move
+	/*
+	if (model.isCheck(curPlayer) == false && beta.myIsInfinity == 0 && curDepth < myDepth-1) {
+		Border newBeta = beta;
+		newBeta.myValue -= 1;
+		tmpScore = -alphaBetaNegaMaxSearch(bestMove, -beta,-newBeta,1-curPlayer, curDepth-1-2,model);
+		if ( beta < tmpScore ) {
+			return tmpScore;
+		}
+	}
+	*/
+
+
+
 	moves = model.allMoves(curPlayer);
 	if (moves.empty()) {
-		fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"sef = %d\n",sefMaterial(model, curPlayer)); fputs(buffer,statfile);
+		DEBUG_LOG_SEF
 		return sefMaterial(model, curPlayer);
 	}
-
-
-	fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"[%d] BEFORE: %d:%d\n",curDepth, alpha.myIsInfinity==0?alpha.myValue:999, beta.myIsInfinity==0?beta.myValue:999); fputs(buffer,statfile);
+	DEBUG_LOG_BEFORE
 	Border score(0, -INF);
 
 	std::sort(moves.begin(),moves.end(), *this);
@@ -190,33 +264,29 @@ int AlphaBetaSearchAIPlayer::alphaBetaNegaMaxSearch(Move& returnMove, Border alp
 		Model curModel = model;
 		curModel.makeMove(*itMove);
 
-
-		if (curDepth == myDepth) {
-			alpha = Border(0,-INF);
-			beta = Border(0, INF);
-		}
-
-
-		if ( alpha.myIsInfinity == 0) {
+		if ( false && alpha.myIsInfinity == 0) {
 			// null window search
 			Border newAlpha = alpha;
 			newAlpha.myValue += 1;
 			tmpScore = -alphaBetaNegaMaxSearch(bestMove, -newAlpha,-alpha,1-curPlayer, curDepth-1,curModel);
 			if (alpha < tmpScore && beta > tmpScore) {
+				//if (curDepth==1) { sprintf(buffer,"        Searching at %d\n",myCounter); debugView->render(buffer);  }
+				bestMove = *itMove;
 				tmpScore = -alphaBetaNegaMaxSearch(bestMove, -beta,-alpha,1-curPlayer, curDepth-1,curModel);
 			}
 			if (curDepth == myDepth) {
-				sprintf(buffer,"[++] %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c' SCORE %d]\n",itMove->pos1.myX+'a',myModel->getBoardSizeY() - itMove->pos1.myY + '0',itMove->pos2.myX+'a',myModel->getBoardSizeY() - itMove->pos2.myY + '0',itMove->effect,itMove->type,itMove->player,myModel->getFigureData(itMove->figureId).letter,tmpScore); debugView->render(buffer);
-				fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); fputs(buffer,statfile);
+				DEBUG_DISPLAY_SCORE
+				DEBUG_LOG_SCORE
 				//debugView->wait();
 			}
 		} else {
 
-
+			//if (curDepth==1) { sprintf(buffer,"        Searching at %d\n",myCounter); debugView->render(buffer);  }
+			bestMove = *itMove;
 			tmpScore = -alphaBetaNegaMaxSearch(bestMove, -beta,-alpha,1-curPlayer, curDepth-1,curModel);
 			if (curDepth == myDepth) {
-				sprintf(buffer,"[AB] %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c' SCORE %d]\n",itMove->pos1.myX+'a',myModel->getBoardSizeY() - itMove->pos1.myY + '0',itMove->pos2.myX+'a',myModel->getBoardSizeY() - itMove->pos2.myY + '0',itMove->effect,itMove->type,itMove->player,myModel->getFigureData(itMove->figureId).letter,tmpScore); debugView->render(buffer);
-				fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); fputs(buffer,statfile);
+				DEBUG_DISPLAY_SCORE
+				DEBUG_LOG_SCORE
 				//debugView->wait();
 			}
 		}
@@ -225,12 +295,14 @@ int AlphaBetaSearchAIPlayer::alphaBetaNegaMaxSearch(Move& returnMove, Border alp
 		if (score  < tmpScore)  { score = tmpScore; returnMove = *itMove; }
 		if (alpha  < score)  alpha = score;
 		if (beta   < alpha ) pruning = true;
-		if (beta == alpha) pruning = true;
+		//if (beta == alpha) pruning = true;
 
-		fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"[%d] AFTER: score=%d, %d:%d\n",curDepth, score.myIsInfinity==0?score.myValue:999,alpha.myIsInfinity==0?alpha.myValue:999, beta.myIsInfinity==0?beta.myValue:999);fputs(buffer,statfile);
+
 
 	}
-	fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile);sprintf(buffer,"[%d]%s RETURN: %d\n",curDepth, pruning==true?"pruninged":"", score.myIsInfinity==0?score.myValue:999); fputs(buffer,statfile);
+
+
+	DEBUG_LOG_RETURN
 
 
 	if (score.myIsInfinity != 0)

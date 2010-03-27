@@ -22,6 +22,10 @@ class Rules {
 		int myBoardSizeX, myBoardSizeY;
 	public:
 
+		bool operator()(const Figure& figure1,const Figure& figure2) {
+			 return myFiguresData[figure1.id].weight > myFiguresData[figure2.id].weight;
+		}
+
 		const MOVERULES& getMoveRules(int figureId);
 		const FigureData& getFigureData(int figureId);
 		const FIGURES& getInitFigures(int playerId) const;

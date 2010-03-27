@@ -20,6 +20,8 @@
 #include "player.h"
 #include "ai.h"
 
+#include <ctime>
+
 
 void Game::start(std::string file, int mode) {
 
@@ -51,14 +53,35 @@ void Game::start(std::string file, int mode) {
 	userView[BLACK] = new CLIView(10,37,13,35,9,true);
 	CLIView* askView;
 
+	/* speed tests:
+	{
+		time_t start,end;
+		time(&start);
+		for (int i=0; i<50000; ++i) {
+			//model.allMoves(WHITE, CAPTURE); //5 sec
+			//model.allMoves(WHITE, MOVE); //37 sec
+			//model.allMoves(WHITE); //39sec
+			//model.isCheck(WHITE); // 1sec
+			//Model newModel = model; // 0 sec
+		}
+		time(&end);
+		sprintf(buffer, "Time: %f", difftime(end,start)); debugView->render(buffer);
 
-	Player *players[2];
-	//players[WHITE] = new HumanPlayer(WHITE, &model, boardView, userView[WHITE]);
-	players[WHITE] = new BruteForceAIPlayer(WHITE, &model, boardView, userView[WHITE],4);
-	//players[2] = new miniMaxAIPlayer(WHITE, &model, boardView, userView[WHITE],3);
-	players[BLACK] = new AlphaBetaAIPlayer(BLACK, &model, boardView, userView[BLACK],5);
+		return;
+	}
+	*/
+
+
+
+
+
+	Player *players[4];
+	players[WHITE] = new HumanPlayer(WHITE, &model, boardView, userView[WHITE]);
+	//players[WHITE] = new FullSearchAIPlayer(WHITE, &model, boardView, userView[WHITE],4);
+	//players[2] = new AlphaBetaSearchAIPlayer(WHITE, &model, boardView, userView[WHITE],5);
+	//players[BLACK] = new FullSearchAIPlayer(BLACK, &model, boardView, userView[BLACK],4);
 	//players[BLACK] = new HumanPlayer(BLACK, &model, boardView, userView[BLACK]);
-	//players[3] = new miniMaxAIPlayer(BLACK, &model, boardView, userView[BLACK],3);
+	players[BLACK] = new AlphaBetaSearchAIPlayer(BLACK, &model, boardView, userView[BLACK],3);
 
 	int curPlayer;
 	int key;
@@ -80,7 +103,7 @@ void Game::start(std::string file, int mode) {
 
 		++counter;
 		//if (counter > 1000) {
-
+/*
 			key = boardView->getKey();
 			if (key == KEY_F(5) ) {
 				infoView = new CLIView(5,30,25,35,6);
@@ -93,7 +116,7 @@ void Game::start(std::string file, int mode) {
 			} else if (key == 27) {
 				isEndGame = true;
 			}
-
+*/
 		//
 		//	isEndGame = true;
 		//	sprintf(buffer,"Stop the game\n");
@@ -133,7 +156,8 @@ void Game::start(std::string file, int mode) {
 			do {
 
 				command = players[curPlayer]->makeTurn(playerMove, message);
-				//players[curPlayer+2]->makeTurn(playerMove, message);
+				//debugView->wait();
+				//command = players[curPlayer+2]->makeTurn(playerMove, message);
 				if (command == TURN) {
 					//sprintf(buffer,"start() check if move is correct\n"); debugView->render(buffer);
 					isMoveCorrect = model.canMove(playerMove);

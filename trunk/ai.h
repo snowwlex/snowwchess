@@ -8,12 +8,29 @@
 #ifndef AI_H_
 #define AI_H_
 
+#define DEBUG_DISPLAY_SEF  sprintf(buffer,"sef = %d\n",sefMaterial(model, curPlayer)); debugView->render(buffer);
+#define DEBUG_DISPLAY_BEFORE  sprintf(buffer,"[%d] BEFORE: %d:%d\n",curDepth, alpha.myIsInfinity==0?alpha.myValue:999, beta.myIsInfinity==0?beta.myValue:999);debugView->render(buffer);
+#define DEBUG_DISPLAY_SCORE  sprintf(buffer,"[AB] %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c' SCORE %d]\n",itMove->pos1.myX+'a',myModel->getBoardSizeY() - itMove->pos1.myY + '0',itMove->pos2.myX+'a',myModel->getBoardSizeY() - itMove->pos2.myY + '0',itMove->effect,itMove->type,itMove->player,myModel->getFigureData(itMove->figureId).letter,tmpScore); debugView->render(buffer);
+#define DEBUG_DISPLAY_MOVE  sprintf(buffer,"[move] %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c' ]\n",itMove->pos1.myX+'a',myModel->getBoardSizeY() - itMove->pos1.myY + '0',itMove->pos2.myX+'a',myModel->getBoardSizeY() - itMove->pos2.myY + '0',itMove->effect,itMove->type,itMove->player,myModel->getFigureData(itMove->figureId).letter); debugView->render(buffer);
+#define DEBUG_DISPLAY_AFTER sprintf(buffer,"[%d] AFTER: score=%d, %d:%d\n",curDepth, score.myIsInfinity==0?score.myValue:999,alpha.myIsInfinity==0?alpha.myValue:999, beta.myIsInfinity==0?beta.myValue:999);debugView->render(buffer);
+#define DEBUG_DISPLAY_RETURN sprintf(buffer,"[%d]%s RETURN: %d\n",curDepth, pruning==true?"pruninged":"", score.myIsInfinity==0?score.myValue:999); debugView->render(buffer);
+#define DEBUG_DISPLAY(something) sprintf(buffer,something); debugView->render(buffer);
+
+#define DEBUG_LOG_SEF fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"sef = %d\n",sefMaterial(model, curPlayer)); fputs(buffer,statfile);
+#define DEBUG_LOG_BEFORE fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"[%d] BEFORE: %d:%d\n",curDepth, alpha.myIsInfinity==0?alpha.myValue:999, beta.myIsInfinity==0?beta.myValue:999); fputs(buffer,statfile);
+#define DEBUG_LOG_SCORE fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"[++] %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c' SCORE %d]\n",itMove->pos1.myX+'a',myModel->getBoardSizeY() - itMove->pos1.myY + '0',itMove->pos2.myX+'a',myModel->getBoardSizeY() - itMove->pos2.myY + '0',itMove->effect,itMove->type,itMove->player,myModel->getFigureData(itMove->figureId).letter,tmpScore); fputs(buffer,statfile);
+#define DEBUG_LOG_MOVE fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile);  sprintf(buffer,"[move] %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c' ]\n",itMove->pos1.myX+'a',myModel->getBoardSizeY() - itMove->pos1.myY + '0',itMove->pos2.myX+'a',myModel->getBoardSizeY() - itMove->pos2.myY + '0',itMove->effect,itMove->type,itMove->player,myModel->getFigureData(itMove->figureId).letter); debugView->render(buffer);  fputs(buffer,statfile);
+#define DEBUG_LOG_AFTER fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"[%d] AFTER: score=%d, %d:%d\n",curDepth, score.myIsInfinity==0?score.myValue:999,alpha.myIsInfinity==0?alpha.myValue:999, beta.myIsInfinity==0?beta.myValue:999);fputs(buffer,statfile);
+#define DEBUG_LOG_RETURN fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile);sprintf(buffer,"[%d]%s RETURN: %d\n",curDepth, pruning==true?"pruninged":"", score.myIsInfinity==0?score.myValue:999); fputs(buffer,statfile);
+
+
 class AIPlayer : public Player {
 	protected:
 		int myColor;
 		int myTurnsCounter;
 		int myDepth;
 		int myCounter;
+		int myQCounter;
 		Model *myModel;
 		BoardCLIView *myBoardView;
 		CLIView *myUserView;
@@ -59,6 +76,7 @@ class AlphaBetaSearchAIPlayer : public AIPlayer {
 		};
 
 		int alphaBetaNegaMaxSearch(Move& returnMove, Border alpha, Border beta, int curPlayer, int curDepth, const Model& model);
+		int quiesSearch(Move& returnMove, Border alpha, Border beta, int curPlayer, int curDepth , const Model& model);
 
 	public:
 		bool operator()(const Move& move1,const Move& move2);
