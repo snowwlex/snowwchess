@@ -1,145 +1,145 @@
-<?dxml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <rules name="classic">
-	<board sizex="8" sizey="8"/>
-	<players turns="1">
-		<player id="1" name="WHITE"/>
-		<player id="2" name="BLACK"/>
-	</players>
-	<figures special="6">
-		<figure id="1" name="QUEEN" weight="9" letter="Q"/>
-		<figure id="2" name="ROOK" weight="5" letter="R"/>
-		<figure id="3" name="KNIGHT" weight="3" letter="N"/>
-		<figure id="4" name="BISHOP" weight="3" letter="B"/>
-		<figure id="5" name="PAWN" weight="1" letter="P"/>
-		<figure id="6" name="KING" weight="1000" letter="K" special="1"/>
-	</figures>
-	<positions>
-		<player id="1">
-			<figure id="6">
-				<position cell="e1"/>
-			</figure>
-			<figure id="1">
-				<position cell="d1"/>
-			</figure>
-			<figure id="2">
-				<position cell="a1"/>
-				<position cell="h1"/>
-			</figure>
-			<figure id="3">
-				<position cell="b1"/>
-				<position cell="g1"/>
-			</figure>
-			<figure id="4">
-				<position cell="c1"/>
-				<position cell="f1"/>
-			</figure>
-			<figure id="5">
-				<position cell="a2"/>
-				<position cell="b2"/>
-				<position cell="c2"/>
-				<position cell="d2"/>
-				<position cell="e2"/>
-				<position cell="f2"/>
-				<position cell="g2"/>
-				<position cell="h2"/>
-			</figure>
-		</player>
-		<player id="2">
-			<figure id="6">
-				<position cell="e8"/>
-			</figure>
-			<figure id="1">
-				<position cell="d8"/>
-			</figure>
-			<figure id="2">
-				<position cell="a8"/>
-				<position cell="h8"/>
-			</figure>
-			<figure id="3">
-				<position cell="b8"/>
-				<position cell="g8"/>
-			</figure>
-			<figure id="4">
-				<position cell="c8"/>
-				<position cell="f8"/>
-			</figure>
-			<figure id="5">
-				<position cell="a7"/>
-				<position cell="b7"/>
-				<position cell="c7"/>
-				<position cell="d7"/>
-				<position cell="e7"/>
-				<position cell="f7"/>
-				<position cell="g7"/>
-				<position cell="h7"/>
-			</figure>
-		</player>
-	</positions>
-	<moves>
-		<figure id="6">
-			<jump dx="1" dy="0"/>
-			<jump dx="-1" dy="0"/>
-			<jump dx="0" dy="1"/>
-			<jump dx="0" dy="-1"/>
-			<jump dx="1" dy="1"/>
-			<jump dx="-1" dy="1"/>
-			<jump dx="1" dy="-1"/>
-			<jump dx="-1" dy="-1"/>
-			<slide dx="2" dy="0"  type="move" effect="castle" limit="1" on="g1" with="h1" to="f1" player="1"/>
-			<slide dx="-2" dy="0" type="move" effect="castle" limit="1" on="c1" with="a1" to="d1" player="1"/>
-			<slide dx="-2" dy="0" type="move" effect="castle" limit="1" on="c8" with="a8" to="d8" player="2"/>
-			<slide dx="2" dy="0"  type="move" effect="castle" limit="1" on="g8" with="h8" to="f8" player="2"/>
-		</figure>
-		<figure id="1">
-			<slide dx="1" dy="1"/>
-			<slide dx="1" dy="-1"/>
-			<slide dx="-1" dy="1"/>
-			<slide dx="-1" dy="-1"/>
-			<slide dx="1" dy="0"/>
-			<slide dx="-1" dy="0"/>
-			<slide dx="0" dy="1"/>
-			<slide dx="0" dy="-1"/>
-		</figure>
-		<figure id="2">
-			<slide dx="1" dy="0"/>
-			<slide dx="-1" dy="0"/>
-			<slide dx="0" dy="1"/>
-			<slide dx="0" dy="-1"/>
-		</figure>
-		<figure id="3">
-			<jump dx="2" dy="1"/>
-			<jump dx="2" dy="-1"/>
-			<jump dx="-2" dy="1"/>
-			<jump dx="-2" dy="-1"/>
-			<jump dx="-1" dy="2"/>
-			<jump dx="1" dy="-2"/>
-			<jump dx="1" dy="2"/>
-			<jump dx="-1" dy="-2"/>
-		</figure>
-		<figure id="4">
-			<slide dx="1" dy="1"/>
-			<slide dx="1" dy="-1"/>
-			<slide dx="-1" dy="1"/>
-			<slide dx="-1" dy="-1"/>
-		</figure>
-		<figure id="5">
-			<jump dx="0" dy="1" type="move" player="2"/>
-			<jump dx="1" dy="1" type="capture" player="2"/>
-			<jump dx="-1" dy="1" type="capture" player="2"/>
-			<jump dx="0" dy="-1" type="move" player="1"/>
-			<jump dx="1" dy="-1" type="capture" player="1"/>
-			<jump dx="-1" dy="-1" type="capture" player="1"/>
+        <board sizex="8" sizey="8"/>
+        <players turns="1">
+                <player id="1" name="WHITE"/>
+                <player id="2" name="BLACK"/>
+        </players>
+        <figures special="1">
+                <figure id="1" name="KING" weight="18" letter="K" special="1"/>
+                <figure id="2" name="QUEEN" weight="9" letter="Q"/>
+                <figure id="3" name="ROOK" weight="5" letter="R"/>
+                <figure id="4" name="KNIGHT" weight="3" letter="N"/>
+                <figure id="5" name="BISHOP" weight="3" letter="B"/>
+                <figure id="6" name="PAWN" weight="1" letter="P"/>
+        </figures>
+        <positions>
+                <player id="1">
+                        <figure id="1">
+                                <position cell="e1"/>
+                        </figure>
+                        <figure id="2">
+                                <position cell="d1"/>
+                        </figure>
+                        <figure id="3">
+                                <position cell="a1"/>
+                                <position cell="h1"/>
+                        </figure>
+                        <figure id="4">
+                                <position cell="b1"/>
+                                <position cell="g1"/>
+                        </figure>
+                        <figure id="5">
+                                <position cell="c1"/>
+                                <position cell="f1"/>
+                        </figure>
+                        <figure id="6">
+                                <position cell="a2"/>
+                                <position cell="b2"/>
+                                <position cell="c2"/>
+                                <position cell="d2"/>
+                                <position cell="e2"/>
+                                <position cell="f2"/>
+                                <position cell="g2"/>
+                                <position cell="h2"/>
+                        </figure>
+                </player>
+                <player id="2">
+                        <figure id="1">
+                                <position cell="e8"/>
+                        </figure>
+                        <figure id="2">
+                                <position cell="d8"/>
+                        </figure>
+                        <figure id="3">
+                                <position cell="a8"/>
+                                <position cell="h8"/>
+                        </figure>
+                        <figure id="4">
+                                <position cell="b8"/>
+                                <position cell="g8"/>
+                        </figure>
+                        <figure id="5">
+                                <position cell="c8"/>
+                                <position cell="f8"/>
+                        </figure>
+                        <figure id="6">
+                                <position cell="a7"/>
+                                <position cell="b7"/>
+                                <position cell="c7"/>
+                                <position cell="d7"/>
+                                <position cell="e7"/>
+                                <position cell="f7"/>
+                                <position cell="g7"/>
+                                <position cell="h7"/>
+                        </figure>
+                </player>
+        </positions>
+        <moves>
+                <figure id="1">
+                        <jump dx="1" dy="0"/>
+                        <jump dx="-1" dy="0"/>
+                        <jump dx="0" dy="1"/>
+                        <jump dx="0" dy="-1"/>
+                        <jump dx="1" dy="1"/>
+                        <jump dx="-1" dy="1"/>
+                        <jump dx="1" dy="-1"/>
+                        <jump dx="-1" dy="-1"/>
+                        <slide dx="2" dy="0"  type="move" effect="castle" limit="1" on="g1" with="h1" to="f1" player="1"/>
+                        <slide dx="-2" dy="0" type="move" effect="castle" limit="1" on="c1" with="a1" to="d1" player="1"/>
+                        <slide dx="-2" dy="0" type="move" effect="castle" limit="1" on="c8" with="a8" to="d8" player="2"/>
+                        <slide dx="2" dy="0"  type="move" effect="castle" limit="1" on="g8" with="h8" to="f8" player="2"/>
+                </figure>
+                <figure id="2">
+                        <slide dx="1" dy="1"/>
+                        <slide dx="1" dy="-1"/>
+                        <slide dx="-1" dy="1"/>
+                        <slide dx="-1" dy="-1"/>
+                        <slide dx="1" dy="0"/>
+                        <slide dx="-1" dy="0"/>
+                        <slide dx="0" dy="1"/>
+                        <slide dx="0" dy="-1"/>
+                </figure>
+                <figure id="3">
+                        <slide dx="1" dy="0"/>
+                        <slide dx="-1" dy="0"/>
+                        <slide dx="0" dy="1"/>
+                        <slide dx="0" dy="-1"/>
+                </figure>
+                <figure id="4">
+                        <jump dx="2" dy="1"/>
+                        <jump dx="2" dy="-1"/>
+                        <jump dx="-2" dy="1"/>
+                        <jump dx="-2" dy="-1"/>
+                        <jump dx="-1" dy="2"/>
+                        <jump dx="1" dy="-2"/>
+                        <jump dx="1" dy="2"/>
+                        <jump dx="-1" dy="-2"/>
+                </figure>
+                <figure id="5">
+                        <slide dx="1" dy="1"/>
+                        <slide dx="1" dy="-1"/>
+                        <slide dx="-1" dy="1"/>
+                        <slide dx="-1" dy="-1"/>
+                </figure>
+                <figure id="6">
+                        <jump dx="0" dy="1" type="move" player="2"/>
+                        <jump dx="1" dy="1" type="capture" player="2"/>
+                        <jump dx="-1" dy="1" type="capture" player="2"/>
+                        <jump dx="0" dy="-1" type="move" player="1"/>
+                        <jump dx="1" dy="-1" type="capture" player="1"/>
+                        <jump dx="-1" dy="-1" type="capture" player="1"/>
 
-			<jump dx="1" dy="-1" type="inpassing" player="1"/>
-			<jump dx="-1" dy="-1" type="inpassing" player="1"/>
-			<jump dx="1" dy="1" type="inpassing" player="2"/>
-			<jump dx="-1" dy="1" type="inpassing" player="2"/>
+                        <jump dx="1" dy="-1" type="inpassing" player="1"/>
+                        <jump dx="-1" dy="-1" type="inpassing" player="1"/>
+                        <jump dx="1" dy="1" type="inpassing" player="2"/>
+                        <jump dx="-1" dy="1" type="inpassing" player="2"/>
 
-			<slide dx="0" dy="-2" limit="1" type="move" effect="longmove" player="1"/>
-			<slide dx="0" dy="2" limit="1" type="move" effect="longmove" player="2"/>
-			
-			<promotion horizontal="8" figure="1" player="1"/>
-			<promotion horizontal="1" figure="1" player="2"/>
-		</figure>
-	</moves>
+                        <slide dx="0" dy="-2" limit="1" type="move" effect="longmove" player="1"/>
+                        <slide dx="0" dy="2" limit="1" type="move" effect="longmove" player="2"/>
+                        
+                        <promotion horizontal="8" figure="2" player="1"/>
+                        <promotion horizontal="1" figure="2" player="2"/>
+                </figure>
+        </moves>
 </rules>

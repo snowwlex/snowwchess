@@ -45,9 +45,9 @@ class Model {
 		int mySpecialFigure;
 		FIGURES mySetFigures[2];
 
-		MOVES movesFigure(int player, const Figure& figure,  bool needCheck=true) const;
 
-		bool isCheck(int player) const;
+
+		MOVES movesFigure(int player, const Figure& figure,  int movetype, bool needCheck=true) const;
 
 		FIGURES::const_iterator findFigureById(int player, int figure) const;
 		FIGURES::iterator getFigureByPosition(int player, Position findPos);
@@ -56,7 +56,7 @@ class Model {
 		int getDirection(int dir) const;
 
 		bool checkIsFree(MoveRule moveRule, Position startPos) const;
-		bool checkPosition(MoveRule moveRule, const Figure& figure, Move& move, bool needCheck) const;
+		bool checkPosition(MoveRule moveRule, const Figure& figure, Move& move, int movetype, bool needCheck) const;
 
 		bool checkMove(MoveRule moveRule, const Figure& figure, Move& move) const;
 		bool checkCapture(MoveRule moveRule, const Figure& figure, Move& move) const;
@@ -81,13 +81,18 @@ class Model {
 	public:
 
 
+
 		Model(Rules* _myRules);
 		void init(int mode);
+
+
 
 		void makeMove(Move move);
 		bool canMove(Move& move) const;
 		MOVES movesFromPosition(int player, Position pos1) const;
-		MOVES allMoves(int player) const;
+		MOVES allMoves(int player, int movetype=(MOVE | CAPTURE)) const;
+		bool isCheck(int player) const;
+
 
 		int getBoardCell(int x, int y) const;
 		int getBoardSizeX() const;
@@ -101,6 +106,7 @@ class Model {
 
 		void setFigure(int playerId, const Figure& figure);
 		void setCurrentPlayer(int playerId);
+
 
 		FIGURES::const_iterator findFigureByPosition(int player, Position findPos) const;
 

@@ -100,23 +100,33 @@ void Model::Board::setBoardCell(int x,int y,int value) {
 }
 Model::Model(Rules* _myRules): myRules(_myRules) { longmove = false;  }
 
+
+
 void Model::init(int mode) {
 	myBoard.init(myRules->getBoardSizeX(),myRules->getBoardSizeY());
 	if (mode == 0) {
 		myCurrentPlayer = myRules->getFirstTurn();
-		mySpecialFigure = myRules->getSpecialFigure();
+
 
 		mySetFigures[WHITE] = myRules->getInitFigures(WHITE);
 		mySetFigures[BLACK] = myRules->getInitFigures(BLACK);
 	}
-	for (int i=0; i < 2; ++i) {
-		for (FIGURES::iterator itFigure = mySetFigures[i].begin(); itFigure!=mySetFigures[i].end(); ++itFigure) {
+
+	mySpecialFigure = myRules->getSpecialFigure();
+	for (int player=0; player<2; ++player) {
+		std::sort(mySetFigures[player].begin(), mySetFigures[player].end(),*myRules);
+	}
+
+	for (int player=0; player < 2; ++player) {
+		for (FIGURES::iterator itFigure = mySetFigures[player].begin(); itFigure!=mySetFigures[player].end(); ++itFigure) {
 			if (itFigure->captured == false) {
 				myBoard.setFigureOnBoard(*itFigure);
 			}
 		}
 	}
 }
+
+
 
 void Model::setFigure(int playerId, const Figure& figure) {
 	mySetFigures[playerId].push_back(figure);
@@ -171,11 +181,12 @@ bool Model::isCheck(int player) const {
 	FIGURES::const_iterator itSpecialFigure;
 	MOVES::const_iterator itMove;
 	int opponent = 1-player;
+
+
 	itSpecialFigure = findFigureById(player, mySpecialFigure );
-	//if (itSpecialFigure->captured == true) { return true; }
 	for (check = false, itFigure = mySetFigures[opponent].begin(); !check &&  itFigure != mySetFigures[opponent].end(); ++itFigure) {
 		if (itFigure->captured == false) {
-			avMoves = movesFigure(opponent, *itFigure, false);
+			avMoves = movesFigure(opponent, *itFigure, CAPTURE, false);
 			for (itMove = avMoves.begin(); !check && itMove != avMoves.end(); ++itMove) {
 				if (itMove->pos2 == itSpecialFigure->position) {
 					check = true;
@@ -202,7 +213,7 @@ void  Model::makeMovePromotion(const Move& move) {
 	int promotionToFigure = myRules->getFigureData(move.figureId).promoting[move.player].figure;
 	FIGURES::iterator itFigure = getFigureByPosition(move.player, move.pos2);
 	itFigure->id = promotionToFigure ;
-	std::sort( mySetFigures[move.player].begin(),mySetFigures[move.player].end() );
+	std::sort(mySetFigures[move.player].begin(), mySetFigures[move.player].end(),*myRules);
 	myBoard.setBoardCell(move.pos2.myX,move.pos2.myY, myRules->getFigureData(promotionToFigure).letter);
 }
 
@@ -291,7 +302,7 @@ void Model::makeMove(Move move) {
 
 }
 
-MOVES Model::movesFigure(int player, const Figure& figure,  bool needCheck) const {
+MOVES Model::movesFigure(int player, const Figure& figure,  int movetype, bool needCheck) const {
 	bool accepted;
 	int curLimit;
 	MOVES avMoves;
@@ -301,14 +312,16 @@ MOVES Model::movesFigure(int player, const Figure& figure,  bool needCheck) cons
 	MOVERULES curRules = myRules->getMoveRules(figure.id);
 
 	for ( itRule=curRules.begin() ; itRule != curRules.end(); ++itRule ) {
-		if  ( itRule->player == ALL || itRule->player == player ) 	{
+		if ( (movetype == CAPTURE && itRule->moveType == MOVE) || (movetype == MOVE && itRule->moveType == CAPTURE) ) {
+			// пропускаем правило
+		} else 	if  ( itRule->player == ALL || itRule->player == player ) 	{
 			if (itRule->ruleType == JUMP) {
 				accepted = false;
 				move.pos1 = figure.position;
 				move.pos2.myX = move.pos1.myX + itRule->dx;
 				move.pos2.myY = move.pos1.myY + itRule->dy;
 				move.player = player;
-				accepted = checkPosition(*itRule,figure,move,needCheck);
+				accepted = checkPosition(*itRule,figure,move,movetype, needCheck);
 				if (accepted == true) {
 					//sprintf(buffer,"[JUMP  %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c']\n",move.pos1.myX+'a',myRules->getBoardSizeY() - move.pos1.myY + '0',move.pos2.myX+'a',myRules->getBoardSizeY() - move.pos2.myY + '0',move.effect,move.type,move.player,getFigureData(move.figureId).letter);
 					//if (needCheck == true) debugView->render(buffer);
@@ -324,7 +337,7 @@ MOVES Model::movesFigure(int player, const Figure& figure,  bool needCheck) cons
 						move.pos2.myX += itRule->dx;
 						move.pos2.myY += itRule->dy;
 						move.player = player;
-						accepted = checkPosition(*itRule,figure,move,needCheck);
+						accepted = checkPosition(*itRule,figure,move,movetype, needCheck);
 						if (accepted == true) {
 							//sprintf(buffer,"[SLIDE %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c']\n",move.pos1.myX+'a',myRules->getBoardSizeY() - move.pos1.myY + '0',move.pos2.myX+'a',myRules->getBoardSizeY() - move.pos2.myY + '0',move.effect,move.type,move.player,getFigureData(move.figureId).letter);
 							//if (needCheck == true) debugView->render(buffer);
@@ -360,7 +373,7 @@ bool Model::checkIsFree(MoveRule moveRule, Position curPos) const{
 
 
 
-bool Model::checkPosition(MoveRule moveRule, const Figure& figure, Move& move, bool needCheck) const{
+bool Model::checkPosition(MoveRule moveRule, const Figure& figure, Move& move, int movetype, bool needCheck) const{
 
 	if (myBoard(move.pos2.myX,move.pos2.myY) == -1) {
 		return false;
@@ -372,11 +385,11 @@ bool Model::checkPosition(MoveRule moveRule, const Figure& figure, Move& move, b
 
 
 
-	if ( myBoard(move.pos2.myX,move.pos2.myY) == 0 && (moveRule.moveType & MOVE) ) {
-		accepted = checkMove(moveRule, figure, move);
-	} else if ( myBoard(curPos.myX,curPos.myY) > 0 && (moveRule.moveType & CAPTURE) ) {
+	if ( (movetype & MOVE) && myBoard(move.pos2.myX,move.pos2.myY) == 0 && (moveRule.moveType & MOVE) ) {
+			accepted = checkMove(moveRule, figure, move);
+	} else if ( (movetype & CAPTURE) && myBoard(curPos.myX,curPos.myY) > 0 && (moveRule.moveType & CAPTURE) ) {
 		accepted = checkCapture(moveRule, figure, move);
-	} else	if ( myBoard(curPos.myX,curPos.myY) == 0 && (moveRule.moveType == INPASSING)) {
+	} else	if ( (movetype & CAPTURE) && myBoard(curPos.myX,curPos.myY) == 0 && (moveRule.moveType == INPASSING)) {
 		accepted = checkInpassing(moveRule, figure, move);
 	}
 	if (accepted == true && needCheck == true) {
@@ -488,24 +501,23 @@ MOVES Model::movesFromPosition(int player, Position pos1) const {
 		return avMoves;
 	}
 
-	avMoves = movesFigure(player,*itFigure);
+	avMoves = movesFigure(player,*itFigure, MOVE|CAPTURE);
 	return avMoves;
 }
 
-MOVES Model::allMoves(int player) const {
+MOVES Model::allMoves(int player, int movetype) const {
 
 	MOVES avMoves, allMoves;
 	FIGURES::const_iterator itFigure;
 	MOVES::const_iterator itMove;
 	for (itFigure = mySetFigures[player].begin();  itFigure != mySetFigures[player].end(); ++itFigure) {
 		if (itFigure->captured == false) {
-			avMoves = movesFigure(player, *itFigure);
+			avMoves = movesFigure(player, *itFigure, movetype);
 			for (itMove = avMoves.begin(); itMove != avMoves.end(); ++itMove) {
 				allMoves.push_back(*itMove);
 			}
 		}
 	}
-	//sort(allMoves.begin(), allMoves.end());
 	return allMoves;
 }
 
