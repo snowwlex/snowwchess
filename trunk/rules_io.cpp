@@ -51,12 +51,6 @@ void rulesIOStartElementHandler(void *userData, const char *name, const char **a
 		}
 	} else if (tag == "figures") {
 		storage->section = "figures";
-		int id = 0;
-		for (i = 0; atts[i]; i += 2)  {
-			attr = atts[i]; value = atts[i+1];
-			if (attr == "special") {  id = makeInt(value); }
-			storage->specialFigure = id;
-		}
 	} else if (tag == "positions") {
 		storage->section = "positions";
 	} else if (tag == "moves") {
@@ -77,13 +71,11 @@ void rulesIOStartElementHandler(void *userData, const char *name, const char **a
 			if (tag == "figure") {
 				FigureData figureData;
 				int id = 0;
-				figureData.special = false;
 				for (i = 0; atts[i]; i += 2)  {
 					attr = atts[i]; value = atts[i+1];
 					if (attr == "id") {  id = makeInt(value); }
 					if (attr == "name") {  figureData.name = value; }
 					if (attr == "letter") {  figureData.letter = value[0]; }
-					if (attr == "special") {  figureData.special = true; }
 					if (attr == "explosion") {  if (value == "0") figureData.explosion = false; }
 					if (attr == "weight") {  figureData.weight = makeInt(value);  }
 					storage->figuresData[id] = figureData;
@@ -103,6 +95,7 @@ void rulesIOStartElementHandler(void *userData, const char *name, const char **a
 				for (i = 0; atts[i]; i += 2)  {
 					attr = atts[i]; value = atts[i+1];
 					if (attr == "id") {  id = makeInt(value); }
+					if (attr == "special") {  storage->specialFigureId[storage->curPlayerId] = id; }
 				}
 				storage->curFigureId = id;
 			} else if (tag == "position") {
@@ -193,7 +186,8 @@ const RulesIOXMLStorage& RulesIO::getStorage() const {
 void RulesIO::updateRules() {
 	myRules->setRulesName(myStorage.rulesName);
 	myRules->setFirstTurn(myStorage.firstTurn);
-	myRules->setSpecialFigure(myStorage.specialFigure);
+	myRules->setSpecialFigure(WHITE, myStorage.specialFigureId[WHITE]);
+	myRules->setSpecialFigure(BLACK, myStorage.specialFigureId[BLACK]);
 	myRules->setBoardSize(myStorage.boardSizeX, myStorage.boardSizeY);
 
 	RulesIOXMLStorage::FIGURES_INFO::iterator it;
@@ -254,6 +248,8 @@ void RulesIO::load(std::string file) {
 	int done, length;
 	char buffer[1024];
 	myStorage.section = "";
+	myStorage.specialFigureId[WHITE] = myStorage.specialFigureId[BLACK] = 0;
+
 	XML_Parser parser = XML_ParserCreate(NULL);
 	XML_SetElementHandler(parser, rulesIOStartElementHandler, rulesIOEndElementHandler);
 	XML_SetUserData(parser, &myStorage);
@@ -270,6 +266,9 @@ void RulesIO::load(std::string file) {
 	XML_ParserFree(parser);
 	fclose(infile);
 
+	if (myStorage.specialFigureId[WHITE] == 0 || myStorage.specialFigureId[BLACK] ==0) {
+		sprintf(buffer,"Special figures are not setted\n"); debugView->render(buffer);
+	}
 }
 
 

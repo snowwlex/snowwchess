@@ -36,7 +36,7 @@ struct RulesIOXMLStorage {
 	int curPlayerId;
 	int curFigureId;
 	int firstTurn;
-	int specialFigure;
+	int specialFigureId[2];
 	std::string rulesName;
 	std::string section;
 	int boardSizeX;

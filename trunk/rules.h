@@ -18,7 +18,7 @@ class Rules {
 		CASTLERULES myCastlesRules;
 		std::string myRulesName;
 		int myFirstTurn;
-		int mySpecialFigure;
+		int mySpecialFigureId[2];
 		int myBoardSizeX, myBoardSizeY;
 	public:
 
@@ -32,12 +32,12 @@ class Rules {
 		std::string getRulesName() const;
 		int getFirstTurn() const;
 		std::string getPlayerData(int playerId);
-		int getSpecialFigure() const;
+		int getSpecialFigure(int player) const;
 		int getBoardSizeX() const;
 		int getBoardSizeY() const;
 
 		void setPlayerData(int playerId, std::string name);
-		void setSpecialFigure(int figureId);
+		void setSpecialFigure(int player, int figureId);
 		void setFirstTurn(int firstTurnId);
 		void setBoardSize(int sizex, int sizey);
 		void setRulesName(std::string rulesName);

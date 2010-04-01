@@ -167,25 +167,25 @@ void BoardCLIView::render(std::string msg) {
 
 	FIGURES::const_iterator itFigure;
 
-	for ( itFigure=myModel->getSetFigures(WHITE).begin(); itFigure != myModel->getSetFigures(WHITE).end(); ++itFigure ) {
-		if (itFigure->captured == false) {
-			color = ((itFigure->position.myX+itFigure->position.myY)%2 == 0) + 1 ;
-			wattron(myWindow, COLOR_PAIR(color) | A_BOLD);
-			wmove(myWindow,itFigure->position.myY+1,itFigure->position.myX+3);
-			wprintw(myWindow, "%c", myModel->getFigureData(itFigure->id).letter);
-			wattroff(myWindow, COLOR_PAIR(color) | A_BOLD);
+	for (int i=0; i<2; ++i) {
+		for ( itFigure=myModel->getSetFigures(i).begin(); itFigure != myModel->getSetFigures(i).end(); ++itFigure ) {
+			if (itFigure->captured == false) {
+				color = ((itFigure->position.myX+itFigure->position.myY)%2 == 0) + 1 ;
+				if (i==1) color += 2;
+				wattron(myWindow, COLOR_PAIR(color) | A_BOLD);
+				wmove(myWindow,itFigure->position.myY+1,itFigure->position.myX+3);
+
+				BoardCell bc = myModel->myBoard(itFigure->position.myX, itFigure->position.myY);
+				Figure fig = myModel->getSetFigures(bc.player).at(bc.setId-1);
+				wprintw(myWindow, "%c", myModel->getFigureData(fig.id).letter);
+
+				//wprintw(myWindow, "%c", myModel->getFigureData(itFigure->id).letter);
+
+				wattroff(myWindow, COLOR_PAIR(color) | A_BOLD);
+			}
 		}
 	}
-	for ( itFigure=myModel->getSetFigures(BLACK).begin(); itFigure != myModel->getSetFigures(BLACK).end(); ++itFigure ) {
-		if (itFigure->captured == false) {
-			color = ((itFigure->position.myX+itFigure->position.myY)%2 == 0) + 1 ;
-			color += 2; // для черных фигур
-			wattron(myWindow, COLOR_PAIR(color) | A_BOLD);
-			wmove(myWindow,itFigure->position.myY+1,itFigure->position.myX+3);
-			wprintw(myWindow, "%c", myModel->getFigureData(itFigure->id).letter);
-			wattroff(myWindow, COLOR_PAIR(color) | A_BOLD);
-		}
-	}
+
 
 	wrefresh(myWindow);
 

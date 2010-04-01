@@ -35,6 +35,14 @@ struct Figure {
 	Figure() { id=0; wasMoved = false; captured = false;}
 	bool operator<(const Figure& figure) const { return id<figure.id; }
 };
+struct BoardCell {
+	int setId;
+	int player;
+	BoardCell(int id=0, int pl=-1) :  setId(id), player(pl) { }
+	bool operator==(int id) { return setId == id; }
+	bool operator!=(int id) { return setId != id; }
+	bool operator> (int id) { return setId > id; }
+};
 struct Promoting {
 	int horizontal;
 	int figure;
@@ -44,16 +52,18 @@ struct Promoting {
 struct FigureData {
 	std::string name;
 	char letter;
-	bool special;
 	bool explosion;
 	int weight;
 	Promoting promoting[2];
-	FigureData() { name=""; letter = 0; weight = 0; special=false; explosion=true; }
+	FigureData() { name=""; letter = 0; weight = 0; explosion=true; }
 };
-struct Move {
+struct SimpleMove {
 	int player;
 	Position pos1;
 	Position pos2;
+	SimpleMove() { player = 0; }
+};
+struct Move : public SimpleMove{
 	// !!!! взятая фигура (id)
 	// значение на новом месте (id)
 	// координата для взятой фигуры
@@ -63,7 +73,7 @@ struct Move {
 	int effect;
 	// int status;
 	int figureId;
-	Move() { player = 0; type=0; effect = 0; figureId=0;}
+	Move() { type=0; effect = 0; figureId=0;}
 	bool operator<(const Move& move) const { return type<move.type; }
 };
 
