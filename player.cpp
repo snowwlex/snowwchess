@@ -92,7 +92,6 @@ PlayerCommand HumanPlayer::makeTurn(Move& move, GameMessage message) {
 					move.pos2.myY = myCursorPos.myY;
 					move.player = myColor;
 					move.type = CAPTURE | MOVE;
-					move.figureId = myModel->findFigureByPosition(myColor,move.pos1)->id;
 					command = TURN;
 				}
 				break;

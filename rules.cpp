@@ -55,14 +55,14 @@ const MOVERULES& Rules::getMoveRules(int figureId) {
 std::string Rules::getPlayerData(int playerId) {
 	return myPlayersData[playerId];
 }
-int Rules::getSpecialFigure() const {
-	return mySpecialFigure;
+int Rules::getSpecialFigure(int player) const {
+	return mySpecialFigureId[player];
 }
 void Rules::setPlayerData(int playerId, std::string name) {
       myPlayersData[playerId] = name;
 }
-void Rules::setSpecialFigure(int figureId) {
-       mySpecialFigure = figureId;
+void Rules::setSpecialFigure(int player, int figureId) {
+	mySpecialFigureId[player] = figureId;
 }
 int Rules::getBoardSizeX() const {
 	return myBoardSizeX;

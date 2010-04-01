@@ -11,47 +11,44 @@
 class Rules;
 
 class Model {
-	private:
+	public:
 
 		class Board {
 			private:
-				int myBufferSize;
-				int* myBoardArray;
+				BoardCell* myBoardArray;
 				int mySizeX, mySizeY;
-				int getCoordinates(int x,int y) const;
+				inline int getCoordinates(int x,int y) const;
 			public:
-				Board(int buffer=4); // 4 - размер буферной зоны
+				Board();
 				~Board();
 				Board(const Board& board);
 				Board& operator=(const Board& board);
 
 				void init(int sizex, int sizey);
-				void setFigureOnBoard(const Figure& figure);
-				void setBoardCell(int x,int y,int value);
-				int operator() (int x,int y) const;
+				void setBoardCell(int x,int y,const BoardCell& boardCell);
+				BoardCell operator() (int x,int y) const;
+				BoardCell operator() (Position pos) const;
 		};
 
-		/********************/
-		// для взятия на проходе
-		Position passant_cell;
-		Figure passant_figure;
-		bool longmove;
-		/********************/
+		bool myLastMoveRecorded;
+		Move myLastMove;
 
 		Board myBoard;
 		Rules* myRules;
 
 		int myCurrentPlayer;
-		int mySpecialFigure;
+		int mySpecialFigureSetId[2];
 		FIGURES mySetFigures[2];
 
 
 
 		MOVES movesFigure(int player, const Figure& figure,  int movetype, bool needCheck=true) const;
 
-		FIGURES::const_iterator findFigureById(int player, int figure) const;
-		FIGURES::iterator getFigureByPosition(int player, Position findPos);
-		bool isFigureOnPosition(Position findPos, FIGURES::const_iterator itFindFigure) const;
+		FIGURES::const_iterator findFigureById2(int player, int figure) const;
+		FIGURES::iterator getFigureByPosition2(int player, Position findPos);
+		bool isFigureOnPosition2(Position findPos, FIGURES::const_iterator itFindFigure) const;
+		inline Figure& accessFigure(const BoardCell& boardCell);
+		inline const Figure& readFigure(const BoardCell& boardCell) const;
 
 		int getDirection(int dir) const;
 
@@ -94,7 +91,8 @@ class Model {
 		bool isCheck(int player) const;
 
 
-		int getBoardCell(int x, int y) const;
+		BoardCell getBoardCell(int x, int y) const;
+		int getFigureIdOnBoard(int x, int y) const;
 		int getBoardSizeX() const;
 		int getBoardSizeY() const;
 		std::string getRulesName() const;
@@ -108,7 +106,7 @@ class Model {
 		void setCurrentPlayer(int playerId);
 
 
-		FIGURES::const_iterator findFigureByPosition(int player, Position findPos) const;
+		FIGURES::const_iterator findFigureByPosition2(int player, Position findPos) const;
 
 
 
