@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <vector>
 #include <string>
+#include <deque>
 #include <map>
 
 #include "snowwchess.h"
@@ -264,8 +265,8 @@ int AlphaBetaSearchAIPlayer::alphaBetaNegaMaxSearch(Move& returnMove, Border alp
 		Model curModel = model;
 		curModel.makeMove(*itMove);
 
-		if ( false && alpha.myIsInfinity == 0) {
-			// null window search
+		if ( alpha.myIsInfinity == 0) { 	// NULL WINDOW search
+
 			Border newAlpha = alpha;
 			newAlpha.myValue += 1;
 			tmpScore = -alphaBetaNegaMaxSearch(bestMove, -newAlpha,-alpha,1-curPlayer, curDepth-1,curModel);
