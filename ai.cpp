@@ -314,8 +314,8 @@ int AlphaBetaSearchAIPlayer::alphaBetaNegaMaxSearch(Move& returnMove, Border alp
 bool AlphaBetaSearchAIPlayer::operator()(const Move& move1,const Move& move2) {
 	//MVV - LVA
 	if (move1.type == MOVE && move2.type == MOVE) {
-		int movingFigure1 = myModel->getBoardCell(move1.pos1.myX,move1.pos1.myY);
-		int movingFigure2 = myModel->getBoardCell(move2.pos1.myX,move2.pos1.myY);
+		int movingFigure1 = myModel->getFigureIdOnBoard(move1.pos1.myX,move1.pos1.myY);
+		int movingFigure2 = myModel->getFigureIdOnBoard(move2.pos1.myX,move2.pos1.myY);
 		if (myModel->getFigureData(movingFigure1).weight > myModel->getFigureData(movingFigure2).weight) return true;
 		return false;
 	}
@@ -324,10 +324,10 @@ bool AlphaBetaSearchAIPlayer::operator()(const Move& move1,const Move& move2) {
 
 	if (move1.type == INPASSING || move2.type == INPASSING) return false;
 
-	int movingFigure1 = myModel->getBoardCell(move1.pos1.myX,move1.pos1.myY);
-	int capturingFigure1 = myModel->getBoardCell(move1.pos2.myX,move1.pos2.myY);
-	int movingFigure2 = myModel->getBoardCell(move2.pos1.myX,move2.pos1.myY);
-	int capturingFigure2 = myModel->getBoardCell(move2.pos2.myX,move2.pos2.myY);
+	int movingFigure1 = myModel->getFigureIdOnBoard(move1.pos1.myX,move1.pos1.myY);
+	int capturingFigure1 = myModel->getFigureIdOnBoard(move1.pos2.myX,move1.pos2.myY);
+	int movingFigure2 = myModel->getFigureIdOnBoard(move2.pos1.myX,move2.pos1.myY);
+	int capturingFigure2 = myModel->getFigureIdOnBoard(move2.pos2.myX,move2.pos2.myY);
 
 	if (myModel->getFigureData(capturingFigure1).weight > myModel->getFigureData(capturingFigure2).weight) return true;
 	if (myModel->getFigureData(capturingFigure1).weight < myModel->getFigureData(capturingFigure2).weight) return false;
@@ -336,7 +336,5 @@ bool AlphaBetaSearchAIPlayer::operator()(const Move& move1,const Move& move2) {
 	if (myModel->getFigureData(movingFigure1).weight > myModel->getFigureData(movingFigure2).weight) return false;
 
 	return false;
-
-
 }
 

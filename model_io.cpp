@@ -113,6 +113,9 @@ void ModelIO::load(std::string file) {
 }
 
 void ModelIO::save(std::string file) {
+
+	//ISSUE: add save last move
+
 	FILE *outfile = fopen(file.c_str(), "wt");
 	char posX, posY, player;
 	int depth,i, curFigureId;
