@@ -23,6 +23,30 @@
 #define DEBUG_LOG_AFTER fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"[%d] AFTER: score=%d, %d:%d\n",curDepth, score.myIsInfinity==0?score.myValue:999,alpha.myIsInfinity==0?alpha.myValue:999, beta.myIsInfinity==0?beta.myValue:999);fputs(buffer,statfile);
 #define DEBUG_LOG_RETURN fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile);sprintf(buffer,"[%d]%s RETURN: %d\n",curDepth, pruning==true?"pruninged":"", score.myIsInfinity==0?score.myValue:999); fputs(buffer,statfile);
 
+enum Infinity { INF=1 };
+struct Border {
+	int myIsInfinity;
+	int myValue;
+	Border(int value, int isInfinity=0) : myIsInfinity(isInfinity), myValue(value) { }
+	Border operator-() const {
+		return Border(-myValue, -myIsInfinity);
+	}
+	bool operator<(const Border& border) const {
+		if (myIsInfinity > border.myIsInfinity) return false;
+		if (myIsInfinity < border.myIsInfinity) return true;
+		if (myIsInfinity == 0 && myValue < border.myValue) return true;
+		return false;
+	}
+	bool operator>(const Border& border) const {
+		if (myIsInfinity > border.myIsInfinity) return true;
+		if (myIsInfinity < border.myIsInfinity) return false;
+		if (myIsInfinity == 0 && myValue > border.myValue) return true;
+		return false;
+	}
+	bool operator==(const Border& border) const {
+		return myIsInfinity==border.myIsInfinity && myValue==border.myValue;
+	}
+};
 
 class AIPlayer : public Player {
 	protected:
@@ -51,36 +75,24 @@ class FullSearchAIPlayer : public AIPlayer {
 class AlphaBetaSearchAIPlayer : public AIPlayer {
 	private:
 		enum Infinity { INF=1 };
-		struct Border {
-			int myIsInfinity;
-			int myValue;
-			Border(int value, int isInfinity=0) : myIsInfinity(isInfinity), myValue(value) { }
-			Border operator-() const {
-				return Border(-myValue, -myIsInfinity);
-			}
-			bool operator<(const Border& border) const {
-				if (myIsInfinity > border.myIsInfinity) return false;
-				if (myIsInfinity < border.myIsInfinity) return true;
-				if (myIsInfinity == 0 && myValue < border.myValue) return true;
-				return false;
-			}
-			bool operator>(const Border& border) const {
-				if (myIsInfinity > border.myIsInfinity) return true;
-				if (myIsInfinity < border.myIsInfinity) return false;
-				if (myIsInfinity == 0 && myValue > border.myValue) return true;
-				return false;
-			}
-			bool operator==(const Border& border) const {
-				return myIsInfinity==border.myIsInfinity && myValue==border.myValue;
-			}
-		};
-
 		int alphaBetaNegaMaxSearch(Move& returnMove, Border alpha, Border beta, int curPlayer, int curDepth, const Model& model);
 		int quiesSearch(Move& returnMove, Border alpha, Border beta, int curPlayer, int curDepth , const Model& model);
-
 	public:
 		bool operator()(const Move& move1,const Move& move2);
 		AlphaBetaSearchAIPlayer(int color, Model* m, BoardCLIView *boardView, CLIView * userView, int depth);
 		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE);
 };
+
+class AlphaBetaParallelSearchAIPlayer : public AIPlayer {
+	private:
+
+		int alphaBetaNegaMaxSearch(const Move& moveMaking, Border alpha, Border beta, int curPlayer, int curDepth, const Model& model);
+		int quiesSearch(Border alpha, Border beta, int curPlayer, int curDepth , const Model& model);
+		friend void* parallelSearch(void*);
+	public:
+		bool operator()(const Move& move1,const Move& move2);
+		AlphaBetaParallelSearchAIPlayer(int color, Model* m, BoardCLIView *boardView, CLIView * userView, int depth);
+		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE);
+};
+
 #endif /* AI_H_ */

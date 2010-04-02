@@ -1,6 +1,6 @@
 CXXFLAGS =	-O2 -g -Wall -fmessage-length=0
 
-OBJS =		snowwchess.o rules.o model.o io.o rules_io.o model_io.o view.o game.o player.o ai.o
+OBJS =		snowwchess.o rules.o model.o io.o rules_io.o model_io.o view.o game.o player.o ai.o history.o parallel.o
 
 LIBS =		-lncurses -lexpat
 
