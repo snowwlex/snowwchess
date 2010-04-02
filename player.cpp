@@ -73,6 +73,9 @@ PlayerCommand HumanPlayer::makeTurn(Move& move, GameMessage message) {
 			case KEY_F(5):
 				command = SAVE;
 				break;
+			case KEY_F(9):
+				command = UNDO;
+				break;
 			case KEY_F(4):
 				moves = myModel->allMoves(myColor);
 				for ( itMove=moves.begin() ; itMove != moves.end(); itMove++ ) {
