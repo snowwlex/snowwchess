@@ -16,7 +16,7 @@ enum RuleType {	JUMP, SLIDE };
 enum MoveType {	CAPTURE=1 , MOVE=2 , INPASSING=4 };
 enum MoveEffect { LONGMOVE=1, CASTLE=2, EXPLOSION=4 };
 
-enum PlayerCommand {NOTHING, TURN, SAVE, EXIT };
+enum PlayerCommand {NOTHING, TURN, SAVE, EXIT, UNDO };
 enum GameMessage {NONE, WRONG_MOVE, GOT_CHECK, SAVED};
 
 
