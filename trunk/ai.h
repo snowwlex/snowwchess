@@ -83,10 +83,24 @@ class AlphaBetaSearchAIPlayer : public AIPlayer {
 		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE);
 };
 
+class AlphaBetaParallelSearchAIPlayer;
+
+typedef std::deque<Move> PULL_QUEUE;
+struct Pull {
+	AlphaBetaParallelSearchAIPlayer* player;
+	PULL_QUEUE deque;
+	Border curAlpha;
+	Border curBeta;
+	Move bestMove;
+	Pull() :  curAlpha(0,-INF), curBeta(0,INF) { }
+};
+
 class AlphaBetaParallelSearchAIPlayer : public AIPlayer {
 	private:
 
-		int alphaBetaNegaMaxSearch(const Move& moveMaking, Border alpha, Border beta, int curPlayer, int curDepth, const Model& model);
+		Pull myPull;
+
+		int alphaBetaNegaMaxSearch(Border alpha, Border beta, int curPlayer, int curDepth, const Model& model);
 		int quiesSearch(Border alpha, Border beta, int curPlayer, int curDepth , const Model& model);
 		friend void* parallelSearch(void*);
 	public:

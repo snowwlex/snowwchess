@@ -21,16 +21,7 @@
 #include "player.h"
 #include "ai.h"
 
-typedef std::deque<Move> PULL_QUEUE;
 
-struct Pull {
-	AlphaBetaParallelSearchAIPlayer* player;
-	PULL_QUEUE deque;
-	Border curAlpha;
-	Border curBeta;
-	Move bestMove;
-	Pull() :  curAlpha(0,-INF), curBeta(0,INF) { }
-};
 
 static pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
 
@@ -54,15 +45,21 @@ void* parallelSearch(void* ptr) {
 		pthread_mutex_unlock(&mutex1);
 
 		if (stop == false) {
-			int score = pull->player->alphaBetaNegaMaxSearch(move, alpha, beta, 1 - pull->player->myColor, pull->player->myDepth-1 , *pull->player->myModel);
+			Model curModel = *pull->player->myModel;
+			curModel.makeMove(move);
+			int score = -pull->player->alphaBetaNegaMaxSearch(-beta, -alpha, 1 - pull->player->myColor, pull->player->myDepth-1 , curModel);
 
-			sprintf(buffer,"[Pab] %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c' SCORE %d]\n",move.pos1.myX+'a',pull->player->myModel->getBoardSizeY() - move.pos1.myY + '0',move.pos2.myX+'a',pull->player->myModel->getBoardSizeY() - move.pos2.myY + '0',move.effect,move.type,move.player,pull->player->myModel->getFigureData(move.figureId).letter,score); debugView->render(buffer);
+			sprintf(buffer,"[Pab] %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c' SCORE %d thread is %ld]\n",move.pos1.myX+'a',pull->player->myModel->getBoardSizeY() - move.pos1.myY + '0',move.pos2.myX+'a',pull->player->myModel->getBoardSizeY() - move.pos2.myY + '0',move.effect,move.type,move.player,pull->player->myModel->getFigureData(move.figureId).letter,score, pthread_self()); debugView->render(buffer);
 
 			pthread_mutex_lock(&mutex1);
+
 			if (pull->curAlpha < score) {
 				pull->bestMove = move;
 				pull->curAlpha = score;
+			} else if (pull->curAlpha == score && rand()%2) {
+				pull->bestMove = move;
 			}
+
 			pthread_mutex_unlock(&mutex1);
 		}
 
@@ -103,9 +100,9 @@ PlayerCommand AlphaBetaParallelSearchAIPlayer::makeTurn(Move& move, GameMessage 
 	MOVES moves = myModel->allMoves(myColor, MOVE|CAPTURE);
 	MOVES::iterator itMove;
 	std::sort(moves.begin(),moves.end(), *this);
-	Pull pull;
-	pull.deque.insert(pull.deque.begin(), moves.begin(), moves.end());
-	pull.player = this;
+	myPull = Pull();
+	myPull.deque.insert(myPull.deque.begin(), moves.begin(), moves.end());
+	myPull.player = this;
 
 
 //	for (PULL_QUEUE::iterator itMove = pull.deque.begin(); itMove != pull.deque.end(); ++itMove) {
@@ -116,18 +113,18 @@ PlayerCommand AlphaBetaParallelSearchAIPlayer::makeTurn(Move& move, GameMessage 
 
 	pthread_t thread1, thread2;
 	time(&start);
-	pthread_create( &thread1, NULL, parallelSearch, (void*) &pull);
-	pthread_create( &thread2, NULL, parallelSearch, (void*) &pull);
+	pthread_create( &thread1, NULL, parallelSearch, (void*) &myPull);
+	pthread_create( &thread2, NULL, parallelSearch, (void*) &myPull);
 
 	pthread_join (thread1, NULL);
 	pthread_join (thread2, NULL);
 
 	time(&end);
-	move = pull.bestMove;
+	move = myPull.bestMove;
 
 	sprintf(buffer, "My Pab move #%d: [%c%c-%c%c (%s+%d)]\n",myTurnsCounter, move.pos1.myX+'a',myModel->getBoardSizeY() - move.pos1.myY+'0',move.pos2.myX+'a', myModel->getBoardSizeY() - move.pos2.myY+'0', move.type == CAPTURE ? "capture" : "move", move.effect ); myUserView->render(buffer);
 	sprintf(buffer,"[Pab] My counter = %d, qcounter=%d,myDepth = %d, turns = %d\n",myCounter, myQCounter, myDepth, myTurnsCounter); debugView->render(buffer);
-	sprintf(buffer,"Time for AB searching: %f\n",difftime(end,start)); debugView->render(buffer);
+	sprintf(buffer,"Time for PAB searching: %f\n",difftime(end,start)); debugView->render(buffer);
 	fflush(statfile);
 	command = TURN;
 	return command;
@@ -135,7 +132,10 @@ PlayerCommand AlphaBetaParallelSearchAIPlayer::makeTurn(Move& move, GameMessage 
 
 
 
-int AlphaBetaParallelSearchAIPlayer::alphaBetaNegaMaxSearch(const Move& moveMaking, Border alpha, Border beta, int curPlayer, int curDepth , const Model& oldModel) {
+int AlphaBetaParallelSearchAIPlayer::alphaBetaNegaMaxSearch(Border alpha, Border beta, int curPlayer, int curDepth , const Model& model) {
+
+	curPlayer == myColor ? alpha = std::max(myPull.curAlpha,alpha) :  beta = std::min(-myPull.curAlpha,beta);
+
 	MOVES moves;
 	MOVES::iterator itMove;
 	int tmpScore, tmp;
@@ -143,20 +143,18 @@ int AlphaBetaParallelSearchAIPlayer::alphaBetaNegaMaxSearch(const Move& moveMaki
 	++myCounter;
 
 
-	Model model = oldModel;
-	model.makeMove(moveMaking);
-
 	if (curDepth <= 0) {
 		DEBUG_LOG_SEF
-		tmp = sefMaterial(model, 1 - curPlayer);
+		tmp = quiesSearch(alpha,beta,curPlayer, curDepth,model);
+		//tmp = sefMaterial(model, curPlayer);
 		return tmp;
 	}
 
 
-	moves = model.allMoves(1-curPlayer, MOVE|CAPTURE);
+	moves = model.allMoves(curPlayer, MOVE|CAPTURE);
 	if (moves.empty()) {
 		DEBUG_LOG_SEF
-		return sefMaterial(model, 1 - curPlayer);
+		return sefMaterial(model, curPlayer);
 	}
 	DEBUG_LOG_BEFORE
 	Border score(0, -INF);
@@ -165,21 +163,19 @@ int AlphaBetaParallelSearchAIPlayer::alphaBetaNegaMaxSearch(const Move& moveMaki
 
 	for (pruning = false, itMove = moves.begin(); !pruning &&  itMove != moves.end(); ++itMove) {
 
-		/*
-		if ( false && alpha.myIsInfinity == 0) {
-			// null window search
+		Model curModel = model;
+		curModel.makeMove(*itMove);
+
+		if (alpha.myIsInfinity == 0) { // NULL WINDOW search
 			Border newAlpha = alpha;
 			newAlpha.myValue += 1;
 			tmpScore = -alphaBetaNegaMaxSearch(-newAlpha,-alpha,1-curPlayer, curDepth-1,curModel);
 			if (alpha < tmpScore && beta > tmpScore) {
-				//if (curDepth==1) { sprintf(buffer,"        Searching at %d\n",myCounter); debugView->render(buffer);  }
 				tmpScore = -alphaBetaNegaMaxSearch(-beta,-alpha,1-curPlayer, curDepth-1,curModel);
 			}
 		} else {
-		*/
-
-			//if (curDepth==1) { sprintf(buffer,"        Searching at %d\n",myCounter); debugView->render(buffer);  }
-		tmpScore = -alphaBetaNegaMaxSearch(*itMove, -beta,-alpha,1-curPlayer, curDepth-1,model);
+			tmpScore = -alphaBetaNegaMaxSearch(-beta,-alpha,1-curPlayer, curDepth-1,curModel);
+		}
 
 		if (score  < tmpScore)  { score = tmpScore; }
 		if (alpha  < score)  alpha = score;
@@ -199,6 +195,8 @@ int AlphaBetaParallelSearchAIPlayer::alphaBetaNegaMaxSearch(const Move& moveMaki
 
 int AlphaBetaParallelSearchAIPlayer::quiesSearch(Border alpha, Border beta, int curPlayer, int curDepth , const Model& model) {
 
+	curPlayer == myColor ? alpha = std::max(myPull.curAlpha,alpha) :  beta = std::min(-myPull.curAlpha,beta);
+
 	MOVES moves;
 	Move bestMove;
 	MOVES::iterator itMove;
@@ -208,7 +206,7 @@ int AlphaBetaParallelSearchAIPlayer::quiesSearch(Border alpha, Border beta, int 
 
 
 	if (model.isCheck(curPlayer) == true) {
-		return alphaBetaNegaMaxSearch(bestMove,alpha, beta, curPlayer, 1 , model);
+		return alphaBetaNegaMaxSearch(alpha, beta, curPlayer, 1 , model);
 	}
 
 	Border score = sefMaterial(model,curPlayer);
