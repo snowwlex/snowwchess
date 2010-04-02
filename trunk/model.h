@@ -44,9 +44,6 @@ class Model {
 
 		MOVES movesFigure(int player, const Figure& figure,  int movetype, bool needCheck=true) const;
 
-		FIGURES::const_iterator findFigureById2(int player, int figure) const;
-		FIGURES::iterator getFigureByPosition2(int player, Position findPos);
-		bool isFigureOnPosition2(Position findPos, FIGURES::const_iterator itFindFigure) const;
 		inline Figure& accessFigure(const BoardCell& boardCell);
 		inline const Figure& readFigure(const BoardCell& boardCell) const;
 
@@ -106,7 +103,6 @@ class Model {
 		void setCurrentPlayer(int playerId);
 
 
-		FIGURES::const_iterator findFigureByPosition2(int player, Position findPos) const;
 
 
 

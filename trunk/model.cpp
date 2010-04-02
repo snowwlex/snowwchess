@@ -400,6 +400,7 @@ bool Model::checkLongMoveEffect(MoveRule moveRule, const Figure& figure, Move& m
 	return true;
 }
 bool Model::checkCastleEffect(MoveRule moveRule, const Figure& figure, Move& move) const {
+	// ISSUE: add a checking for non-checked cells
 
 	if (figure.wasMoved == true) {
 		return false;
