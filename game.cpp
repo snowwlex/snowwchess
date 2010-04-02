@@ -10,6 +10,8 @@
 #include <string>
 #include <map>
 
+#include <ctime>
+
 #include "snowwchess.h"
 #include "model.h"
 #include "rules.h"
@@ -19,8 +21,8 @@
 #include "game.h"
 #include "player.h"
 #include "ai.h"
+#include "history.h"
 
-#include <ctime>
 
 
 void Game::start(std::string file, int mode) {
@@ -81,7 +83,9 @@ void Game::start(std::string file, int mode) {
 	//players[2] = new AlphaBetaSearchAIPlayer(WHITE, &model, boardView, userView[WHITE],5);
 	//players[BLACK] = new FullSearchAIPlayer(BLACK, &model, boardView, userView[BLACK],4);
 	//players[BLACK] = new HumanPlayer(BLACK, &model, boardView, userView[BLACK]);
-	players[BLACK] = new AlphaBetaSearchAIPlayer(BLACK, &model, boardView, userView[BLACK],3);
+	players[BLACK] = new AlphaBetaParallelSearchAIPlayer(BLACK, &model, boardView, userView[BLACK],3);
+
+	History history;
 
 	int curPlayer;
 	int key;
@@ -174,6 +178,7 @@ void Game::start(std::string file, int mode) {
 				case TURN:
 					model.makeMove(playerMove);
 					model.setCurrentPlayer( 1 - curPlayer );
+					history.addRecord(playerMove, model);
 					break;
 				case EXIT:
 					isEndGame = true;
@@ -186,6 +191,9 @@ void Game::start(std::string file, int mode) {
 					string = std::string("saves/") + string + std::string(".xml");
 					model_io.save(string);
 					message = SAVED;
+					break;
+				case UNDO:
+					model = history.makeUndo(2);
 					break;
 				default:
 					break;
