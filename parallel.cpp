@@ -70,8 +70,8 @@ void* parallelSearch(void* ptr) {
 }
 
 
-AlphaBetaParallelSearchAIPlayer::AlphaBetaParallelSearchAIPlayer(int color, Model* model, BoardCLIView *boardView, CLIView * userView, int depth):
-		AIPlayer(color,model,boardView,userView,depth) { }
+AlphaBetaParallelSearchAIPlayer::AlphaBetaParallelSearchAIPlayer(int color, Model* model, BoardCLIView *boardView, CLIView * userView, int depth, int depth2):
+		AIPlayer(color,model,boardView,userView,depth,depth2) { }
 
 PlayerCommand AlphaBetaParallelSearchAIPlayer::makeTurn(Move& move, GameMessage message) {
 
@@ -211,7 +211,7 @@ int AlphaBetaParallelSearchAIPlayer::quiesSearch(Border alpha, Border beta, int 
 
 	Border score = sefMaterial(model,curPlayer);
 
-	if (curDepth < -3) return score.myValue;
+	if (curDepth <= myDepth2) return score.myValue;
 	moves = model.allMoves(curPlayer, CAPTURE);
 
 	//sprintf(buffer,"[%d]",curDepth); debugView->render(buffer);

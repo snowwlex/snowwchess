@@ -106,5 +106,6 @@ typedef	std::vector<CastleRule> CASTLERULES;
 
 extern int randomizator;
 extern FILE* statfile;
+extern char buffer[1024];
 
 #endif /* SNOWWCHESS_H_ */
