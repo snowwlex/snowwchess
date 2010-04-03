@@ -47,7 +47,7 @@ class aiTester {
 	}
 };
 
-void Game::start(std::string file, int mode) {
+PlayerColor Game::start(std::string file, int mode, playerInfo onePlayer, playerInfo twoPlayer) {
 
 
 
@@ -80,43 +80,40 @@ void Game::start(std::string file, int mode) {
 	userView[BLACK] = new CLIView(10,37,13,35,9,true);
 	CLIView* askView;
 
-	/* speed tests:
-	{
-		time_t start,end;
-		time(&start);
-		for (int i=0; i<50000; ++i) {
-			//model.allMoves(WHITE, CAPTURE); //5 sec
-			//model.allMoves(WHITE, MOVE); //37 sec
-			//model.allMoves(WHITE); //39sec
-			//model.isCheck(WHITE); // 1sec
-			//Model newModel = model; // 0 sec
-		}
-		time(&end);
-		sprintf(buffer, "Time: %f", difftime(end,start)); debugView->render(buffer);
-
-		return;
-	}
-	*/
-
-
-
-
-
 	Player *players[2];
-	players[WHITE] = new HumanPlayer(WHITE, &model, boardView, userView[WHITE]);
-	players[BLACK] = new AlphaBetaParallelSearchAIPlayer(BLACK, &model, boardView, userView[BLACK],3,-4);
+
+	if (onePlayer.playerName == "Human") {
+		players[WHITE] = new HumanPlayer(WHITE, &model, boardView, userView[WHITE]);
+	} else if (onePlayer.playerName == "Parallel") {
+		players[WHITE] = new AlphaBetaParallelSearchAIPlayer(WHITE, &model, boardView, userView[WHITE],onePlayer.num1,onePlayer.num2);
+	} else if (onePlayer.playerName == "FullSearch") {
+		players[WHITE] = new FullSearchAIPlayer(WHITE, &model, boardView, userView[WHITE],onePlayer.num1,onePlayer.num2);
+	} else  {
+		players[WHITE] = new AlphaBetaSearchAIPlayer(WHITE, &model, boardView, userView[WHITE],onePlayer.num1,onePlayer.num2);
+	}
+
+
+	if (twoPlayer.playerName == "Human") {
+		players[BLACK] = new HumanPlayer(BLACK, &model, boardView, userView[BLACK]);
+	} else if (twoPlayer.playerName == "Parallel") {
+		players[BLACK] = new AlphaBetaParallelSearchAIPlayer(BLACK, &model, boardView, userView[BLACK],twoPlayer.num1,twoPlayer.num2);
+	} else if (twoPlayer.playerName == "FullSearch") {
+		players[BLACK] = new FullSearchAIPlayer(BLACK, &model, boardView, userView[BLACK],twoPlayer.num1,twoPlayer.num2);
+	} else  {
+		players[BLACK] = new AlphaBetaSearchAIPlayer(BLACK, &model, boardView, userView[BLACK],twoPlayer.num1,twoPlayer.num2);
+	}
+
 
 
 
 	// EXPERIMENT
-	Experiment exp(0.6,3,10);
-	ExpRunner exprunner(exp);
-	int n[] = { 1,2,3 };
-	exprunner.run(aiTester((AIPlayer*)players[BLACK]), std::vector<int>(n,n+3), "gnuplot.txt");
+//	Experiment exp(0.6,3,10);
+//	ExpRunner exprunner(exp);
+//	int n[] = { 1,2,3 };
+//	exprunner.run(aiTester((AIPlayer*)players[BLACK]), std::vector<int>(n,n+3), "gnuplot.txt");
 
 
 	int curPlayer;
-	//int key;
 	bool isEndGame, isMoveCorrect;
 	char buffer[1024];
 	std::string string;
@@ -126,7 +123,6 @@ void Game::start(std::string file, int mode) {
 	GameStatus status;
 	message = NONE;
 
-	int counter=0;
 
 	sprintf(buffer,"Hello) Use arrows to\nselect figure,\nthen SPACE - choose figure\nthen select destination cell!\nGood luck)\n"); infoView->render(buffer);
 	do {
@@ -208,4 +204,16 @@ void Game::start(std::string file, int mode) {
 	delete boardView;
 	delete userView[WHITE];
 	delete userView[BLACK];
+
+	PlayerColor whoWin;
+	if (status == STALEMATE) {
+		whoWin = ALL;
+	} else {
+		if (model.getCurrentPlayer() == WHITE) {
+			whoWin = BLACK;
+		} else {
+			whoWin = WHITE;
+		}
+	}
+	return whoWin;
 }

@@ -9,6 +9,8 @@
 #include <cstdlib>
 #include <ctime>
 
+#include <iostream>
+#include <fstream>
 
 #include <ncurses.h>
 #include <vector>
@@ -52,11 +54,105 @@ int main(int argc, char* argv[]) {
 	std::string option,name;
 	int mode=0;
 	Game game;
-	CLIView *menuView = new MainMenuCLIView(8,30,2,20,6);
-	CLIView *chooseView;
+
 	debugView = new CLIView(38,70,2,75,11,true);
 	debugView->render("debug view\n");
+	statfile = fopen("statfile2.txt", "wt");
 
+	 //command line processing
+	int curArg = 1;
+	bool paramInputfile = false;
+	bool paramOutputfile = false;
+	std::string inputfile,outputfile;
+
+	while (curArg < argc) {
+		if (argv[curArg][0] == '-') {
+			switch(argv[curArg][1]) {
+
+				case 'f':
+					paramInputfile = true;
+					if (curArg+1 < argc && argv[curArg+1][0] != '-') {
+						inputfile = argv[++curArg];
+					}
+					break;
+				case 'o':
+					paramOutputfile = true;
+					if (curArg+1 < argc && argv[curArg+1][0] != '-') {
+						outputfile = argv[++curArg];
+					}
+					break;
+			}
+		}
+		++curArg;
+	}
+
+
+
+	if (paramInputfile == true) {
+		if (paramOutputfile != true) {
+			outputfile = "output.txt";
+		}
+
+		std::ifstream infile( inputfile.c_str() );
+
+		std::string string;
+		int qGames;
+		infile >> string;
+		if (string == "1") {
+			mode = 0;
+		} else {
+			mode = 1;
+		}
+		infile >> name;
+		infile >> qGames;
+
+
+		int n1,n2;
+		infile >> string;
+		infile >> n1;
+		infile >> n2;
+
+		playerInfo one(string,n1,n2);
+
+
+		infile >> string;
+		infile >> n1;
+		infile >> n2;
+
+		playerInfo two(string,n1,n2);
+		PlayerColor winPlayer;
+		int whiteCounter = 0,
+			blackCounter = 0,
+			stalemateCounter = 0;
+
+
+		for (int i=0; i< qGames; ++i) {
+			randomizator = rand()%10000+200;
+			winPlayer = game.start(name,mode, one, two);
+			if (winPlayer == WHITE) {
+				++whiteCounter;
+			} else if (winPlayer == BLACK) {
+				++blackCounter;
+			} else {
+				++stalemateCounter;
+			}
+		}
+
+		std::ofstream outfile(outputfile.c_str(), std::ios::app);
+		outfile << "Game " << one.playerName << " vs " << two.playerName << std::endl;
+		outfile << "White wins: " << whiteCounter << std::endl << "Black Wins: " << blackCounter << std::endl << "Stalemates: " << stalemateCounter << std::endl;
+
+		fclose(statfile);
+		delete debugView;
+		endwin();
+		return 0;
+	}
+
+
+
+
+	CLIView *menuView = new MainMenuCLIView(8,30,2,20,6);
+	CLIView *chooseView;
 	do {
 		menuView->render();
 		option = menuView->ask();
@@ -77,18 +173,21 @@ int main(int argc, char* argv[]) {
 
 		if (option != "2") {
 			srand ( 123 );
-			statfile = fopen("statfile2.txt", "wt");
+
 			menuView->hide();
+
+			playerInfo one("Human", 0,0);
+			playerInfo two("Parallel",3,3);
 			for (int i=0; i< 1; ++i) {
 				randomizator = rand()%10000+200;
-				game.start(name,mode);
+				game.start(name,mode,one,two);
 			}
-			fclose(statfile);
+
 			menuView->show();
 		}
 
 	} while(option != "2");
-
+	fclose(statfile);
 	delete menuView;
 	delete debugView;
 	endwin();
