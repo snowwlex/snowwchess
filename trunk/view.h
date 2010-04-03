@@ -30,7 +30,7 @@ class CLIView {
 };
 
 extern CLIView* debugView;
-extern char buffer[1024];
+
 
 class MainMenuCLIView : public CLIView {
 	private:

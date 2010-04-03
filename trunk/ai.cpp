@@ -20,10 +20,11 @@
 #include "player.h"
 #include "ai.h"
 
-AIPlayer::AIPlayer(int color, Model* model, BoardCLIView *boardView, CLIView * userView, int depth): myColor(color), myModel(model),
+AIPlayer::AIPlayer(int color, Model* model, BoardCLIView *boardView, CLIView * userView, int depth, int depth2): myColor(color), myModel(model),
 					myBoardView(boardView), myUserView(userView) {
 	//time(0) );
 	myDepth = depth;
+	myDepth2 = depth2;
 	myTurnsCounter = 0;
 }
 
@@ -45,8 +46,8 @@ int AIPlayer::sefMaterial(const Model& model, int player) const {
 }
 
 
-FullSearchAIPlayer::FullSearchAIPlayer(int color, Model* model, BoardCLIView *boardView, CLIView * userView, int depth):
-		AIPlayer(color,model,boardView,userView,depth) { }
+FullSearchAIPlayer::FullSearchAIPlayer(int color, Model* model, BoardCLIView *boardView, CLIView * userView, int depth, int depth2):
+		AIPlayer(color,model,boardView,userView,depth,depth2) { }
 
 PlayerCommand FullSearchAIPlayer::makeTurn(Move& move, GameMessage message) {
 
@@ -124,8 +125,8 @@ int FullSearchAIPlayer::miniMaxSearch(Move& returnMove, int curDepth, int curPla
 }
 
 
-AlphaBetaSearchAIPlayer::AlphaBetaSearchAIPlayer(int color, Model* model, BoardCLIView *boardView, CLIView * userView, int depth):
-		AIPlayer(color,model,boardView,userView,depth) { }
+AlphaBetaSearchAIPlayer::AlphaBetaSearchAIPlayer(int color, Model* model, BoardCLIView *boardView, CLIView * userView, int depth, int depth2):
+		AIPlayer(color,model,boardView,userView,depth,depth2) { }
 
 PlayerCommand AlphaBetaSearchAIPlayer::makeTurn(Move& move, GameMessage message) {
 
@@ -179,7 +180,7 @@ int AlphaBetaSearchAIPlayer::quiesSearch(Move& returnMove, Border alpha, Border 
 
 	Border score = sefMaterial(model,curPlayer);
 
-	if (curDepth < -3) return score.myValue;
+	if (curDepth <= myDepth2) return score.myValue;
 	moves = model.allMoves(curPlayer, CAPTURE);
 
 	//sprintf(buffer,"[%d]",curDepth); debugView->render(buffer);
@@ -338,4 +339,11 @@ bool AlphaBetaSearchAIPlayer::operator()(const Move& move1,const Move& move2) {
 
 	return false;
 }
+
+void AIPlayer::setDepth(int depth) {
+	myDepth = depth;
+	//myDepth2 = depth2;
+}
+
+
 
