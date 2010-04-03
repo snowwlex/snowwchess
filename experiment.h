@@ -18,13 +18,14 @@ class Experiment {
 		double mySumX;
 		double mySumXSquare;
 	private: // help methods
-		double countCovar();
-		double countVariance();
+		double countCovar() const;
+		double countVariance() const;
 	public:
 		Experiment(double covar,int minExp, int maxExp);
+		void clear();
 		void addValue(double t);
-		int isReady();
-		double getMean();
+		int isReady() const;
+		double getMean() const;
 
 };
 

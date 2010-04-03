@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <deque>
 
 #include <ctime>
 
@@ -23,14 +24,38 @@
 #include "ai.h"
 #include "history.h"
 
+#include "experiment.h"
+#include "exprunner.h"
 
+struct foo {
+	void operator()(int number) {
+		for (int i=0; i < 500*number; ++i) {
+			DEBUG_DISPLAY("asdsad")
+		}
+	}
+};
+
+class aiTester {
+	private:
+		AIPlayer* myPlayer;
+	public:
+	aiTester(AIPlayer* player) : myPlayer(player) { }
+	void operator()(int number) {
+		Move move;
+		myPlayer->setDepth(number);
+		myPlayer->makeTurn(move,NONE);
+	}
+};
 
 void Game::start(std::string file, int mode) {
+
+
 
 	Rules rules;
 	Model model(&rules);
 	RulesIO rules_io(&rules);
 	ModelIO model_io(&model);
+	History history;
 
 	if ( mode == 0) {
 		file = std::string("rules/") + file + std::string(".xml");
@@ -77,18 +102,21 @@ void Game::start(std::string file, int mode) {
 
 
 
-	Player *players[4];
+	Player *players[2];
 	players[WHITE] = new HumanPlayer(WHITE, &model, boardView, userView[WHITE]);
-	//players[WHITE] = new FullSearchAIPlayer(WHITE, &model, boardView, userView[WHITE],4);
-	//players[2] = new AlphaBetaSearchAIPlayer(WHITE, &model, boardView, userView[WHITE],5);
-	//players[BLACK] = new FullSearchAIPlayer(BLACK, &model, boardView, userView[BLACK],4);
-	//players[BLACK] = new HumanPlayer(BLACK, &model, boardView, userView[BLACK]);
-	players[BLACK] = new AlphaBetaParallelSearchAIPlayer(BLACK, &model, boardView, userView[BLACK],3);
+	players[BLACK] = new AlphaBetaParallelSearchAIPlayer(BLACK, &model, boardView, userView[BLACK],3,-4);
 
-	History history;
+
+
+	// EXPERIMENT
+	Experiment exp(0.6,3,10);
+	ExpRunner exprunner(exp);
+	int n[] = { 1,2,3 };
+	exprunner.run(aiTester((AIPlayer*)players[BLACK]), std::vector<int>(n,n+3), "gnuplot.txt");
+
 
 	int curPlayer;
-	int key;
+	//int key;
 	bool isEndGame, isMoveCorrect;
 	char buffer[1024];
 	std::string string;
@@ -105,35 +133,10 @@ void Game::start(std::string file, int mode) {
 
 		isEndGame = false;
 
-		++counter;
-		//if (counter > 1000) {
-/*
-			key = boardView->getKey();
-			if (key == KEY_F(5) ) {
-				infoView = new CLIView(5,30,25,35,6);
-				infoView->render("Enter savename:\n");
-				string = infoView->ask("> ");
-				delete infoView;
-				string = std::string("saves/") + string + std::string(".xml");
-				model_io.save(string);
-				message = SAVED;
-			} else if (key == 27) {
-				isEndGame = true;
-			}
-*/
-		//
-		//	isEndGame = true;
-		//	sprintf(buffer,"Stop the game\n");
-		//	fputs(buffer, statfile);
-		//}
-
-
 		curPlayer = model.getCurrentPlayer();
 
 		boardView->render();
-		//sprintf(buffer,"start() getting game status\n"); debugView->render(buffer);
-		status = USUAL;//model.getGameStatus(curPlayer);
-		//sprintf(buffer,"start() game status received\n\n"); debugView->render(buffer);
+		status = model.getGameStatus(curPlayer);
 		switch(status) {
 		case CHECK:
 			message = GOT_CHECK;
@@ -160,12 +163,8 @@ void Game::start(std::string file, int mode) {
 			do {
 
 				command = players[curPlayer]->makeTurn(playerMove, message);
-				//debugView->wait();
-				//command = players[curPlayer+2]->makeTurn(playerMove, message);
 				if (command == TURN) {
-					//sprintf(buffer,"start() check if move is correct\n"); debugView->render(buffer);
 					isMoveCorrect = model.canMove(playerMove);
-					//sprintf(buffer,"start() end of check; move is %scorrect\n\n",isMoveCorrect?"":"not "); debugView->render(buffer);
 					if ( isMoveCorrect == false) {
 						message = WRONG_MOVE;
 					}
