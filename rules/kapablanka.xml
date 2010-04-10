@@ -5,7 +5,7 @@
 		<player id="1" name="WHITE"/>
 		<player id="2" name="BLACK"/>
 	</players>
-	<figures special="1">
+	<figures>
 		<figure id="1" name="KING" letter="K"/>
 		<figure id="2" name="QUEEN" letter="Q"/>
 		<figure id="3" name="ROOK" letter="R"/>
@@ -17,7 +17,7 @@
 	</figures>
 	<positions>
 		<player id="1">
-			<figure id="1">
+			<figure id="1" special="1">
 				<position cell="f1"/>
 			</figure>
 			<figure id="2">
@@ -55,7 +55,7 @@
 			</figure>
 		</player>
 		<player id="2">
-			<figure id="1">
+			<figure id="1" special="1">
 				<position cell="f8"/>
 			</figure>
 			<figure id="2">

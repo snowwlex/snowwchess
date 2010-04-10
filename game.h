@@ -8,21 +8,39 @@
 #ifndef GAME_H_
 #define GAME_H_
 
-struct playerInfo {
-	std::string playerName;
-	int num1;
-	int num2;
-	playerInfo (std::string name, int n1, int n2) {
-		playerName = name;
-		num1 = n1;
-		num2 = n2;
-	}
-};
+//struct playerInfo {
+//	std::string playerName;
+//	int num1;
+//	int num2;
+//	playerInfo (std::string name, int n1, int n2) {
+//		playerName = name;
+//		num1 = n1;
+//		num2 = n2;
+//	}
+//};
 
 class Game {
-	private:
 	public:
-		PlayerColor start(std::string file, int mode, playerInfo onePlayer, playerInfo twoPlayer);
+		Game();
+		~Game();
+
+	public:
+		bool isReady();
+
+	public:
+		void setRules(const RulesIO& rulesIO);
+		void setPlayer(int color, Player* player);
+		void setBoardView(GuiBoardView* boardView);
+
+	public:
+		void start();
+		void clear();
+
+	private:
+		Model myModel;
+		Rules myRules;
+		GuiBoardView* myBoardView;
+		Player* players[2];
 };
 
 

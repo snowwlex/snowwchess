@@ -18,54 +18,54 @@
 
 
 
-HumanPlayer::HumanPlayer(int color, Model* model, BoardCLIView *boardView, CLIView * userView): myColor(color), myModel(model), myBoardView(boardView), myUserView(userView) { myCursorPos.myX = 0; myCursorPos.myY=0;}
+HumanPlayer::HumanPlayer() {
 
-PlayerCommand HumanPlayer::makeTurn(Move& move, GameMessage message) {
+}
+
+Move HumanPlayer::makeTurn(GameMessage message) {
 
 	PlayerCommand command;
 	std::string inputCommand;
 	MOVES moves;
+	Move move;
 	MOVES::iterator itMove;
 	int key,mode;
 	switch(message) {
 		case WRONG_MOVE:
-				myUserView->render("Wrong move!\n");
+				qDebug() << "Received message: Wrong move!\n";
 				break;
 		case GOT_CHECK:
-				myUserView->render("You've gotta check!\n");
-				break;
-		case SAVED:
-				myUserView->render("Game saved\n");
+				qDebug() << "Received message: You've gotta check!";
 				break;
 		default:
 				break;
 	}
 
 
-	myBoardView->render();
-	myBoardView->highlight(myCursorPos,13);
+	//myBoardView->render();
+	//myBoardView->highlight(myCursorPos,13);
 
 	command = NOTHING;
 	mode = 0;
 	do {
 
 
-		key = myUserView->getKey();
+		//key = myUserView->getKey();
 
-		myBoardView->render();
+		//myBoardView->render();
 
 		switch(key) {
 			case KEY_UP:
-				if (myCursorPos.myY > 0) myCursorPos.myY -= 1;
+			//	if (myCursorPos.myY > 0) myCursorPos.myY -= 1;
 				break;
 			case KEY_DOWN:
-				if (myCursorPos.myY < myModel->getBoardSizeY()-1 ) myCursorPos.myY += 1;
+			//	if (myCursorPos.myY < myModel->getBoardSizeY()-1 ) myCursorPos.myY += 1;
 				break;
 			case KEY_LEFT:
-				if (myCursorPos.myX > 0 ) myCursorPos.myX -= 1;
+			//	if (myCursorPos.myX > 0 ) myCursorPos.myX -= 1;
 				break;
 			case KEY_RIGHT:
-				if (myCursorPos.myX < myModel->getBoardSizeX()-1 ) myCursorPos.myX += 1;
+			//	if (myCursorPos.myX < myModel->getBoardSizeX()-1 ) myCursorPos.myX += 1;
 				break;
 			case 27:
 				command = EXIT;
@@ -79,20 +79,20 @@ PlayerCommand HumanPlayer::makeTurn(Move& move, GameMessage message) {
 			case KEY_F(4):
 				moves = myModel->allMoves(myColor);
 				for ( itMove=moves.begin() ; itMove != moves.end(); itMove++ ) {
-					myBoardView->highlight(itMove->pos2,(itMove->type & MOVE) ? 12 : 11);
+					//myBoardView->highlight(itMove->pos2,(itMove->type & MOVE) ? 12 : 11);
 				}
 				break;
 			case ' ':
 				if (mode == 0) {
-					move.pos1.myX = myCursorPos.myX;
-					move.pos1.myY = myCursorPos.myY;
+					//move.pos1.myX = myCursorPos.myX;
+					//move.pos1.myY = myCursorPos.myY;
 					moves = myModel->movesFromPosition(myColor, Position(move.pos1.myX,move.pos1.myY));
 					mode = 1;
-				} else if (myCursorPos.myX == move.pos1.myX && myCursorPos.myY == move.pos1.myY){
+				//} else if (myCursorPos.myX == move.pos1.myX && myCursorPos.myY == move.pos1.myY){
 					mode = 0;
 				} else {
-					move.pos2.myX = myCursorPos.myX;
-					move.pos2.myY = myCursorPos.myY;
+					//move.pos2.myX = myCursorPos.myX;
+					//move.pos2.myY = myCursorPos.myY;
 					move.player = myColor;
 					move.type = CAPTURE | MOVE;
 					command = TURN;
@@ -105,11 +105,11 @@ PlayerCommand HumanPlayer::makeTurn(Move& move, GameMessage message) {
 
 		if (mode == 1) {
 			for ( itMove=moves.begin() ; itMove != moves.end(); ++itMove ) {
-				myBoardView->highlight(itMove->pos2,(itMove->type & MOVE) ? 12 : 11);
+				//myBoardView->highlight(itMove->pos2,(itMove->type & MOVE) ? 12 : 11);
 			}
-			myBoardView->highlight(Position(move.pos1.myX,move.pos1.myY),13);
+			//myBoardView->highlight(Position(move.pos1.myX,move.pos1.myY),13);
 		}
-		myBoardView->highlight(myCursorPos,13);
+		//myBoardView->highlight(myCursorPos,13);
 
 
 
@@ -117,7 +117,7 @@ PlayerCommand HumanPlayer::makeTurn(Move& move, GameMessage message) {
 	} while( command == NOTHING );
 
 
-	return command;
+	return move;
 }
 
 

@@ -50,20 +50,15 @@ struct Border {
 
 class AIPlayer : public Player {
 	protected:
-		int myColor;
 		int myTurnsCounter;
 		int myDepth;
 		int myDepth2;
 		int myCounter;
 		int myQCounter;
-		Model *myModel;
-		BoardCLIView *myBoardView;
-		CLIView *myUserView;
-
 		int sefMaterial(const Model& model, int player) const;
 	public:
-		AIPlayer(int color, Model* m, BoardCLIView *boardView, CLIView * userView, int depth, int depth2);
-		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE) = 0;
+		AIPlayer();
+		virtual Move makeTurn(GameMessage message = NONE) = 0;
 		void setDepth(int depth);
 };
 
@@ -71,7 +66,7 @@ class FullSearchAIPlayer : public AIPlayer {
 	private:
 		int miniMaxSearch(Move& returnMove, int curDepth, int curPlayer, const Model& model);
 	public:
-		FullSearchAIPlayer(int color, Model* m, BoardCLIView *boardView, CLIView * userView, int depth, int depth2);
+		FullSearchAIPlayer();
 		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE);
 };
 
@@ -82,7 +77,7 @@ class AlphaBetaSearchAIPlayer : public AIPlayer {
 		int quiesSearch(Move& returnMove, Border alpha, Border beta, int curPlayer, int curDepth , const Model& model);
 	public:
 		bool operator()(const Move& move1,const Move& move2);
-		AlphaBetaSearchAIPlayer(int color, Model* m, BoardCLIView *boardView, CLIView * userView, int depth, int depth2);
+		AlphaBetaSearchAIPlayer();
 		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE);
 };
 
@@ -107,7 +102,7 @@ class AlphaBetaParallelSearchAIPlayer : public AIPlayer {
 		friend void* parallelSearch(void*);
 	public:
 		bool operator()(const Move& move1,const Move& move2);
-		AlphaBetaParallelSearchAIPlayer(int color, Model* m, BoardCLIView *boardView, CLIView * userView, int depth, int depth2);
+		AlphaBetaParallelSearchAIPlayer();
 		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE);
 };
 
