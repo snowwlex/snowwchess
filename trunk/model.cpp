@@ -4,7 +4,9 @@
  *
  *      Author: snowwlex
  */
-#include <ncurses.h>
+
+//#include <ncurses.h> // ncurses is temporaly unsupported
+
 #include <algorithm>
 #include <vector>
 #include <string>
@@ -15,7 +17,7 @@
 #include "rules.h"
 #include "model.h"
 
-#include "view.h" //for debugView
+//#include "view.h" //for debugView
 
 Model::Board::Board(): myBoardArray(0)  { }
 
@@ -74,18 +76,33 @@ inline int Model::Board::getCoordinates(int x,int y) const {
 void Model::Board::setBoardCell(int x,int y,const BoardCell& boardCell) {
 	myBoardArray[getCoordinates(x,y)] = boardCell;
 }
-Model::Model(Rules* _myRules): myRules(_myRules) { myLastMoveRecorded = false;  }
+Model::Model()  {
+	myRules = 0;
+	initiated = false;
+	myLastMoveRecorded = false;
+}
+
+bool Model::isReady() {
+	if (myRules != 0 && initiated == true) {
+		return true;
+	}
+	return false;
+}
+
+void Model::setRules(Rules* rules) {
+	myRules = rules;
+}
 
 
 
-void Model::init(int mode) {
+void Model::init(bool newGame) {
 	myBoard.init(myRules->getBoardSizeX(),myRules->getBoardSizeY());
-	if (mode == 0) {
+
+	if (newGame == true) {
 		myCurrentPlayer = myRules->getFirstTurn();
 		mySetFigures[WHITE] = myRules->getInitFigures(WHITE);
 		mySetFigures[BLACK] = myRules->getInitFigures(BLACK);
 	}
-
 
 	for (int player=0; player<2; ++player) {
 		std::sort(mySetFigures[player].begin(), mySetFigures[player].end(),*myRules);
@@ -109,6 +126,8 @@ void Model::init(int mode) {
 			}
 		}
 	}
+
+	initiated = true;
 }
 
 
@@ -117,9 +136,6 @@ void Model::setFigure(int playerId, const Figure& figure) {
 	mySetFigures[playerId].push_back(figure);
 }
 
-int Model::getCurrentPlayer() const {
-	return myCurrentPlayer;
-}
 
 BoardCell Model::getBoardCell(int x, int y) const {
 	return myBoard(x,y);
@@ -136,9 +152,6 @@ int Model::getFigureIdOnBoard(int x, int y) const {
 	return readFigure(boardCell).id;
 }
 
-void Model::setCurrentPlayer(int playerId) {
-	myCurrentPlayer = playerId;
-}
 
 int Model::getBoardSizeX() const {
 	return myRules->getBoardSizeX();
@@ -149,16 +162,12 @@ int Model::getBoardSizeY() const {
 std::string Model::getRulesName() const {
 	return myRules->getRulesName();
 }
-GameStatus Model::getGameStatus(int player) const {
+GameStatus Model::checkGameStatus(int player) const {
 
 	MOVES avMoves;
 	bool check;
 	avMoves = allMoves(player);
 	check = isCheck(player);
-
-	if (check) {
-		sprintf(buffer,"Check!\n");	debugView->render(buffer);
-	}
 
 	if ( avMoves.size() == 0 && check == true) {
 		return MATE;
@@ -535,60 +544,6 @@ int Model::getDirection(int dir) const {
 	if (dir < 0) return -1;
 	return 0;
 }
-
-//FIGURES::const_iterator Model::findFigureByPosition(int player , Position findPos) const {
-//
-//	FIGURES::const_iterator itFigure;
-//
-//	for ( itFigure = mySetFigures[player].begin() ; itFigure != mySetFigures[player].end(); ++itFigure ) {
-//		if (itFigure->captured == false && itFigure->position == findPos)
-//			return itFigure;
-//	}
-//	//if (itFigure == mySetFigures[player].end()) {
-//	//sprintf(buffer, "EXCEPTION! find figure by position:  player %d, %d-%d\n", player, findPos.myX,findPos.myY); debugView->render(buffer);
-//	return itFigure;
-//
-//}
-//
-//FIGURES::iterator Model::getFigureByPosition(int player , Position findPos) {
-//
-//	FIGURES::iterator itFigure;
-//
-//	for ( itFigure = mySetFigures[player].begin() ; itFigure != mySetFigures[player].end(); ++itFigure ) {
-//		if (itFigure->captured == false && itFigure->position == findPos)
-//			break;
-//	}
-//	if (itFigure == mySetFigures[player].end()) {
-//			sprintf(buffer, "EXCEPTION! GET figure by position:  player %d, %d-%d\n", player, findPos.myX,findPos.myY); debugView->render(buffer); }
-//	return itFigure;
-//
-//}
-//
-//bool Model::isFigureOnPosition(Position findPos, FIGURES::const_iterator itFindFigure) const{
-//	FIGURES::const_iterator itFigure;
-//
-//	for (int i=0; i<2; ++i) {
-//		for ( itFigure = mySetFigures[i].begin() ; itFigure != mySetFigures[i].end(); ++itFigure ) {
-//			if (itFigure->captured == false && itFigure->position == findPos) {
-//				itFindFigure = itFigure;
-//				return true;
-//			}
-//		}
-//	}
-//	return false;
-//}
-//
-//FIGURES::const_iterator Model::findFigureById(int player , int figureId) const{
-//	FIGURES::const_iterator itFigure;
-//	for ( itFigure = mySetFigures[player].begin() ; itFigure != mySetFigures[player].end(); ++itFigure ) {
-//		if (itFigure->id == figureId)
-//			break;
-//	}
-//	if (itFigure == mySetFigures[player].end()) {
-//		sprintf(buffer, "EXCEPTION! find figure by id:  player %d, %d\n", player, figureId); debugView->render(buffer); }
-//	return itFigure;
-//}
-
 
 
 const FIGURES& Model::getSetFigures(int player) const {

@@ -8,6 +8,8 @@
 #ifndef RULES_IO_H_
 #define RULES_IO_H_
 
+#include <QtXml>
+
 struct RulesIOXMLStorage {
 	struct FigureInfo {
 		int id;
@@ -51,21 +53,49 @@ struct RulesIOXMLStorage {
 };
 
 
+class XmlRulesParser : public QXmlDefaultHandler {
+	public:
+		XmlRulesParser(RulesIOXMLStorage* storagePtr);
+
+	public:
+		bool startElement(const QString&, const QString&, const QString& tagName, const QXmlAttributes& attrs);
+		//bool characters(const QString& strText);
+		bool endElement(const QString&, const QString&, const QString& tagName);
+		bool fatalError(const QXmlParseException& exception);
+
+	private:
+		RulesIOXMLStorage* myStoragePtr;
+};
+
 
 class RulesIO {
-	private:
-		Rules *myRules;
-		RulesIOXMLStorage myStorage;
-	public:
-		RulesIO(Rules *rules);
-		void load(std::string file);
-		void updateRules();
 
+	public:
+		RulesIO();
+
+	public:
+		bool load(std::string file);
+		void updateRules(Rules& rules) const;
+
+	public:
 		const RulesIOXMLStorage& getStorage() const;
 
-		friend void rulesIOStartElementHandler(void *userData, const char *name, const char **atts);
-		friend void rulesIOEndElementHandler(void *userData, const char *name);
+	private:
+		void updateInitFigures(Rules& rules) const;
+		void updateCastleRules(Rules& rules) const;
+		void updateFiguresData(Rules& rules) const;
+		void updatePlayersData(Rules& rules) const;
+		void updateMoveRules(Rules& rules) const;
+
+	private: //after parsing processing
+		void setPromotionRules();
+
+	private:
+		RulesIOXMLStorage myStorage;
 };
+
+
+
 
 
 #endif /* RULES_IO_H_ */

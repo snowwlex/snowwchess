@@ -4,7 +4,7 @@
  *
  *      Author: snowwlex
  */
-#include <ncurses.h>
+
 #include <vector>
 #include <map>
 #include <string>
@@ -12,7 +12,7 @@
 #include "snowwchess.h"
 #include "rules.h"
 
-#include "view.h" // для debig view
+Rules::Rules() { }
 
 void Rules::setRulesName(std::string rulesName) {
 	myRulesName = rulesName;

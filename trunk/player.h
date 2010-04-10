@@ -10,23 +10,27 @@
 
 
 class Player {
-	protected:
+	public:
+		void setModel(Model* model) { myModel = model; }
+		void setColor(int color)    { myColor = color; }
 
 	public:
-		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE) = 0;
+		virtual Move makeTurn(GameMessage message = NONE) = 0;
+
+	protected:
+		int myColor;
+		Model *myModel;
+
 };
 
 
 class HumanPlayer : public Player {
-	private:
-		int myColor;
-		Position myCursorPos;
-		Model *myModel;
-		BoardCLIView *myBoardView;
-		CLIView *myUserView;
+
 	public:
-		HumanPlayer(int color, Model* m, BoardCLIView *boardView, CLIView * userView);
-		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE);
+		HumanPlayer();
+
+	public:
+		virtual Move makeTurn(GameMessage message = NONE);
 };
 
 

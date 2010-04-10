@@ -8,7 +8,8 @@
 #ifndef SNOWWCHESS_H_
 #define SNOWWCHESS_H_
 
-		
+#include <QDebug> //just for debug version
+
 enum GameStatus {USUAL, CHECK, MATE, STALEMATE };
 enum PlayerColor { WHITE = 0, BLACK = 1, ALL = 2 };
 
@@ -17,7 +18,7 @@ enum MoveType {	CAPTURE=1 , MOVE=2 , INPASSING=4 };
 enum MoveEffect { LONGMOVE=1, CASTLE=2, EXPLOSION=4 };
 
 enum PlayerCommand {NOTHING, TURN, SAVE, EXIT, UNDO };
-enum GameMessage {NONE, WRONG_MOVE, GOT_CHECK, SAVED};
+enum GameMessage {NONE, WRONG_MOVE, GOT_CHECK};
 
 
 struct Position {
