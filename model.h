@@ -8,6 +8,8 @@
 #ifndef MODEL_H_
 #define MODEL_H_
 
+#include "snowwchess.h"
+
 class Rules;
 
 class Model {
@@ -32,14 +34,14 @@ class Model {
 		GameStatus checkGameStatus(int player) const;
 
 	public: //getters
-		inline BoardCell getBoardCell(int x, int y) const;
-		inline int getFigureIdOnBoard(int x, int y) const;
-		inline int getBoardSizeX() const;
-		inline int getBoardSizeY() const;
-		inline std::string getRulesName() const;
-		inline const FIGURES& getSetFigures(int player) const;
-		inline const FigureData& getFigureData(int figureId) const;
-		inline std::string getPlayerData(int playerId) const;
+		BoardCell getBoardCell(int x, int y) const;
+		int getFigureIdOnBoard(int x, int y) const;
+		int getBoardSizeX() const;
+		int getBoardSizeY() const;
+		std::string getRulesName() const;
+		const FIGURES& getSetFigures(int player) const;
+		const FigureData& getFigureData(int figureId) const;
+		std::string getPlayerData(int playerId) const;
 
 	public: //setters
 		inline void setFigure(int playerId, const Figure& figure);

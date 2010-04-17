@@ -42,7 +42,7 @@ Game::~Game() {
 	this->clear();
 }
 
-void Game::setRules(const RulesIO& rulesIO) {
+void Game::loadRules(const RulesIO& rulesIO) {
 	rulesIO.updateRules(myRules);
 }
 
@@ -54,13 +54,16 @@ void Game::setPlayer(int color, Player* player) {
 	players[color] = player;
 }
 
-bool Game::isReady() {
+void Game::prepare() {
+	qDebug() << "init model";
+	myModel.setRules(&myRules);
 	myModel.init(true); // true is set temporaly; set because of only 'new game' mode is avaliable now;
-
+}
+bool Game::isReady() {
 	if ( players[WHITE] != 0 &&
 		 players[BLACK] != 0 &&
-		 myModel.isReady()   &&
-		 myBoardView    != 0
+		 myBoardView    != 0 &&
+		 myModel.isReady()
 	   )
 	{
 		qDebug() << "returning true";
@@ -79,7 +82,9 @@ void Game::start() {
 
 	History history;
 
-
+	myBoardView->setModel(&myModel);
+	//myBoardView->drawBoard();
+	myBoardView->update();
 
 
 }

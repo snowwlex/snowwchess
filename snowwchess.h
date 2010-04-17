@@ -10,6 +10,8 @@
 
 #include <QDebug> //just for debug version
 
+#include <string>
+
 enum GameStatus {USUAL, CHECK, MATE, STALEMATE };
 enum PlayerColor { WHITE = 0, BLACK = 1, ALL = 2 };
 
@@ -56,6 +58,7 @@ struct FigureData {
 	bool explosion;
 	int weight;
 	Promoting promoting[2];
+	std::string picture[2];
 	FigureData() { name=""; letter = 0; weight = 0; explosion=true; }
 };
 struct SimpleMove {

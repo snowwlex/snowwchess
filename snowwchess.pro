@@ -31,4 +31,4 @@ SOURCES += guiboardview.cpp \
     player.cpp
 FORMS += dialognewgame.ui \
     mainwindow.ui
-RESOURCES += 
+RESOURCES += pieces.qrc

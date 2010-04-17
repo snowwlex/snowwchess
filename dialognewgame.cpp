@@ -1,24 +1,24 @@
 #include "dialognewgame.h"
 #include <QFileDialog>
 
-dialogNewGame::dialogNewGame(QWidget *parent)
+DialogNewGame::DialogNewGame(QWidget *parent)
     : QDialog(parent)
 {
 	ui.setupUi(this);
 
 }
 
-dialogNewGame::~dialogNewGame()
+DialogNewGame::~DialogNewGame()
 {
 
 }
 
-QString dialogNewGame::getRulesFileName() {
+QString DialogNewGame::getRulesFileName() {
 	return ui.lineEditRulesFileName->text();
 }
 
 
-void dialogNewGame::on_buttonSelectFile_clicked() {
+void DialogNewGame::on_buttonSelectFile_clicked() {
 	QString fileName = QFileDialog::getOpenFileName(this,tr("Opening file with rules"), "", tr("Rules in xml (*.xml)"));
 	ui.lineEditRulesFileName->setText(fileName);
 	return;

@@ -6,23 +6,56 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>489</width>
+    <height>493</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>SnowwChess</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="GuiBoardView" name="widget" native="true">
+   <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>40</y>
-      <width>331</width>
-      <height>351</height>
+      <x>20</x>
+      <y>10</y>
+      <width>421</width>
+      <height>421</height>
      </rect>
     </property>
+    <layout class="QHBoxLayout" name="mainWindowLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="sizeConstraint">
+      <enum>QLayout::SetNoConstraint</enum>
+     </property>
+     <item>
+      <widget class="GuiBoardView" name="boardView" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="baseSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="cursor">
+        <cursorShape>OpenHandCursor</cursorShape>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -30,7 +63,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>489</width>
      <height>23</height>
     </rect>
    </property>
@@ -73,6 +106,9 @@
    <property name="text">
     <string>Exit</string>
    </property>
+   <property name="shortcut">
+    <string>Alt+X</string>
+   </property>
   </action>
  </widget>
  <customwidgets>
@@ -83,7 +119,9 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="pieces.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>actionExit</sender>

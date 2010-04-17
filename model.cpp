@@ -22,9 +22,12 @@
 Model::Board::Board(): myBoardArray(0)  { }
 
 void Model::Board::init(int sizex, int sizey) {
+	qDebug() << "   setting sizes";
 	mySizeX = sizex;
 	mySizeY = sizey;
+	qDebug() << "   allocating memory";
 	if (myBoardArray == 0) {
+		qDebug() << "   operator new: "<< mySizeY << mySizeX;
 		myBoardArray = new BoardCell[ mySizeY * mySizeX ];
 	}
 }
@@ -96,18 +99,24 @@ void Model::setRules(Rules* rules) {
 
 
 void Model::init(bool newGame) {
+
+	qDebug() << "init board";
 	myBoard.init(myRules->getBoardSizeX(),myRules->getBoardSizeY());
 
 	if (newGame == true) {
+		qDebug() << "getting first turn";
 		myCurrentPlayer = myRules->getFirstTurn();
+		qDebug() << "getting init figures";
 		mySetFigures[WHITE] = myRules->getInitFigures(WHITE);
 		mySetFigures[BLACK] = myRules->getInitFigures(BLACK);
 	}
 
+	qDebug() << "sorting figures";
 	for (int player=0; player<2; ++player) {
 		std::sort(mySetFigures[player].begin(), mySetFigures[player].end(),*myRules);
 	}
 
+	qDebug() << "getting special figures";
 	for (int player=0; player<2; ++player) {
 		int i=0;
 		for (FIGURES::const_iterator itFigure = mySetFigures[player].begin(); itFigure != mySetFigures[player].end(); ++itFigure, ++i) {
@@ -118,6 +127,7 @@ void Model::init(bool newGame) {
 		}
 	}
 
+	qDebug() << "setting board cells";
 	for (int player=0; player < 2; ++player) {
 		int setId=1;
 		for (FIGURES::iterator itFigure = mySetFigures[player].begin(); itFigure!=mySetFigures[player].end(); ++itFigure, ++setId) {
