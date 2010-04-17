@@ -1,6 +1,7 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QtXml>
+#include <QLayout>
 
 #include "snowwchess.h"
 #include "rules.h"
@@ -15,45 +16,50 @@
 #include "mainwindow.h"
 #include "dialognewgame.h"
 
-mainWindow::mainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
 	ui.setupUi(this);
-	connect(ui.actionNewGame, SIGNAL(activated()),SLOT(slotActionNewGameActivated()));
+	//ui.centralwidget->set
+}
 
-
+MainWindow::~MainWindow() {
 
 }
 
-mainWindow::~mainWindow() {
-
-}
-
-void mainWindow::slotActionNewGameActivated() {
+void MainWindow::on_actionNewGame_activated() {
 
 	RulesIO rulesIO;
 
-	dialogNewGame* dialog = new dialogNewGame();
+	DialogNewGame* dialog = new DialogNewGame();
+	bool accepted = false;
 	if (dialog->exec() == QDialog::Accepted) {
+		accepted = true;
+		qDebug() << "accepted";
 		bool ok = rulesIO.load(dialog->getRulesFileName().toStdString());
 		if (ok == false) {
 			 QMessageBox(QMessageBox::Warning, tr("Error"), tr("File with rules is not valid"), QMessageBox::Ok).exec();
 		}
+		else {
+			qDebug() << "rules file is valid";
+		}
 	}
 	delete dialog;
 
-	if (dialog->exec() != QDialog::Accepted) {
+	if (accepted != true) {
+		qDebug() << "not accepted";
 		return;
 	}
 
-	myGame.setRules(rulesIO);
-
+	myGame.loadRules(rulesIO);
 	myGame.setPlayer(WHITE, new HumanPlayer() );
 	myGame.setPlayer(BLACK, new HumanPlayer() );
+	myGame.setBoardView(ui.boardView);
 
+	myGame.prepare();
 	if (myGame.isReady() == false) {
-		myGame.clear();
 		qDebug() << "Game is not ready";
+		myGame.clear();
 		return;
 	}
 

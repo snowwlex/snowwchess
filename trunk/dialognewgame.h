@@ -4,19 +4,19 @@
 #include <QtGui/QDialog>
 #include "ui_dialognewgame.h"
 
-class dialogNewGame : public QDialog
+class DialogNewGame : public QDialog
 {
     Q_OBJECT
 
 public:
-    dialogNewGame(QWidget *parent = 0);
-    ~dialogNewGame();
+    DialogNewGame(QWidget *parent = 0);
+    ~DialogNewGame();
 
 public:
     QString getRulesFileName();
 
 private:
-    Ui::dialogNewGameClass ui;
+    Ui::DialogNewGameClass ui;
 
 private slots:
 	void on_buttonSelectFile_clicked();

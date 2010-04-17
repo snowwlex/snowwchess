@@ -2,26 +2,19 @@
 #define SNOWWCHESS_H
 
 #include <QtGui/QMainWindow>
-#include "guiboardview.h"
 #include "ui_mainwindow.h"
-
-#include "snowwchess.h"
-#include "rules.h"
-#include "rules_io.h"
-#include "model.h"
-#include "player.h"
 
 #include "game.h"
 
-class mainWindow : public QMainWindow {
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
 	public:
-		mainWindow(QWidget *parent = 0);
-		~mainWindow();
+		MainWindow(QWidget *parent = 0);
+		~MainWindow();
 
 	public slots:
-		void slotActionNewGameActivated();
+		void on_actionNewGame_activated();
 
 	private slots:
 

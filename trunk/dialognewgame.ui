@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dialogNewGameClass</class>
- <widget class="QDialog" name="dialogNewGameClass">
+ <class>DialogNewGameClass</class>
+ <widget class="QDialog" name="DialogNewGameClass">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>275</width>
+    <height>127</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,8 +18,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>391</width>
-     <height>291</height>
+     <width>261</width>
+     <height>121</height>
     </rect>
    </property>
    <layout class="QFormLayout" name="formLayout">
@@ -66,7 +66,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>dialogNewGameClass</receiver>
+   <receiver>DialogNewGameClass</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -82,7 +82,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>dialogNewGameClass</receiver>
+   <receiver>DialogNewGameClass</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

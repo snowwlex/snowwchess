@@ -19,16 +19,24 @@
 //	}
 //};
 
+#include "snowwchess.h"
+#include "model.h"
+#include "rules.h"
+#include "rules_io.h"
+#include "guiboardview.h"
+#include "player.h"
+
 class Game {
 	public:
 		Game();
 		~Game();
 
-	public:
+	public: //initiating
 		bool isReady();
+		void prepare();
 
 	public:
-		void setRules(const RulesIO& rulesIO);
+		void loadRules(const RulesIO& rulesIO);
 		void setPlayer(int color, Player* player);
 		void setBoardView(GuiBoardView* boardView);
 

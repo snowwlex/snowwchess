@@ -9,6 +9,7 @@
 #define RULES_IO_H_
 
 #include <QtXml>
+#include <string>
 
 struct RulesIOXMLStorage {
 	struct FigureInfo {
@@ -59,12 +60,33 @@ class XmlRulesParser : public QXmlDefaultHandler {
 
 	public:
 		bool startElement(const QString&, const QString&, const QString& tagName, const QXmlAttributes& attrs);
-		//bool characters(const QString& strText);
 		bool endElement(const QString&, const QString&, const QString& tagName);
 		bool fatalError(const QXmlParseException& exception);
 
+	private: //help methods
+
+		void playersTag(const QString& tag, const QXmlAttributes& attrs);
+		void rulesTag(const QString& tag, const QXmlAttributes& attrs);
+		void boardTag(const QString& tag, const QXmlAttributes& attrs);
+
+		void sectionPlayers(const QString& tag, const QXmlAttributes& attrs);
+		void sectionPlayersTagPlayer(const QString& tag, const QXmlAttributes& attrs);
+
+		void sectionFigures(const QString& tag, const QXmlAttributes& attrs) ;
+		void sectionFiguresTagFigure(const QString& tag, const QXmlAttributes& attrs);
+
+		void sectionPositions(const QString& tag, const QXmlAttributes& attrs);
+		void sectionPositionsTagPlayer(const QString& tag, const QXmlAttributes& attrs);
+		void sectionPositionsTagFigure(const QString& tag, const QXmlAttributes& attrs);
+		void sectionPositionsTagPosition(const QString& tag, const QXmlAttributes& attrs);
+
+		void sectionMoves(const QString& tag, const QXmlAttributes& attrs);
+		void sectionMovesTagFigure(const QString& tag, const QXmlAttributes& attrs);
+		void sectionMovesTagJumpSlide(const QString& tag, const QXmlAttributes& attrs);
+		void sectionMovesTagPromotion(const QString& tag, const QXmlAttributes& attrs);
+
 	private:
-		RulesIOXMLStorage* myStoragePtr;
+		RulesIOXMLStorage* myStorage;
 };
 
 
@@ -80,15 +102,19 @@ class RulesIO {
 	public:
 		const RulesIOXMLStorage& getStorage() const;
 
-	private:
+	private: //update rules methods
 		void updateInitFigures(Rules& rules) const;
 		void updateCastleRules(Rules& rules) const;
 		void updateFiguresData(Rules& rules) const;
 		void updatePlayersData(Rules& rules) const;
-		void updateMoveRules(Rules& rules) const;
+		void updateMoveRules  (Rules& rules) const;
 
 	private: //after parsing processing
 		void setPromotionRules();
+		void setDefaultPictures();
+
+	private: //help methods
+		std::string figureLetterToName(char letter);
 
 	private:
 		RulesIOXMLStorage myStorage;

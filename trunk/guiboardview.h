@@ -9,6 +9,8 @@
 #define GUIBOARDVIEW_H_
 
 #include <QtGui/QWidget>
+#include <QPainter>
+#include "model.h"
 
 class GuiBoardView : public QWidget {
 	Q_OBJECT
@@ -17,15 +19,27 @@ class GuiBoardView : public QWidget {
 		GuiBoardView(QWidget *parent = 0);
 		~GuiBoardView();
 
+	public:
+		void setModel(Model* model);
+
+	public:
+
 	public slots:
 
 	private slots:
 
 	signals:
 
-	private: //methods
+	protected: //events
+		virtual void paintEvent(QPaintEvent *pe);
+		virtual void mouseMoveEvent(QMouseEvent *pe);
+
+	private: //draw methods
+		void drawBoardCells(QPainter& painter);
+		void drawFigures(QPainter& painter);
 
 	private: //fields
+		Model* myModel;
 
 };
 
