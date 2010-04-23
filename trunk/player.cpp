@@ -5,7 +5,7 @@
  *      Author: snowwlex
  */
 
-#include <ncurses.h>
+//#include <ncurses.h>  // console is not supported at this version
 #include <vector>
 #include <string>
 #include <map>
@@ -13,111 +13,120 @@
 
 #include "snowwchess.h"
 #include "model.h"
-#include "view.h"
+//#include "view.h" // console is not supported at this version
+#include "guiboardview.h"
 #include "player.h"
 
 
 
 HumanPlayer::HumanPlayer() {
+	myBoardView = 0;
+	iAmMoving = false;
+	catchDestination = false;
+}
+
+void HumanPlayer::pushedCell(const Position& pos) {
+
+	qDebug() << ":HumanPlayer:" << "get pushed cell, my color is" << myColor;
+	if (iAmMoving == false) {
+		return;
+	}
+
+	if (catchDestination == true) {
+		catchFinishCell(pos);
+	} else {
+		catchStartCell(pos);
+	}
+}
+
+void Player::notifyMoveReady(const Move& move) const{
+	for (LISTENERS::const_iterator itListener = myListeners.begin(); itListener != myListeners.end(); ++itListener) {
+		(*itListener)->moveReady(move);
+		qDebug() << ":Player:" << "calling of listener moveReady ";
+	}
+}
+
+void HumanPlayer::catchFinishCell(const Position& pos) {
+
+	qDebug() << ":HumanPlayer:" << "catch destination";
+	myMove.pos2 = pos;
+	myBoardView->clearHightlights();
+
+	catchDestination = false;
+
+	myMove.player = myColor;
+
+	if (myModel->canMove(myMove) == false) {
+		return;
+	}
+
+	iAmMoving = false;
+
+
+	MOVES avMoves = myModel->movesFromPosition(myColor, myMove.pos1);
+	bool accepted;
+	MOVES::iterator itMove;
+	for ( accepted = false, itMove = avMoves.begin() ; !accepted && itMove != avMoves.end(); ++itMove ) {
+		if ( itMove->pos1 == myMove.pos1 && itMove->pos2 == myMove.pos2) {
+			accepted = true;
+			myMove = *itMove;
+		}
+	}
+
+	notifyMoveReady(myMove);
+
 
 }
 
-Move HumanPlayer::makeTurn(GameMessage message) {
+void HumanPlayer::catchStartCell(const Position& pos) {
 
-	PlayerCommand command;
-	std::string inputCommand;
-	MOVES moves;
-	Move move;
-	MOVES::iterator itMove;
-	int key,mode;
-	switch(message) {
-		case WRONG_MOVE:
-				qDebug() << "Received message: Wrong move!\n";
-				break;
-		case GOT_CHECK:
-				qDebug() << "Received message: You've gotta check!";
-				break;
-		default:
-				break;
+	qDebug() << ":HumanPlayer:" << "catch start cell";
+
+	if (myModel->getBoardCell(pos.myX,pos.myY).player != myColor) {
+		return;
 	}
 
 
-	//myBoardView->render();
-	//myBoardView->highlight(myCursorPos,13);
+	MOVES moves = myModel->movesFromPosition(myColor, pos);
 
-	command = NOTHING;
-	mode = 0;
-	do {
+	qDebug() << ":HumanPlayer:" << "moves from position";
+	if ( moves.empty() ) {
+		return;
+	}
+	qDebug() << ":HumanPlayer:" << "moves empty";
+	catchDestination = true;
+	HIGHLIGHT_CELLS highlightCells;
+	MOVES::iterator itMove;
+	for ( itMove=moves.begin() ; itMove != moves.end(); ++itMove ) {
+		QColor color = itMove->type & MOVE ? Qt::cyan : Qt::red;
+		highlightCells.push_back ( std::make_pair( itMove->pos2, color ) );
+	}
 
+	myMove.pos1 = pos;
 
-		//key = myUserView->getKey();
-
-		//myBoardView->render();
-
-		switch(key) {
-			case KEY_UP:
-			//	if (myCursorPos.myY > 0) myCursorPos.myY -= 1;
-				break;
-			case KEY_DOWN:
-			//	if (myCursorPos.myY < myModel->getBoardSizeY()-1 ) myCursorPos.myY += 1;
-				break;
-			case KEY_LEFT:
-			//	if (myCursorPos.myX > 0 ) myCursorPos.myX -= 1;
-				break;
-			case KEY_RIGHT:
-			//	if (myCursorPos.myX < myModel->getBoardSizeX()-1 ) myCursorPos.myX += 1;
-				break;
-			case 27:
-				command = EXIT;
-				break;
-			case KEY_F(5):
-				command = SAVE;
-				break;
-			case KEY_F(9):
-				command = UNDO;
-				break;
-			case KEY_F(4):
-				moves = myModel->allMoves(myColor);
-				for ( itMove=moves.begin() ; itMove != moves.end(); itMove++ ) {
-					//myBoardView->highlight(itMove->pos2,(itMove->type & MOVE) ? 12 : 11);
-				}
-				break;
-			case ' ':
-				if (mode == 0) {
-					//move.pos1.myX = myCursorPos.myX;
-					//move.pos1.myY = myCursorPos.myY;
-					moves = myModel->movesFromPosition(myColor, Position(move.pos1.myX,move.pos1.myY));
-					mode = 1;
-				//} else if (myCursorPos.myX == move.pos1.myX && myCursorPos.myY == move.pos1.myY){
-					mode = 0;
-				} else {
-					//move.pos2.myX = myCursorPos.myX;
-					//move.pos2.myY = myCursorPos.myY;
-					move.player = myColor;
-					move.type = CAPTURE | MOVE;
-					command = TURN;
-				}
-				break;
-			default:
-				break;
-		}
-
-
-		if (mode == 1) {
-			for ( itMove=moves.begin() ; itMove != moves.end(); ++itMove ) {
-				//myBoardView->highlight(itMove->pos2,(itMove->type & MOVE) ? 12 : 11);
-			}
-			//myBoardView->highlight(Position(move.pos1.myX,move.pos1.myY),13);
-		}
-		//myBoardView->highlight(myCursorPos,13);
-
-
-
-
-	} while( command == NOTHING );
-
-
-	return move;
+	myBoardView->highlight(highlightCells);
 }
 
+void HumanPlayer::makeTurn() {
+
+	iAmMoving = true;
+	catchDestination = false;
+
+//	case ' ':
+//		if (mode == 0) {
+//			//move.pos1.myX = myCursorPos.myX;
+//			//move.pos1.myY = myCursorPos.myY;
+//			moves = myModel->movesFromPosition(myColor, Position(move.pos1.myX,move.pos1.myY));
+//			mode = 1;
+//		//} else if (myCursorPos.myX == move.pos1.myX && myCursorPos.myY == move.pos1.myY){
+//			mode = 0;
+//		} else {
+//			//move.pos2.myX = myCursorPos.myX;
+//			//move.pos2.myY = myCursorPos.myY;
+//			move.player = myColor;
+//			move.type = CAPTURE | MOVE;
+//			command = TURN;
+//		}
+
+}
 

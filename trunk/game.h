@@ -25,8 +25,9 @@
 #include "rules_io.h"
 #include "guiboardview.h"
 #include "player.h"
+#include "listener.h"
 
-class Game {
+class Game : public Listener {
 	public:
 		Game();
 		~Game();
@@ -44,11 +45,17 @@ class Game {
 		void start();
 		void clear();
 
+	public: //listener methods
+		virtual void moveReady(const Move&);
+
 	private:
 		Model myModel;
 		Rules myRules;
 		GuiBoardView* myBoardView;
 		Player* players[2];
+
+	private:
+		int curPlayer;
 };
 
 

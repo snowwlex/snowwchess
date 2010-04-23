@@ -9,10 +9,11 @@
 #define MODEL_H_
 
 #include "snowwchess.h"
+#include "sender.h"
 
 class Rules;
 
-class Model {
+class Model : public Sender {
 
 	public:
 		Model();
@@ -24,9 +25,9 @@ class Model {
 
 
 	public: //moves methods
-		void makeMove(Move move);
-		bool canMove(Move& move) const;
-		MOVES movesFromPosition(int player, Position pos1) const;
+		void makeMove(const Move& move);
+		bool canMove(const Move& move) const;
+		MOVES movesFromPosition(int player, const Position& pos1) const;
 		MOVES allMoves(int player, int movetype=(MOVE | CAPTURE)) const;
 
 	public: //game status
@@ -42,9 +43,13 @@ class Model {
 		const FIGURES& getSetFigures(int player) const;
 		const FigureData& getFigureData(int figureId) const;
 		std::string getPlayerData(int playerId) const;
+		int getCurrentPlayer() const { return myCurrentPlayer; }
 
 	public: //setters
 		inline void setFigure(int playerId, const Figure& figure);
+
+	public: //sender methods
+		void notifyMoveMaked(const Move& move) const;
 
 	private:
 		class Board {
@@ -61,7 +66,7 @@ class Model {
 
 			public: //sort operator()
 				BoardCell operator() (int x,int y) const;
-				BoardCell operator() (Position pos) const;
+				BoardCell operator() (const Position& pos) const;
 
 			private:
 				inline int getCoordinates(int x,int y) const;

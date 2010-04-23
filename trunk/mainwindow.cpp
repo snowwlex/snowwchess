@@ -7,9 +7,8 @@
 #include "rules.h"
 #include "rules_io.h"
 #include "model.h"
-#include "player.h"
-
 #include "guiboardview.h"
+#include "player.h"
 #include "game.h"
 
 

@@ -12,6 +12,7 @@
 #include <string>
 #include <map>
 #include <deque>
+#include <algorithm>
 
 #include <ctime>
 
@@ -21,9 +22,9 @@
 #include "rules_io.h"
 #include "model_io.h"
 //#include "view.h"
+#include "guiboardview.h"
 #include "player.h"
 #include "ai.h"
-#include "guiboardview.h"
 #include "game.h"
 
 
@@ -78,13 +79,46 @@ void Game::clear() {
 	delete players[BLACK];
 }
 
+
+void Game::moveReady(const Move& move) {
+
+	qDebug() << ":Game: "<< "got  move: " << move.pos1.myX << move.pos1.myY
+								          << move.pos2.myX << move.pos2.myY;
+
+	if (move.player != curPlayer) {
+		return;
+	}
+
+	if (myModel.canMove(move) == false) {
+		return;
+	}
+
+	myModel.makeMove(move);
+	myBoardView->update();
+	curPlayer = 1 - curPlayer;
+	players[curPlayer]->makeTurn();
+
+	qDebug() << ":Game: "<< " move is made: ";
+}
+
 void Game::start() {
 
-	History history;
 
 	myBoardView->setModel(&myModel);
-	//myBoardView->drawBoard();
-	myBoardView->update();
+	myModel.addListener(myBoardView);
+	for (int i = 0; i < 2; ++i) {
+		players[i]->setModel(&myModel);
+		players[i]->setColor(i);
+		players[i]->setBoardView(myBoardView);
 
+		players[i]->addListener(this);
+		myBoardView->addListener(players[i]);
+	}
+
+	curPlayer = myModel.getCurrentPlayer();
+
+	players[curPlayer]->makeTurn();
+
+	myBoardView->update();
 
 }

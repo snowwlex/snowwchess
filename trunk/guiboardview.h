@@ -11,8 +11,11 @@
 #include <QtGui/QWidget>
 #include <QPainter>
 #include "model.h"
+#include "sender.h"
 
-class GuiBoardView : public QWidget {
+typedef std::vector< std::pair<Position, QColor> > HIGHLIGHT_CELLS;
+
+class GuiBoardView : public QWidget, public Sender, public Listener {
 	Q_OBJECT
 
 	public:
@@ -23,6 +26,11 @@ class GuiBoardView : public QWidget {
 		void setModel(Model* model);
 
 	public:
+		void highlight(const HIGHLIGHT_CELLS& highlightCells);
+		void clearHightlights();
+
+	public: //listener methods
+		virtual void moveMaked(const Move& move);
 
 	public slots:
 
@@ -30,16 +38,39 @@ class GuiBoardView : public QWidget {
 
 	signals:
 
+	private: //sender methods
+		void notifyClickedCell(const Position& pos) const;
+
+
+
+
 	protected: //events
 		virtual void paintEvent(QPaintEvent *pe);
-		virtual void mouseMoveEvent(QMouseEvent *pe);
+		virtual void mousePressEvent(QMouseEvent *pe);
 
-	private: //draw methods
-		void drawBoardCells(QPainter& painter);
-		void drawFigures(QPainter& painter);
+	private: //draw preparing methods
+		void prepareBoardCells();
+		void prepareFigures();
+		void prepareHighlightCells();
+
+	private:
+		void countSizes();
 
 	private: //fields
 		Model* myModel;
+		QPixmap myBoardCells;
+		QPixmap myBoardFigures;
+		QPixmap myBoardHighlightCells;
+		HIGHLIGHT_CELLS myHighlightCells;
+
+		QSize boardSize;
+		QSize screenSize;
+		QSize cellSize;
+		bool redrawBoardCells,
+			 redrawBoardFigures,
+			 redrawBoardHighlightCells;
+
+
 
 };
 

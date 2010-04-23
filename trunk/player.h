@@ -8,18 +8,26 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 
+#include "listener.h"
+#include "sender.h"
 
-class Player {
+class Player : public Listener, public Sender {
+
 	public:
+		virtual void makeTurn() = 0;
+
+	public: //setters
 		void setModel(Model* model) { myModel = model; }
 		void setColor(int color)    { myColor = color; }
+		void setBoardView(GuiBoardView* boardView) { myBoardView = boardView; }
 
-	public:
-		virtual Move makeTurn(GameMessage message = NONE) = 0;
+	public: //sender methods
+		void notifyMoveReady(const Move& move) const;
 
 	protected:
 		int myColor;
 		Model *myModel;
+		GuiBoardView* myBoardView;
 
 };
 
@@ -30,7 +38,20 @@ class HumanPlayer : public Player {
 		HumanPlayer();
 
 	public:
-		virtual Move makeTurn(GameMessage message = NONE);
+		virtual void makeTurn();
+
+	public: //listener methods
+		virtual void pushedCell(const Position& pos);
+
+	private: //helper methods
+		void catchFinishCell(const Position& pos);
+		void catchStartCell(const Position& pos);
+
+	public:
+		bool iAmMoving;
+		bool catchDestination;
+		Move myMove;
+
 };
 
 

@@ -64,7 +64,7 @@ BoardCell Model::Board::operator() (int x,int y) const {
 	return myBoardArray[getCoordinates(x,y)];
 }
 
-BoardCell Model::Board::operator() (Position pos) const {
+BoardCell Model::Board::operator() (const Position& pos) const {
 	if ( pos.myX<0 || pos.myX >= mySizeX ||
 	     pos.myY<0 || pos.myY >= mySizeY ) {
 		return BoardCell(-1);
@@ -96,6 +96,12 @@ void Model::setRules(Rules* rules) {
 	myRules = rules;
 }
 
+void Model::notifyMoveMaked(const Move& move) const {
+	for (LISTENERS::const_iterator itListener = myListeners.begin(); itListener != myListeners.end(); ++itListener) {
+		(*itListener)->moveMaked(move);
+		qDebug() << ":Model:" << "calling of listener for notifyMoveMaked";
+	}
+}
 
 
 void Model::init(bool newGame) {
@@ -228,7 +234,7 @@ void  Model::makeMovePromotion(const Move& move) {
 	mySetFigures[move.player].at(myBoard(move.pos2).setId-1).id = promotionToFigure;
 }
 
-void Model::makeMoveEffectLongMove(const Move& move) {
+void Model::makeMoveEffectLongMove(const Move&) {
 	return;
 }
 
@@ -268,7 +274,30 @@ void Model::makeMoveEffectExplosion(const Move& move) {
 	}
 
 }
-void Model::makeMove(Move move) {
+
+
+bool Model::canMove(const Move& move) const {
+
+	qDebug() << ":Model:" << "canMove()";
+
+	bool accepted;
+	MOVES avMoves;
+	MOVES::const_iterator itMove;
+
+	avMoves = movesFromPosition(move.player, move.pos1);
+	for ( accepted = false, itMove = avMoves.begin() ; !accepted && itMove != avMoves.end(); ++itMove ) {
+		if ( itMove->pos1 == move.pos1 && itMove->pos2 == move.pos2) {
+			accepted = true;
+		}
+	}
+	return accepted;
+}
+
+
+void Model::makeMove(const Move& move) {
+
+	// ISSUE: here we should check if this move is right;
+
 
 	BoardCell boardCell;
 	boardCell = myBoard(move.pos1);
@@ -304,6 +333,8 @@ void Model::makeMove(Move move) {
 	myLastMoveRecorded = true;
 	myLastMove = move;
 
+	notifyMoveMaked(myLastMove);
+
 
 }
 Figure& Model::accessFigure(const BoardCell& boardCell) {
@@ -334,8 +365,6 @@ MOVES Model::movesFigure(int player, const Figure& figure,  int movetype, bool n
 				move.player = player;
 				accepted = checkPosition(*itRule,figure,move,movetype, needCheck);
 				if (accepted == true) {
-					//sprintf(buffer,"[JUMP  %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c']\n",move.pos1.myX+'a',myRules->getBoardSizeY() - move.pos1.myY + '0',move.pos2.myX+'a',myRules->getBoardSizeY() - move.pos2.myY + '0',move.effect,move.type,move.player,getFigureData(move.figureId).letter);
-					//if (needCheck == true) debugView->render(buffer);
 					avMoves.push_back(move);
 				}
 			} else if (itRule->ruleType == SLIDE) {
@@ -350,8 +379,6 @@ MOVES Model::movesFigure(int player, const Figure& figure,  int movetype, bool n
 						move.player = player;
 						accepted = checkPosition(*itRule,figure,move,movetype, needCheck);
 						if (accepted == true) {
-							//sprintf(buffer,"[SLIDE %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c']\n",move.pos1.myX+'a',myRules->getBoardSizeY() - move.pos1.myY + '0',move.pos2.myX+'a',myRules->getBoardSizeY() - move.pos2.myY + '0',move.effect,move.type,move.player,getFigureData(move.figureId).letter);
-							//if (needCheck == true) debugView->render(buffer);
 							avMoves.push_back(move);
 						}
 						++curLimit;
@@ -407,18 +434,18 @@ bool Model::checkPosition(MoveRule moveRule, const Figure& figure, Move& move, i
 	return accepted;
 }
 
-bool Model::checkExplosionEffect(MoveRule moveRule, const Figure& figure, Move& move) const{
+bool Model::checkExplosionEffect(MoveRule moveRule, const Figure&, Move& move) const{
 	move.effect = EXPLOSION;
 	return true;
 }
-bool Model::checkLongMoveEffect(MoveRule moveRule, const Figure& figure, Move& move) const {
+bool Model::checkLongMoveEffect(MoveRule, const Figure& figure, Move& move) const {
 	if (figure.wasMoved == true) {
 		return false;
 	}
 	move.effect = LONGMOVE;
 	return true;
 }
-bool Model::checkCastleEffect(MoveRule moveRule, const Figure& figure, Move& move) const {
+bool Model::checkCastleEffect(MoveRule, const Figure& figure, Move& move) const {
 	// ISSUE: add a checking for non-checked cells
 
 	if (figure.wasMoved == true) {
@@ -455,7 +482,7 @@ bool Model::checkCapture(MoveRule moveRule, const Figure& figure, Move& move) co
 	}
 	return accepted;
 }
-bool Model::checkIfCheck(MoveRule moveRule, const Figure& figure, Move& move) const{
+bool Model::checkIfCheck(MoveRule, const Figure&, Move& move) const{
 	Model m = *this;
 	m.makeMove(move);
 	return m.isCheck(move.player);
@@ -502,32 +529,20 @@ bool Model::checkInpassing(MoveRule moveRule, const Figure& figure, Move& move) 
 	return accepted;
 }
 
-bool Model::canMove(Move& move) const {
 
-	bool accepted;
-	MOVES avMoves;
-	MOVES::iterator itMove;
-
-	avMoves = movesFromPosition(move.player, move.pos1);
-	for ( accepted = false, itMove = avMoves.begin() ; !accepted && itMove != avMoves.end(); ++itMove ) {
-		if ( itMove->pos1 == move.pos1 && itMove->pos2 == move.pos2) { // && (it->type & move.type) ) {
-			move.effect = itMove->effect;
-			move.type = itMove->type;
-			accepted = true;
-		}
-	}
-	return accepted;
-}
-
-MOVES Model::movesFromPosition(int player, Position pos1) const {
+MOVES Model::movesFromPosition(int player, const Position& pos1) const {
 
 	MOVES avMoves;
 	BoardCell boardCell;
 
 	boardCell = myBoard(pos1);
+
+	qDebug() << boardCell.setId << boardCell.player;
 	if (boardCell.setId <= 0 || boardCell.player != player) {
 		return avMoves;
 	}
+
+	//qDebug() << ":Model:" << "movesFromPosition() before moesFigure";
 
 	avMoves = movesFigure(player, readFigure(boardCell),CAPTURE|MOVE);
 	return avMoves;
