@@ -3,7 +3,9 @@ TARGET = snowwchess
 QT += core \
     gui \
     xml
-HEADERS += guiboardview.h \
+HEADERS += sender.h \
+    listener.h \
+    guiboardview.h \
     tester.h \
     dialognewgame.h \
     ai.h \
