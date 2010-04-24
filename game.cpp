@@ -8,6 +8,8 @@
 
 //#include <ncurses.h> //ncurses is temporaly not supported;
 
+#include <QMessageBox>
+
 #include <vector>
 #include <string>
 #include <map>
@@ -94,11 +96,23 @@ void Game::moveReady(const Move& move) {
 	}
 
 	myModel.makeMove(move);
+	qDebug() << ":Game: "<< " move made: ";
+
 	myBoardView->update();
 	curPlayer = 1 - curPlayer;
-	players[curPlayer]->makeTurn();
 
-	qDebug() << ":Game: "<< " move is made: ";
+	GameStatus status = myModel.checkGameStatus(curPlayer);
+	if (status == MATE) {
+		QString playerName = curPlayer == WHITE ? "white" : "black";
+		QMessageBox("game message", QString("player ")+playerName+" has got the mate!",
+				    QMessageBox::Information, QMessageBox::Ok,0,0).exec();
+	} else if (status == STALEMATE) {
+		QMessageBox("game message", "It's the stalemate!",
+					QMessageBox::Information, QMessageBox::Ok,0,0).exec();
+	} else {
+		players[curPlayer]->makeTurn();
+	}
+
 }
 
 void Game::start() {

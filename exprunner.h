@@ -30,8 +30,8 @@ class ExpRunner {
 					myExperiment.addValue( difftime(end,start) );
 				}
 				//sprintf(buffer, "Number: %d, mean: %f, %s\n",*itNumber, myExperiment.getMean(), myExperiment.isReady() == 1 ? "max experiments done": "covariant is less than setted");
-				sprintf(buffer, "%d %f\n",*itNumber, myExperiment.getMean() );//, myExperiment.isReady() == 1 ? "max experiments done": "covariant is less than setted");
-				fputs(buffer,outfile);
+				//sprintf(buffer, "%d %f\n",*itNumber, myExperiment.getMean() );//, myExperiment.isReady() == 1 ? "max experiments done": "covariant is less than setted");
+				//fputs(buffer,outfile);
 			}
 			fclose(outfile);
 		}

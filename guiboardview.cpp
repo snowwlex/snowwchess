@@ -215,7 +215,7 @@ void GuiBoardView::notifyClickedCell(const Position& pos) const {
 	}
 }
 
-void GuiBoardView::moveMaked(const Move& move) {
+void GuiBoardView::moveMaked(const Move&) {
 	redrawBoardFigures = true;
 	this->update();
 }

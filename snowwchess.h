@@ -8,9 +8,11 @@
 #ifndef SNOWWCHESS_H_
 #define SNOWWCHESS_H_
 
-#include <QDebug> //just for debug version
+#include <QDebug>
 
+#include <map>
 #include <string>
+#include <vector>
 
 enum GameStatus {USUAL, CHECK, MATE, STALEMATE };
 enum PlayerColor { WHITE = 0, BLACK = 1, ALL = 2 };
@@ -107,9 +109,5 @@ typedef std::map<int,MOVERULES > FIGURES_RULES;
 typedef	std::map<int,FigureData > FIGURES_DATA;
 typedef	std::map<int, std::string> PLAYERS_DATA;
 typedef	std::vector<CastleRule> CASTLERULES;
-
-extern int randomizator;
-extern FILE* statfile;
-extern char buffer[1024];
 
 #endif /* SNOWWCHESS_H_ */

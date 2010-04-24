@@ -9,6 +9,7 @@
 #include "model.h"
 #include "guiboardview.h"
 #include "player.h"
+#include "ai.h"
 #include "game.h"
 
 
@@ -52,7 +53,7 @@ void MainWindow::on_actionNewGame_activated() {
 
 	myGame.loadRules(rulesIO);
 	myGame.setPlayer(WHITE, new HumanPlayer() );
-	myGame.setPlayer(BLACK, new HumanPlayer() );
+	myGame.setPlayer(BLACK, new AlphaBetaParallelSearchAIPlayer(4,2) );
 	myGame.setBoardView(ui.boardView);
 
 	myGame.prepare();

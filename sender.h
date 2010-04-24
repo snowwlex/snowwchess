@@ -25,8 +25,8 @@ class Sender {
 
 	protected:
 		Sender() { }
-		Sender(const Sender& sender) { }
-		Sender& operator=(const Sender& sender) { }
+		Sender(const Sender&) { }
+		Sender& operator=(const Sender&) { return *this; }
 
 	protected:
 
