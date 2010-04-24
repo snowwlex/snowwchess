@@ -434,7 +434,7 @@ bool Model::checkPosition(MoveRule moveRule, const Figure& figure, Move& move, i
 	return accepted;
 }
 
-bool Model::checkExplosionEffect(MoveRule moveRule, const Figure&, Move& move) const{
+bool Model::checkExplosionEffect(MoveRule, const Figure&, Move& move) const{
 	move.effect = EXPLOSION;
 	return true;
 }

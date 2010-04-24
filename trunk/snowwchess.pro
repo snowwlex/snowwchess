@@ -22,7 +22,10 @@ HEADERS += sender.h \
     snowwchess.h \
     view.h \
     mainwindow.h
-SOURCES += guiboardview.cpp \
+SOURCES +=  ai_full_search.cpp \
+    ai_ab_search.cpp \ 
+    ai_parallel_search.cpp \
+    guiboardview.cpp \
     dialognewgame.cpp \
     mainwindow.cpp \
     main.cpp \
@@ -30,7 +33,8 @@ SOURCES += guiboardview.cpp \
     rules.cpp \
     model.cpp \
     game.cpp \
-    player.cpp
+    player.cpp \
+    ai.cpp
 FORMS += dialognewgame.ui \
     mainwindow.ui
 RESOURCES += pieces.qrc

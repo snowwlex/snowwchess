@@ -16,7 +16,7 @@ class aiTester {
 	void operator()(int number) {
 		Move move;
 		myPlayer->setDepth(number);
-		myPlayer->makeTurn(NONE);
+		myPlayer->makeTurn();
 	}
 };
 

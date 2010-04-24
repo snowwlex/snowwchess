@@ -8,6 +8,9 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 
+#include "snowwchess.h"
+#include "guiboardview.h"
+#include "model.h"
 #include "listener.h"
 #include "sender.h"
 
@@ -44,8 +47,8 @@ class HumanPlayer : public Player {
 		virtual void pushedCell(const Position& pos);
 
 	private: //helper methods
-		void catchFinishCell(const Position& pos);
 		void catchStartCell(const Position& pos);
+		void catchFinishCell(const Position& pos);
 
 	public:
 		bool iAmMoving;

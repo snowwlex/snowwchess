@@ -8,23 +8,13 @@
 #ifndef AI_H_
 #define AI_H_
 
-#define DEBUG_DISPLAY_SEF  sprintf(buffer,"sef = %d\n",sefMaterial(model, curPlayer)); debugView->render(buffer);
-#define DEBUG_DISPLAY_BEFORE  sprintf(buffer,"[%d] BEFORE: %d:%d\n",curDepth, alpha.myIsInfinity==0?alpha.myValue:999, beta.myIsInfinity==0?beta.myValue:999);debugView->render(buffer);
-#define DEBUG_DISPLAY_SCORE  sprintf(buffer,"[AB] %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c' SCORE %d]\n",itMove->pos1.myX+'a',myModel->getBoardSizeY() - itMove->pos1.myY + '0',itMove->pos2.myX+'a',myModel->getBoardSizeY() - itMove->pos2.myY + '0',itMove->effect,itMove->type,itMove->player,myModel->getFigureData(itMove->figureId).letter,tmpScore); debugView->render(buffer);
-#define DEBUG_DISPLAY_MOVE  sprintf(buffer,"[move] %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c' ]\n",itMove->pos1.myX+'a',myModel->getBoardSizeY() - itMove->pos1.myY + '0',itMove->pos2.myX+'a',myModel->getBoardSizeY() - itMove->pos2.myY + '0',itMove->effect,itMove->type,itMove->player,myModel->getFigureData(itMove->figureId).letter); debugView->render(buffer);
-#define DEBUG_DISPLAY_AFTER sprintf(buffer,"[%d] AFTER: score=%d, %d:%d\n",curDepth, score.myIsInfinity==0?score.myValue:999,alpha.myIsInfinity==0?alpha.myValue:999, beta.myIsInfinity==0?beta.myValue:999);debugView->render(buffer);
-#define DEBUG_DISPLAY_RETURN sprintf(buffer,"[%d]%s RETURN: %d\n",curDepth, pruning==true?"pruninged":"", score.myIsInfinity==0?score.myValue:999); debugView->render(buffer);
-#define DEBUG_DISPLAY(something) sprintf(buffer,something); debugView->render(buffer);
+#include <deque>
 
-#define DEBUG_LOG_SEF fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"sef = %d\n",sefMaterial(model, curPlayer)); fputs(buffer,statfile);
-#define DEBUG_LOG_BEFORE fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"[%d] BEFORE: %d:%d\n",curDepth, alpha.myIsInfinity==0?alpha.myValue:999, beta.myIsInfinity==0?beta.myValue:999); fputs(buffer,statfile);
-#define DEBUG_LOG_SCORE fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"[++] %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c' SCORE %d]\n",itMove->pos1.myX+'a',myModel->getBoardSizeY() - itMove->pos1.myY + '0',itMove->pos2.myX+'a',myModel->getBoardSizeY() - itMove->pos2.myY + '0',itMove->effect,itMove->type,itMove->player,myModel->getFigureData(itMove->figureId).letter,tmpScore); fputs(buffer,statfile);
-#define DEBUG_LOG_MOVE fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile);  sprintf(buffer,"[move] %c%c-%c%c, eff=%d, type=%d,pl=%d, '%c' ]\n",itMove->pos1.myX+'a',myModel->getBoardSizeY() - itMove->pos1.myY + '0',itMove->pos2.myX+'a',myModel->getBoardSizeY() - itMove->pos2.myY + '0',itMove->effect,itMove->type,itMove->player,myModel->getFigureData(itMove->figureId).letter); debugView->render(buffer);  fputs(buffer,statfile);
-#define DEBUG_LOG_AFTER fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile); sprintf(buffer,"[%d] AFTER: score=%d, %d:%d\n",curDepth, score.myIsInfinity==0?score.myValue:999,alpha.myIsInfinity==0?alpha.myValue:999, beta.myIsInfinity==0?beta.myValue:999);fputs(buffer,statfile);
-#define DEBUG_LOG_RETURN fputs(std::string(3*(myDepth-curDepth),' ').c_str(),statfile);sprintf(buffer,"[%d]%s RETURN: %d\n",curDepth, pruning==true?"pruninged":"", score.myIsInfinity==0?score.myValue:999); fputs(buffer,statfile);
+#include "snowwchess.h"
+#include "player.h"
 
 enum Infinity { INF=1 };
-struct Border {
+struct Border { // for alpha-beta borders
 	int myIsInfinity;
 	int myValue;
 	Border(int value, int isInfinity=0) : myIsInfinity(isInfinity), myValue(value) { }
@@ -49,36 +39,58 @@ struct Border {
 };
 
 class AIPlayer : public Player {
+	public:
+		virtual void makeTurn() = 0;
+
+	public: //setters
+		void setDepth(int depth);
+		void setAddDepth(int addDepth);
+
+	public: //help methods
+		bool operator()(const Move& move1,const Move& move2); //for moves sort
+
 	protected:
-		int myTurnsCounter;
+		AIPlayer() { myTurnsCounter = 0; }
+
+	protected:
+		int sefMaterial(const Model& model, int player) const;
+
+	protected:
 		int myDepth;
-		int myDepth2;
+		int myAddDepth;
+
+	protected: //for debug
+		int myTurnsCounter;
 		int myCounter;
 		int myQCounter;
-		int sefMaterial(const Model& model, int player) const;
-	public:
-		AIPlayer();
-		virtual Move makeTurn(GameMessage message = NONE) = 0;
-		void setDepth(int depth);
-};
 
-class FullSearchAIPlayer : public AIPlayer {
-	private:
-		int miniMaxSearch(Move& returnMove, int curDepth, int curPlayer, const Model& model);
-	public:
-		FullSearchAIPlayer();
-		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE);
+
 };
+//
+//class FullSearchAIPlayer : public AIPlayer {
+//	private:
+//		int miniMaxSearch(Move& returnMove, int curDepth, int curPlayer, const Model& model);
+//	public:
+//		FullSearchAIPlayer();
+//		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE);
+//};
+//
 
 class AlphaBetaSearchAIPlayer : public AIPlayer {
-	private:
-		enum Infinity { INF=1 };
-		int alphaBetaNegaMaxSearch(Move& returnMove, Border alpha, Border beta, int curPlayer, int curDepth, const Model& model);
-		int quiesSearch(Move& returnMove, Border alpha, Border beta, int curPlayer, int curDepth , const Model& model);
 	public:
-		bool operator()(const Move& move1,const Move& move2);
-		AlphaBetaSearchAIPlayer();
-		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE);
+		AlphaBetaSearchAIPlayer(int depth=1, int addDepth=0);
+
+	public:
+		virtual void makeTurn();
+
+	protected:
+		enum Infinity { INF=1 };
+
+	protected: //searching methods
+
+		int alphaBetaNegaMaxSearch(Border alpha, Border beta, int curPlayer, int curDepth, const Model& model);
+		int quiesSearch(Border alpha, Border beta, int curPlayer, int curDepth , const Model& model);
+
 };
 
 class AlphaBetaParallelSearchAIPlayer;
@@ -89,21 +101,25 @@ struct Pull {
 	Border curAlpha;
 	Border curBeta;
 	Move bestMove;
+	int threadsLeft;
 	Pull() :  curAlpha(0,-INF), curBeta(0,INF) { }
 };
 
-class AlphaBetaParallelSearchAIPlayer : public AIPlayer {
-	private:
+class AlphaBetaParallelSearchAIPlayer : public AlphaBetaSearchAIPlayer {
 
+	public:
+		AlphaBetaParallelSearchAIPlayer(int depth=0, int addDepth=0);
+
+	public:
+		virtual void makeTurn();
+
+	private:
+		friend void* parallelSearch(void*);
+		void allDone();
+
+	private:
 		Pull myPull;
 
-		int alphaBetaNegaMaxSearch(Border alpha, Border beta, int curPlayer, int curDepth, const Model& model);
-		int quiesSearch(Border alpha, Border beta, int curPlayer, int curDepth , const Model& model);
-		friend void* parallelSearch(void*);
-	public:
-		bool operator()(const Move& move1,const Move& move2);
-		AlphaBetaParallelSearchAIPlayer();
-		virtual PlayerCommand makeTurn(Move& move, GameMessage message = NONE);
 };
 
 #endif /* AI_H_ */

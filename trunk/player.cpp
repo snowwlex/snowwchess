@@ -74,8 +74,6 @@ void HumanPlayer::catchFinishCell(const Position& pos) {
 	}
 
 	notifyMoveReady(myMove);
-
-
 }
 
 void HumanPlayer::catchStartCell(const Position& pos) {
@@ -85,7 +83,6 @@ void HumanPlayer::catchStartCell(const Position& pos) {
 	if (myModel->getBoardCell(pos.myX,pos.myY).player != myColor) {
 		return;
 	}
-
 
 	MOVES moves = myModel->movesFromPosition(myColor, pos);
 
@@ -111,22 +108,5 @@ void HumanPlayer::makeTurn() {
 
 	iAmMoving = true;
 	catchDestination = false;
-
-//	case ' ':
-//		if (mode == 0) {
-//			//move.pos1.myX = myCursorPos.myX;
-//			//move.pos1.myY = myCursorPos.myY;
-//			moves = myModel->movesFromPosition(myColor, Position(move.pos1.myX,move.pos1.myY));
-//			mode = 1;
-//		//} else if (myCursorPos.myX == move.pos1.myX && myCursorPos.myY == move.pos1.myY){
-//			mode = 0;
-//		} else {
-//			//move.pos2.myX = myCursorPos.myX;
-//			//move.pos2.myY = myCursorPos.myY;
-//			move.player = myColor;
-//			move.type = CAPTURE | MOVE;
-//			command = TURN;
-//		}
-
 }
 
