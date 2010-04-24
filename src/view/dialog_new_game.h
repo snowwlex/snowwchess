@@ -3,7 +3,7 @@
 
 #include <QtGui/QDialog>
 #include <QString>
-#include "../ui_dialog_new_game.h"
+#include "../../ui_dialog_new_game.h"
 
 class DialogNewGame : public QDialog
 {
