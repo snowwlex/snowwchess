@@ -34,6 +34,7 @@ void AlphaBetaSearchAIPlayer::makeTurn() {
 	time(&start);
 	for (itMove = moves.begin(); itMove != moves.end(); ++itMove) {
 		++myCounter;
+
 		Model curModel = *myModel;
 		curModel.makeMove(*itMove);
 		int score = -alphaBetaNegaMaxSearch(-beta, -alpha, 1 - myColor, myDepth-1 , curModel);
@@ -43,6 +44,9 @@ void AlphaBetaSearchAIPlayer::makeTurn() {
 		} else if (alpha == score && rand()%2) {
 			bestMove = *itMove;
 		}
+
+		qWarning() << ":AlphaBetaSearchAIPlayer: "
+				   << "move counted, score: " << score;
 	}
 	time(&end);
 
@@ -57,6 +61,9 @@ void AlphaBetaSearchAIPlayer::makeTurn() {
 			 << "myDepth = "        << myDepth
 			 << "turns ="           << myTurnsCounter;
 	qDebug() << ":AlphaBetaSearchAIPlayer:" << "Time for AB searching:" << difftime(end,start);
+
+	qWarning() << ":AlphaBetaSearchAIPlayer: "
+			   << "counter: " << myCounter;
 
 	notifyMoveReady(bestMove);
 }
@@ -105,6 +112,7 @@ int AlphaBetaSearchAIPlayer::alphaBetaNegaMaxSearch(Border alpha, Border beta, i
 		if (score  < tmpScore)  { score = tmpScore; }
 		if (alpha  < score)  alpha = score;
 		if (beta   < alpha ) pruning = true;
+		if (beta == alpha && abEqualPruning == true) pruning = true;
 
 
 
@@ -142,8 +150,8 @@ int AlphaBetaSearchAIPlayer::quiesSearch(Border alpha, Border beta, int curPlaye
 		Model curModel = model;
 		curModel.makeMove(*itMove);
 		tmpScore = -quiesSearch(-beta,-alpha,1-curPlayer, curDepth-1,curModel);
-		if (alpha  < tmpScore)  { alpha = tmpScore; }
-		if (beta   < alpha ) pruning = true;
+		if (alpha < tmpScore)  { alpha = tmpScore; }
+		if (beta  < alpha ) pruning = true;
 		if (beta == alpha) pruning = true;
 	}
 

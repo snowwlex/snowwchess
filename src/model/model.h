@@ -1,10 +1,3 @@
-/*
- * model.h
- *
- *
- *      Author: snowwlex
- */
-
 #ifndef MODEL_H_
 #define MODEL_H_
 
@@ -21,7 +14,6 @@ class Model : public Sender {
 	public: //initialization
 		void init(bool newGame);
 		void setRules(Rules* rules);
-		bool isReady();
 
 
 	public: //moves methods
@@ -42,14 +34,16 @@ class Model : public Sender {
 		std::string getRulesName() const;
 		const FIGURES& getSetFigures(int player) const;
 		const FigureData& getFigureData(int figureId) const;
+		const FIGURES_DATA& getAllFiguresData() const;
 		std::string getPlayerData(int playerId) const;
-		int getCurrentPlayer() const { return myCurrentPlayer; }
+		int getFirstTurnPlayer() const { return myRules->getFirstTurnPlayer(); }
 
 	public: //setters
-		inline void setFigure(int playerId, const Figure& figure);
+		void setFigure(int playerId, const Figure& figure);
+		void setFirstTurnPlayer(int playerId) const { myRules->setFirstTurnPlayer(playerId); }
 
 	public: //sender methods
-		void notifyMoveMaked(const Move& move) const;
+		void notifyTurnMaked(const Move& move) const;
 
 	private: //inner methods
 		MOVES movesFigure(int player, const Figure& figure,  int movetype, bool needCheck=true) const;
@@ -112,7 +106,6 @@ class Model : public Sender {
 	private:
 		bool myLastMoveRecorded;
 		Move myLastMove;
-		int myCurrentPlayer;
 		int mySpecialFigureSetId[2];
 		FIGURES mySetFigures[2];
 

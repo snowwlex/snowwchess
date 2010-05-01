@@ -1,10 +1,3 @@
-/*
- * full_search_ai_player.h
- *
- *  Created on: 24.04.2010
- *      Author: snowwlex
- */
-
 #ifndef FULL_SEARCH_AI_PLAYER_H_
 #define FULL_SEARCH_AI_PLAYER_H_
 

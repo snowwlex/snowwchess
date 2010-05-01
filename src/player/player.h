@@ -1,10 +1,3 @@
-/*
- * player.h
- *
- *
- *      Author: snowwlex
- */
-
 #ifndef PLAYER_H_
 #define PLAYER_H_
 

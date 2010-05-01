@@ -1,14 +1,10 @@
-/*
- * io.h
- *
- *
- *      Author: snowwlex
- */
-
 #ifndef MODEL_IO_H_
 #define MODEL_IO_H_
 
-#include "model.h"
+#include <QtXml>
+
+#include "../../snowwchess.h"
+#include "../model.h"
 
 struct ModelIOXMLStorage {
 	struct FigureInfo {
@@ -26,25 +22,45 @@ struct ModelIOXMLStorage {
 };
 
 
+class XmlModelParser : public QXmlDefaultHandler {
+	public:
+		XmlModelParser(ModelIOXMLStorage* storage);
+
+	public:
+		bool startElement(const QString&, const QString&, const QString& tagName, const QXmlAttributes& attrs);
+		bool endElement(const QString&, const QString&, const QString& tagName);
+		bool fatalError(const QXmlParseException& exception);
+
+	private: //help methods
+
+		void positionsTag(const QString& tag, const QXmlAttributes& attrs);
+		void playerTag(const QString& tag, const QXmlAttributes& attrs);
+		void figureTag(const QString& tag, const QXmlAttributes& attrs);
+		void positionTag(const QString& tag, const QXmlAttributes& attrs);
+
+	private:
+		ModelIOXMLStorage* myStorage;
+};
+
 
 class ModelIO {
 	public:
-		ModelIO(Model *_model);
+		ModelIO();
 
 	public:
 		void load(std::string file);
-		void save(std::string file);
+		void save(std::string file, const Model& model) const;
+		void updateModel(Model& model) const;
+
+	public: //getters
 		const ModelIOXMLStorage& getStorage() const;
 
-	public: //update methods
-		void updateModel();
+	private: //update model methods
+		void updateFiguresInfo(Model& model) const;
 
 	private:
-		Model *myModel;
 		ModelIOXMLStorage myStorage;
 
-	friend void modelIOStartElementHandler(void *userData, const char *name, const char **atts);
-	friend void modelIOEndElementHandler(void *userData, const char *name);
 };
 
 

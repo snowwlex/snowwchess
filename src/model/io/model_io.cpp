@@ -1,109 +1,123 @@
-/*
- * model_io.cpp
- *
- *
- *      Author: snowwlex
- */
-
+#include <cassert>
+#include <cstdlib> // for atoi()
 #include "model_io.h"
 
-ModelIO::ModelIO(Model *model): myModel(model) { }
+ModelIO::ModelIO() {
 
-void modelIOStartElementHandler(void *userData, const char *name, const char **atts) {
-	ModelIOXMLStorage *storage = (ModelIOXMLStorage *)userData;
-	int i;
+}
 
-	std::string tag = name, attr, value;
+XmlModelParser::XmlModelParser(ModelIOXMLStorage* storage) {
+	myStorage = storage;
+}
+
+bool XmlModelParser::startElement(const QString&, const QString&,const QString& tag, const QXmlAttributes& attrs) {
 	if (tag == "positions") {
-		 storage->rulesName = "";
-		 for (i = 0; atts[i]; i += 2)  {
-			attr = atts[i];	value = atts[i+1];
-			if (attr == "rules") {  storage->rulesName = value; }
-			if (attr == "turn") {  storage->firstTurn = makeInt(value)-1; }
-		 }
+		positionsTag(tag, attrs);
 	} else if (tag == "player") {
-		int id = 0;
-		for (i = 0; atts[i]; i += 2)  {
-			attr = atts[i]; value = atts[i+1];
-			if (attr == "id") {  id = makeInt(value); }
-		}
-		storage->curPlayerId = id-1;
+		playerTag(tag, attrs);
 	} else	if (tag == "figure") {
-		int id = 0;
-		for (i = 0; atts[i]; i += 2)  {
-			attr = atts[i]; value = atts[i+1];
-			if (attr == "id") {  id = makeInt(value); }
-		}
-		storage->curFigureId = id;
+		figureTag(tag, attrs);
 	} else if (tag == "position") {
-		ModelIOXMLStorage::FigureInfo figure_info;
-		figure_info.id = storage->curFigureId;
-		figure_info.wasMoved = false;
-		figure_info.captured = false;
-		for (i = 0; atts[i]; i += 2)  {
-			attr = atts[i]; value = atts[i+1];
-			if (attr == "cell") {  figure_info.cell = value; }
-			if (attr == "unmoved") { figure_info.wasMoved = false; }
-			if (attr == "captured") { figure_info.captured = true; }
-		}
-		storage->setFiguresInfo[storage->curPlayerId].push_back(figure_info);
+		positionTag(tag, attrs);
+	}
+	return true;
+}
+
+bool XmlModelParser::endElement(const QString&, const QString&, const QString&) {
+	return true;
+}
+
+bool XmlModelParser::fatalError(const QXmlParseException& exception) {
+	qDebug() << "Error of Model Save file parsing!"
+			 << "Line:"      << exception.lineNumber()
+			 << ", Column:"  << exception.columnNumber()
+			 << ", Message:" << exception.message();
+	return false;
+}
+
+void XmlModelParser::positionsTag(const QString& , const QXmlAttributes& attrs) {
+	QString attr, value;
+	myStorage->rulesName = "";
+	for(int i = 0; i < attrs.count(); ++i) {
+		attr = attrs.localName(i); value = attrs.value(i);
+		if (attr == "rules") {  myStorage->rulesName = value.toStdString(); }
+		if (attr == "turn") {  myStorage->firstTurn = value.toInt()-1; }
 	}
 }
-
-void modelIOEndElementHandler(void *userData, const char *name) {
-	return;
+void XmlModelParser::playerTag(const QString& , const QXmlAttributes& attrs) {
+	QString attr, value;
+	int id = 0;
+	for(int i = 0; i < attrs.count(); ++i) {
+		attr = attrs.localName(i); value = attrs.value(i);
+		if (attr == "id") {  id = value.toInt(); }
+	}
+	assert(id > 0);
+	myStorage->curPlayerId = id-1;
 }
+void XmlModelParser::figureTag(const QString& , const QXmlAttributes& attrs) {
+	QString attr, value;
+	int id = 0;
+	for(int i = 0; i < attrs.count(); ++i) {
+		attr = attrs.localName(i); value = attrs.value(i);
+		if (attr == "id") {  id = value.toInt(); }
+	}
+	myStorage->curFigureId = id;
+}
+void XmlModelParser::positionTag(const QString& , const QXmlAttributes& attrs) {
+	QString attr, value;
+	ModelIOXMLStorage::FigureInfo figure_info;
+	figure_info.id = myStorage->curFigureId;
+	figure_info.wasMoved = false;
+	figure_info.captured = false;
+	for (int i = 0; i < attrs.count(); ++i) {
+		attr = attrs.localName(i); value = attrs.value(i);
+		if (attr == "cell") {  figure_info.cell = value.toStdString(); }
+		if (attr == "unmoved") { figure_info.wasMoved = false; }
+		if (attr == "captured") { figure_info.captured = true; }
+	}
+	myStorage->setFiguresInfo[myStorage->curPlayerId].push_back(figure_info);
+}
+
 
 const ModelIOXMLStorage& ModelIO::getStorage() const {
 	return myStorage;
 }
 
-void ModelIO::updateModel() {
-	int boardSizeY = myModel->getBoardSizeY();
+void ModelIO::updateModel(Model& model) const {
+	model.setFirstTurnPlayer(myStorage.firstTurn);
+	updateFiguresInfo(model);
+}
 
-	ModelIOXMLStorage::FIGURES_INFO::iterator it;
+
+void ModelIO::updateFiguresInfo(Model& model) const {
+	int boardSizeY = model.getBoardSizeY();
+	ModelIOXMLStorage::FIGURES_INFO::const_iterator it;
 	Figure tmpFigure;
-
-	myModel->setCurrentPlayer(myStorage.firstTurn);
-
 	for (int i=0; i<2; ++i) {
 		for ( it=myStorage.setFiguresInfo[i].begin(); it != myStorage.setFiguresInfo[i].end(); ++it ) {
 			tmpFigure.id = it->id;
 			tmpFigure.position.myX = it->cell[0]-'a';
-			tmpFigure.position.myY = boardSizeY - makeInt(it->cell.substr(1,2));
+			tmpFigure.position.myY = boardSizeY - atoi(it->cell.substr(1,2).c_str());
 			tmpFigure.wasMoved = it->wasMoved;
 			tmpFigure.captured = it->captured;
-			myModel->setFigure(i, tmpFigure);
+			model.setFigure(i, tmpFigure);
 		}
 	}
+}
 
+void ModelIO::load(std::string filename) {
+
+	XmlModelParser handler(&myStorage);
+	QFile file(filename.c_str());
+	QXmlInputSource   source(&file);
+	QXmlSimpleReader  parser;
+
+	parser.setContentHandler(&handler);
+	parser.parse(source);
 
 }
 
-void ModelIO::load(std::string file) {
-
-	FILE *infile = fopen(file.c_str(), "rt");
-	int done, length;
-	char buffer[1024];
-	XML_Parser parser = XML_ParserCreate(NULL);
-	XML_SetElementHandler(parser, modelIOStartElementHandler, modelIOEndElementHandler);
-	XML_SetUserData(parser, &myStorage);
-	do  {
-		length = fread(buffer, 1, sizeof(buffer), infile);
-		done = feof(infile);
-		if (XML_Parse(parser, buffer, length, done) == XML_STATUS_ERROR) {
-			//wprintw(rules->myWindow, "Error: %s at line %d\n", XML_ErrorString(XML_GetErrorCode(parser)),  (int)XML_GetCurrentLineNumber(parser));
-			//wrefresh(rules->myWindow);
-			//wgetch(rules->myWindow);
-     		done = 1;
-	    }
-	} while (!done);
-	XML_ParserFree(parser);
-	fclose(infile);
-
-}
-
-void ModelIO::save(std::string file) {
+void ModelIO::save(std::string file, const Model& model) const {
 
 	//ISSUE: add save last move
 
@@ -113,8 +127,8 @@ void ModelIO::save(std::string file) {
 	const char TAB = '\t';
 	std::string bufferStr;
 	fputs("<?xml version='1.0' encoding='UTF-8'?>\n", outfile);
-	player = myModel->getCurrentPlayer() + 1 + '0';
-	bufferStr = "<positions rules='"+myModel->getRulesName()+"' turn='"+player+"'>\n";
+	player = model.getFirstTurnPlayer() + 1 + '0';
+	bufferStr = "<positions rules='"+model.getRulesName()+"' turn='"+player+"'>\n";
 	fputs(bufferStr.c_str(),outfile);
 
 	FIGURES::const_iterator it;
@@ -123,7 +137,7 @@ void ModelIO::save(std::string file) {
 		bufferStr = std::string(depth,TAB) + "<player id='"+player+"'>\n";
 		fputs(bufferStr.c_str(),outfile);
 		++depth;
-		for (curFigureId = 0, it=myModel->getSetFigures(i).begin(); it != myModel->getSetFigures(i).end(); ++it ) {
+		for (curFigureId = 0, it=model.getSetFigures(i).begin(); it != model.getSetFigures(i).end(); ++it ) {
 			if (curFigureId != it->id) {
 				if (curFigureId != 0) {
 					--depth;
@@ -137,7 +151,7 @@ void ModelIO::save(std::string file) {
 			}
 
 			posX = it->position.myX+'a';
-			posY = myModel->getBoardSizeY() - it->position.myY+'0';
+			posY = model.getBoardSizeY() - it->position.myY+'0';
 			bufferStr = std::string(depth,TAB) + "<position cell='"+posX + posY +"'";
 			if (it->wasMoved == false) bufferStr += " unmoved='1'";
 			if (it->captured == true) bufferStr += " captured='1'";

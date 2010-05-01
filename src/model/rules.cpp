@@ -1,10 +1,3 @@
-/*
- * rules.cpp
- *
- *
- *      Author: snowwlex
- */
-
 #include "rules.h"
 
 Rules::Rules() { }
@@ -20,10 +13,10 @@ void Rules::setBoardSize(int sizex, int sizey) {
 	myBoardSizeY = sizey;
 }
 
-void Rules::setFirstTurn(int firstTurnId) {
+void Rules::setFirstTurnPlayer(int firstTurnId) {
 	myFirstTurn = firstTurnId;
 }
-int Rules::getFirstTurn() const {
+int Rules::getFirstTurnPlayer() const {
 	return myFirstTurn;
 }
 
@@ -42,6 +35,10 @@ const FIGURES& Rules::getInitFigures(int playerId) const {
 }
 const FigureData& Rules::getFigureData(int figureId) {
 	return myFiguresData[figureId];
+}
+
+const FIGURES_DATA& Rules::getAllFiguresData() const {
+	return myFiguresData;
 }
 const MOVERULES& Rules::getMoveRules(int figureId) {
 	return myMoveRules[figureId];

@@ -1,10 +1,3 @@
-/*
- * rules.h
- *
- *
- *      Author: snowwlex
- */
-
 #ifndef RULES_H_
 #define RULES_H_
 
@@ -18,9 +11,10 @@ class Rules {
 	public: //getters
 		const MOVERULES& getMoveRules(int figureId);
 		const FigureData& getFigureData(int figureId);
+		const FIGURES_DATA& getAllFiguresData() const;
 		const FIGURES& getInitFigures(int playerId) const;
 		std::string getRulesName() const;
-		int getFirstTurn() const;
+		int getFirstTurnPlayer() const;
 		std::string getPlayerData(int playerId);
 		int getSpecialFigure(int player) const;
 		int getBoardSizeX() const;
@@ -30,7 +24,7 @@ class Rules {
 	public: //setters
 		void setPlayerData(int playerId, std::string name);
 		void setSpecialFigure(int player, int figureId);
-		void setFirstTurn(int firstTurnId);
+		void setFirstTurnPlayer(int firstTurnId);
 		void setBoardSize(int sizex, int sizey);
 		void setRulesName(std::string rulesName);
 		void setInitFigure(int playerId, const Figure& figure);

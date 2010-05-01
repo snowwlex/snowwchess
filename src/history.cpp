@@ -1,10 +1,3 @@
-/*
- * history.cpp
- *
- *  Created on: 02.04.2010
- *      Author: snowwlex
- */
-
 #include "history.h"
 
 const Model& History::makeUndo(int quantityMoves) {
@@ -22,7 +15,10 @@ void History::addRecord(const Move & move, const Model & model) {
 	myModels.push_back(model);
 }
 
-
+void History::clear() {
+	myMoves.clear();
+	myModels.clear();
+}
 
 const MOVES& History::getMoves() const {
 	return myMoves;

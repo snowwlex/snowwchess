@@ -1,9 +1,3 @@
-/*
- * sender.h
- *
- *  Created on: 23.04.2010
- *      Author: snowwlex
- */
 
 #ifndef SENDER_H_
 #define SENDER_H_

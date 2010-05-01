@@ -1,34 +1,20 @@
-/*
- * model.cpp
- *
- *
- *      Author: snowwlex
- */
-
 #include <algorithm>
+#include <cassert>
 
 #include "model.h"
 
 Model::Model()  {
 	myRules = 0;
-	initiated = false;
 	myLastMoveRecorded = false;
-}
-
-bool Model::isReady() {
-	if (myRules != 0 && initiated == true) {
-		return true;
-	}
-	return false;
 }
 
 void Model::setRules(Rules* rules) {
 	myRules = rules;
 }
 
-void Model::notifyMoveMaked(const Move& move) const {
+void Model::notifyTurnMaked(const Move& move) const {
 	for (LISTENERS::const_iterator itListener = myListeners.begin(); itListener != myListeners.end(); ++itListener) {
-		(*itListener)->moveMaked(move);
+		(*itListener)->turnMaked(move);
 		qDebug() << ":Model:" << "calling of listener for notifyMoveMaked";
 	}
 }
@@ -36,23 +22,25 @@ void Model::notifyMoveMaked(const Move& move) const {
 
 void Model::init(bool newGame) {
 
-	qDebug() << "init board";
+	assert (myRules != 0);
+
+	initiated = true;
+
+	qDebug() << ":Model:  init board";
 	myBoard.init(myRules->getBoardSizeX(),myRules->getBoardSizeY());
 
 	if (newGame == true) {
-		qDebug() << "getting first turn";
-		myCurrentPlayer = myRules->getFirstTurn();
-		qDebug() << "getting init figures";
+		qDebug() << ":Model: getting init figures";
 		mySetFigures[WHITE] = myRules->getInitFigures(WHITE);
 		mySetFigures[BLACK] = myRules->getInitFigures(BLACK);
 	}
 
-	qDebug() << "sorting figures";
+	qDebug() << ":Model:  sorting figures";
 	for (int player=0; player<2; ++player) {
 		std::sort(mySetFigures[player].begin(), mySetFigures[player].end(),*myRules);
 	}
 
-	qDebug() << "getting special figures";
+	qDebug() << ":Model:  getting special figures";
 	for (int player=0; player<2; ++player) {
 		int i=0;
 		for (FIGURES::const_iterator itFigure = mySetFigures[player].begin(); itFigure != mySetFigures[player].end(); ++itFigure, ++i) {
@@ -63,7 +51,7 @@ void Model::init(bool newGame) {
 		}
 	}
 
-	qDebug() << "setting board cells";
+	qDebug() << ":Model: setting board cells";
 	for (int player=0; player < 2; ++player) {
 		int setId=1;
 		for (FIGURES::iterator itFigure = mySetFigures[player].begin(); itFigure!=mySetFigures[player].end(); ++itFigure, ++setId) {
@@ -73,7 +61,7 @@ void Model::init(bool newGame) {
 		}
 	}
 
-	initiated = true;
+
 }
 
 
@@ -208,6 +196,8 @@ void Model::makeMoveEffectExplosion(const Move& move) {
 
 bool Model::canMove(const Move& move) const {
 
+	assert ( initiated == true);
+
 	qDebug() << ":Model:" << "canMove()";
 
 	bool accepted;
@@ -228,6 +218,7 @@ void Model::makeMove(const Move& move) {
 
 	// ISSUE: here we should check if this move is right;
 
+	assert(initiated == true);
 
 	BoardCell boardCell;
 	boardCell = myBoard(move.pos1);
@@ -263,7 +254,7 @@ void Model::makeMove(const Move& move) {
 	myLastMoveRecorded = true;
 	myLastMove = move;
 
-	notifyMoveMaked(myLastMove);
+	notifyTurnMaked(myLastMove);
 
 
 }
@@ -275,6 +266,8 @@ const Figure& Model::readFigure(const BoardCell& boardCell) const {
 }
 
 MOVES Model::movesFigure(int player, const Figure& figure,  int movetype, bool needCheck) const {
+
+
 	bool accepted;
 	int curLimit;
 	MOVES avMoves;
@@ -462,6 +455,7 @@ bool Model::checkInpassing(MoveRule moveRule, const Figure& figure, Move& move) 
 
 MOVES Model::movesFromPosition(int player, const Position& pos1) const {
 
+	assert ( initiated == true);
 	MOVES avMoves;
 	BoardCell boardCell;
 
@@ -479,6 +473,8 @@ MOVES Model::movesFromPosition(int player, const Position& pos1) const {
 }
 
 MOVES Model::allMoves(int player, int movetype) const {
+
+	assert ( initiated == true);
 
 	MOVES avMoves, allMoves;
 	FIGURES::const_iterator itFigure;
@@ -507,6 +503,10 @@ const FIGURES& Model::getSetFigures(int player) const {
 
 const FigureData& Model::getFigureData(int figureId) const {
 	return myRules->getFigureData(figureId);
+}
+
+const FIGURES_DATA& Model::getAllFiguresData() const {
+	return myRules->getAllFiguresData();
 }
 
 std::string Model::getPlayerData(int playerId) const {

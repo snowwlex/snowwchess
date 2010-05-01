@@ -1,15 +1,6 @@
-/*
- * rules_io.cpp
- *
- *
- *      Author: snowwlex
- */
-
-#include <QtXml>
-
 #include "rules_io.h"
 
-XmlRulesParser::XmlRulesParser(RulesIOXMLStorage* storagePtr): myStorage(storagePtr) { }
+XmlRulesParser::XmlRulesParser(RulesIOXMLStorage* storage): myStorage(storage) { }
 
 bool XmlRulesParser::startElement(const QString&, const QString&,const QString& tag, const QXmlAttributes& attrs) {
 	if (tag == "rules") {
@@ -302,50 +293,6 @@ void RulesIO::setPromotionRules() {
 	}
 }
 
-void RulesIO::setDefaultPictures() {
-	std::string name;
-	for (FIGURES_DATA::iterator it=myStorage.figuresData.begin(); it!=myStorage.figuresData.end(); ++it) {
-		for (int i = 0; i < 2; ++i) {
-			if (it->second.picture[i] == "") {
-				name = ":/images/pieces/";
-				name += (i == WHITE) ? "white" : "black";
-				name += figureLetterToName(it->second.letter);
-				name += ".svg";
-				it->second.picture[i] = name;
-			}
-		}
-	}
-}
-
-
-std::string RulesIO::figureLetterToName(char letter) {
-	std::string name;
-	switch (letter) {
-		case 'K':
-			name = "King";
-			break;
-		case 'Q':
-			name = "Queen";
-			break;
-		case 'R':
-			name = "Rook";
-			break;
-		case 'N':
-			name = "Knight";
-			break;
-		case 'B':
-			name = "Bishop";
-			break;
-		case 'P':
-			name = "Pawn";
-			break;
-		default:
-			name = "Default";
-			break;
-	}
-	return name;
-}
-
 
 void RulesIO::updateFiguresData(Rules& rules) const {
 	for (FIGURES_DATA::const_iterator it=myStorage.figuresData.begin(); it!=myStorage.figuresData.end(); ++it) {
@@ -370,7 +317,7 @@ void RulesIO::updateMoveRules(Rules& rules) const {
 
 void RulesIO::updateRules(Rules& rules) const {
 	rules.setRulesName(myStorage.rulesName);
-	rules.setFirstTurn(myStorage.firstTurn);
+	rules.setFirstTurnPlayer(myStorage.firstTurn);
 	rules.setSpecialFigure(WHITE, myStorage.specialFigureId[WHITE]);
 	rules.setSpecialFigure(BLACK, myStorage.specialFigureId[BLACK]);
 	rules.setBoardSize(myStorage.boardSizeX, myStorage.boardSizeY);
@@ -403,7 +350,6 @@ bool RulesIO::load(std::string filename) {
 
 		//after parsing processing:
 		setPromotionRules(); //promotions rules add to figures data
-		setDefaultPictures();
 	}
 
 	return ok;

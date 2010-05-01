@@ -1,29 +1,12 @@
-/*
- * game.h
- *
- *
- *      Author: snowwlex
- */
-
 #ifndef GAME_H_
 #define GAME_H_
 
 #include "snowwchess.h"
-#include "model/io/rules_io.h"
 #include "player/player.h"
 #include "view/gui_board_view.h"
+#include "view/gui_history_view.h"
 
-//struct playerInfo {
-//	std::string playerName;
-//	int num1;
-//	int num2;
-//	playerInfo (std::string name, int n1, int n2) {
-//		playerName = name;
-//		num1 = n1;
-//		num2 = n2;
-//	}
-//};
-
+class GuiHistoryView;
 
 class Game : public Listener {
 	public:
@@ -31,29 +14,37 @@ class Game : public Listener {
 		~Game();
 
 	public: //initiating
-		bool isReady();
-		void prepare();
 
 	public:
-		void loadRules(const RulesIO& rulesIO);
 		void setPlayer(int color, Player* player);
 		void setBoardView(GuiBoardView* boardView);
+		void setHistoryView(GuiHistoryView* historyView);
+		void setModel(Model* model);
 
 	public:
+		void init();
+
+	public: //listener methods
 		void start();
-		void clear();
+		void stop();
+
+	public:
+		void setCurrentPlayer(int player) { myCurrentPlayer = player; }
+
+	public:
+		void changeModel(const Model& model);
 
 	public: //listener methods
 		virtual void moveReady(const Move&);
 
 	private:
-		Model myModel;
-		Rules myRules;
+		Model* myModel;
 		GuiBoardView* myBoardView;
-		Player* players[2];
+		GuiHistoryView* myHistoryView;
+		Player* myPlayers[2];
 
 	private:
-		int curPlayer;
+		int myCurrentPlayer;
 };
 
 
