@@ -1,10 +1,3 @@
-/*
- * snowwchess.h
- *
- *  Created on: 04.03.2010
- *      Author: snowwlex
- */
-
 #ifndef SNOWWCHESS_H_
 #define SNOWWCHESS_H_
 
@@ -16,6 +9,7 @@
 
 enum GameStatus {USUAL, CHECK, MATE, STALEMATE };
 enum PlayerColor { WHITE = 0, BLACK = 1, ALL = 2 };
+enum PlayerType { HUMAN = 0, AI };
 
 enum RuleType {	JUMP, SLIDE };
 enum MoveType {	CAPTURE=1 , MOVE=2 , INPASSING=4 };
@@ -70,11 +64,6 @@ struct SimpleMove {
 	SimpleMove() { player = 0; }
 };
 struct Move : public SimpleMove{
-	// !!!! взятая фигура (id)
-	// значение на новом месте (id)
-	// координата для взятой фигуры
-	// фигуры для рокировки (указатели?)
-	// координаты хода ладьи при рокировке
 	int type;
 	int effect;
 	// int status;

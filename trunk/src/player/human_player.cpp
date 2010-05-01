@@ -1,9 +1,3 @@
-/*
- *  *
- *
- *      Author: snowwlex
- */
-
 #include "human_player.h"
 
 HumanPlayer::HumanPlayer() {
@@ -26,6 +20,9 @@ void HumanPlayer::pushedCell(const Position& pos) {
 	}
 }
 
+void HumanPlayer::stop() {
+	iAmMoving = false;
+}
 
 void HumanPlayer::catchFinishCell(const Position& pos) {
 

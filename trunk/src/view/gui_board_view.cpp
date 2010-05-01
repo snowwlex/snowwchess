@@ -1,16 +1,10 @@
-/*
- * guiboardview.cpp
- *
- *  Created on: 10.04.2010
- *      Author: snowwlex
- */
-
 #include <QEvent>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPixmap>
 
 #include <algorithm>
+#include <cassert>
 
 #include "gui_board_view.h"
 
@@ -22,6 +16,7 @@ GuiBoardView::GuiBoardView(QWidget *parent)
 	redrawBoardCells = true;
 	redrawBoardFigures = true;
 	redrawBoardHighlightCells = true;
+	boardFiguresLoaded = false;
 }
 
 void GuiBoardView::countSizes() {
@@ -48,10 +43,71 @@ void GuiBoardView::countSizes() {
 	}
 }
 
+void GuiBoardView::loadBoardFigures() {
+	assert (myModel != 0);
+
+	boardFiguresLoaded = true;
+
+	for (FIGURES_DATA::const_iterator itFigure = myModel->getAllFiguresData().begin();
+		 itFigure != myModel->getAllFiguresData().end();
+		 ++itFigure) {
+
+		for (int i = 0; i < 2; ++i) {
+
+			QString pictureFile = itFigure->second.picture[i].c_str();
+			char letter = itFigure->second.letter;
+			if (pictureFile == "") {
+				QString name = ":/images/pieces/";
+				name += (i == WHITE) ? "white" : "black";
+				name += figureLetterToName(letter);
+				name += ".svg";
+				pictureFile = name;
+			}
+
+			QPixmap picture( pictureFile );
+			picture = picture.scaledToWidth(cellSize.width());
+			picturesFigure[i][letter] =  picture;
+		}
+
+	}
+}
+
+QString GuiBoardView::figureLetterToName(char letter) {
+	QString name;
+	switch (letter) {
+		case 'K':
+			name = "King";
+			break;
+		case 'Q':
+			name = "Queen";
+			break;
+		case 'R':
+			name = "Rook";
+			break;
+		case 'N':
+			name = "Knight";
+			break;
+		case 'B':
+			name = "Bishop";
+			break;
+		case 'P':
+			name = "Pawn";
+			break;
+		default:
+			name = "Default";
+			break;
+	}
+	return name;
+}
+
 void GuiBoardView::prepareBoardCells() {
 
 	if (redrawBoardCells == false) {
 		return;
+	}
+
+	if (boardFiguresLoaded == false) {
+		loadBoardFigures();
 	}
 
 	redrawBoardCells = false;
@@ -111,10 +167,11 @@ void GuiBoardView::prepareFigures() {
 //						 << myModel->getFigureData(itFigure->id).picture[WHITE].c_str()
 //						 << myModel->getFigureData(itFigure->id).picture[BLACK].c_str();
 
-				QPixmap picture(myModel->getFigureData(itFigure->id).picture[i].c_str());
+				char letter = myModel->getFigureData(itFigure->id).letter;
+				QPixmap picture = picturesFigure[i][letter];
 				QPoint point(cellSize.width() * itFigure->position.myX, cellSize.height() * itFigure->position.myY);
 
-				picture = picture.scaledToWidth(cellSize.width());
+
 				painter.drawPixmap(point, picture);
 			}
 		}
@@ -215,7 +272,13 @@ void GuiBoardView::notifyClickedCell(const Position& pos) const {
 	}
 }
 
-void GuiBoardView::moveMaked(const Move&) {
+void GuiBoardView::turnMaked(const Move&) {
 	redrawBoardFigures = true;
+	this->update();
+}
+
+void GuiBoardView::updateIt() {
+	redrawBoardFigures = true;
+	prepareFigures();
 	this->update();
 }

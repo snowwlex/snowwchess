@@ -1,15 +1,9 @@
-/*
- * guiboardview.h
- *
- *  Created on: 10.04.2010
- *      Author: snowwlex
- */
-
 #ifndef GUIBOARDVIEW_H_
 #define GUIBOARDVIEW_H_
 
 #include <QtGui/QWidget>
 #include <QPainter>
+#include <QPixmap>
 
 #include "../snowwchess.h"
 #include "../model/model.h"
@@ -32,7 +26,8 @@ class GuiBoardView : public QWidget, public Sender, public Listener {
 		void clearHightlights();
 
 	public: //listener methods
-		virtual void moveMaked(const Move& move);
+		virtual void turnMaked(const Move& move);
+		virtual void updateIt();
 
 	public slots:
 
@@ -57,6 +52,10 @@ class GuiBoardView : public QWidget, public Sender, public Listener {
 
 	private:
 		void countSizes();
+		void loadBoardFigures();
+
+	private: //help methods
+		QString figureLetterToName(char letter);
 
 	private: //fields
 		Model* myModel;
@@ -65,12 +64,15 @@ class GuiBoardView : public QWidget, public Sender, public Listener {
 		QPixmap myBoardHighlightCells;
 		HIGHLIGHT_CELLS myHighlightCells;
 
+		std::map<char, QPixmap> picturesFigure[2];
+
 		QSize boardSize;
 		QSize screenSize;
 		QSize cellSize;
 		bool redrawBoardCells,
 			 redrawBoardFigures,
 			 redrawBoardHighlightCells;
+		bool boardFiguresLoaded;
 
 
 

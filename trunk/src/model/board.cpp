@@ -1,21 +1,15 @@
-/*
- * board.cpp
- *
- *  Created on: 24.04.2010
- *      Author: snowwlex
- */
 #include <cstring> //for memcpy() function
 #include "board.h"
 
 Model::Board::Board(): myBoardArray(0)  { }
 
 void Model::Board::init(int sizex, int sizey) {
-	qDebug() << "   setting sizes";
+	qDebug() << " :Board: " << " setting sizes";
 	mySizeX = sizex;
 	mySizeY = sizey;
-	qDebug() << "   allocating memory";
+	qDebug() << " :Board: " << "   allocating memory";
 	if (myBoardArray == 0) {
-		qDebug() << "   operator new: "<< mySizeY << mySizeX;
+		qDebug() << " :Board: " << "   operator new: "<< mySizeY << mySizeX;
 		myBoardArray = new BoardCell[ mySizeY * mySizeX ];
 	}
 }

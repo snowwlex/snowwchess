@@ -1,22 +1,26 @@
-/*
- * experiment.h
- *
- *  Created on: 03.04.2010
- *      Author: snowwlex
- */
-
 #ifndef EXPERIMENT_H_
 #define EXPERIMENT_H_
 
 class Experiment {
 	public:
-		Experiment(double covar,int minExp, int maxExp);
+		Experiment();
 
 	public:
-		void clear();
-		void addValue(double t);
-		int isReady() const;
+		void setCovar(double covar);
+		void setMinExp(int minExp);
+		void setMaxExp(int maxExp);
+
+	public:
+		void clearExpData();
+		void addValue(double value);
 		double getMean() const;
+
+	public: // experiment's finish condition
+		int isReady() const;
+		// isReady() return:
+		// 0 - if it's not ready
+		// 1 - if maxExperiment is achieved
+		// 2 - if covariant < setted
 
 	private: // initial data
 		double myCovar;

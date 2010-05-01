@@ -1,10 +1,3 @@
-/*
- * io.h
- *
- *
- *      Author: snowwlex
- */
-
 #ifndef RULES_IO_H_
 #define RULES_IO_H_
 
@@ -58,7 +51,7 @@ struct RulesIOXMLStorage {
 
 class XmlRulesParser : public QXmlDefaultHandler {
 	public:
-		XmlRulesParser(RulesIOXMLStorage* storagePtr);
+		XmlRulesParser(RulesIOXMLStorage* storage);
 
 	public:
 		bool startElement(const QString&, const QString&, const QString& tagName, const QXmlAttributes& attrs);
@@ -113,10 +106,8 @@ class RulesIO {
 
 	private: //after parsing processing
 		void setPromotionRules();
-		void setDefaultPictures();
 
 	private: //help methods
-		std::string figureLetterToName(char letter);
 
 	private:
 		RulesIOXMLStorage myStorage;

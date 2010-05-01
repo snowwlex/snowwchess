@@ -1,9 +1,3 @@
-/*
- * human_player.h
- *
- *  Created on: 24.04.2010
- *      Author: snowwlex
- */
 
 #ifndef HUMAN_PLAYER_H_
 #define HUMAN_PLAYER_H_
@@ -20,6 +14,10 @@ class HumanPlayer : public Player {
 
 	public: //listener methods
 		virtual void pushedCell(const Position& pos);
+
+
+	public: //listener
+		void stop();
 
 	private: //helper methods
 		void catchStartCell(const Position& pos);
