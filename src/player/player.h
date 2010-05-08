@@ -1,33 +1,25 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 
-#include "../view/gui_board_view.h"
 #include "../model/model.h"
-#include "../listener.h"
-#include "../sender.h"
 
-class Player : public Listener, public Sender {
+class Player {
 
-	public:
-		virtual void makeTurn() = 0;
+	public: // turn making methods methods
+                virtual void moveFromBoard(const SimpleMove& ) { qDebug() << ":Player:" << "moveFromBoard()"; }
+ 		virtual void getMove() = 0;
+                virtual void stopGetMove() { qDebug() << ":Player:" << "stopMakeTurn()"; }
+
+        public: //getters
+                int getColor();
 
 	public: //setters
-		void setModel(Model* model) { myModel = model; }
-		void setColor(int color)    { myColor = color; }
-		void setBoardView(GuiBoardView* boardView) { myBoardView = boardView; }
-
-	public: //sender methods
-		void notifyMoveReady(const Move& move) const {
-			for (LISTENERS::const_iterator itListener = myListeners.begin(); itListener != myListeners.end(); ++itListener) {
-				(*itListener)->moveReady(move);
-				qDebug() << ":Player:" << "calling of listener moveReady ";
-			}
-		}
+		void setModel(Model* model);
+		void setColor(int color);
 
 	protected:
 		int myColor;
 		Model *myModel;
-		GuiBoardView* myBoardView;
 
 };
 

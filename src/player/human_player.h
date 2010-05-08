@@ -8,26 +8,16 @@ class HumanPlayer : public Player {
 
 	public:
 		HumanPlayer();
+                virtual void moveFromBoard(const SimpleMove& move);
 
-	public:
-		virtual void makeTurn();
-
-	public: //listener methods
-		virtual void pushedCell(const Position& pos);
+	public: 
+		virtual void getMove();
+            
 
 
-	public: //listener
-		void stop();
-
-	private: //helper methods
-		void catchStartCell(const Position& pos);
-		void catchFinishCell(const Position& pos);
-
-	public:
-		bool iAmMoving;
-		bool catchDestination;
-		Move myMove;
-
+	public: //variables
+		
+		
 };
 
 

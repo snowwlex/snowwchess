@@ -1,5 +1,10 @@
 TEMPLATE = app
 TARGET = snowwchess
+
+OBJECTS_DIR = bin
+MOC_DIR = bin
+
+
 QT += core \
     gui \
     xml
@@ -23,19 +28,16 @@ HEADERS += src/view/gui_history_view.h \
     src/tests/experiment.h \
     src/tests/time_test.h \
     src/tests/ai_speed_test.h \
-    src/sender.h \
-    src/listener.h \
-    src/game.h \
-    src/history.h \
+    src/publisher.h \
+    src/subscriber.h \
+    src/model/game.h \
+    src/model/history.h \
     src/snowwchess.h
 SOURCES += src/view/gui_history_view.cpp \
-    src/tests/speedtestfunc.cpp \
-    src/tests/time_test.cpp \
-    src/tests/ai_speed_test.cpp \
-    src/tests/experiment.cpp \
     src/view/main_window.cpp \
     src/view/gui_board_view.cpp \
     src/view/dialog_new_game.cpp \
+    src/player/player.cpp \
     src/player/human_player.cpp \
     src/player/full_search_ai_player.cpp \
     src/player/alphabeta_search_ai_player.cpp \
@@ -47,9 +49,7 @@ SOURCES += src/view/gui_history_view.cpp \
     src/model/rules.cpp \
     src/model/model.cpp \
     src/main.cpp \
-    src/history.cpp \
-    src/game.cpp
-FORMS += src/view/forms/main_window.ui \
-    src/view/forms/dialog_new_game.ui
+    src/model/history.cpp \
+    src/model/game.cpp
 RESOURCES += interface.qrc \
     pieces.qrc

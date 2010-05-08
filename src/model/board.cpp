@@ -4,12 +4,9 @@
 Model::Board::Board(): myBoardArray(0)  { }
 
 void Model::Board::init(int sizex, int sizey) {
-	qDebug() << " :Board: " << " setting sizes";
 	mySizeX = sizex;
 	mySizeY = sizey;
-	qDebug() << " :Board: " << "   allocating memory";
 	if (myBoardArray == 0) {
-		qDebug() << " :Board: " << "   operator new: "<< mySizeY << mySizeX;
 		myBoardArray = new BoardCell[ mySizeY * mySizeX ];
 	}
 }

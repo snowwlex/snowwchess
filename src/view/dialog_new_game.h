@@ -1,14 +1,22 @@
 #ifndef DIALOGNEWGAME_H
 #define DIALOGNEWGAME_H
 
+
+#include <QtGui/QAction>
+#include <QtGui/QApplication>
+#include <QtGui/QButtonGroup>
+#include <QtGui/QComboBox>
 #include <QtGui/QDialog>
+#include <QtGui/QDialogButtonBox>
+#include <QtGui/QHeaderView>
+#include <QtGui/QLineEdit>
+#include <QtGui/QPushButton>
 #include <QString>
-#include "../../ui_dialog_new_game.h"
+
 
 #include "../snowwchess.h"
 
-class DialogNewGame : public QDialog
-{
+class DialogNewGame : public QDialog {
     Q_OBJECT
 
 public:
@@ -23,12 +31,30 @@ public:
 public:
     void setLoadFileText(QString caption, QString dir, QString filter);
 
+public slots:
+    void whitePlayerChanged(const QString& string);
+    void blackPlayerChanged(const QString& string);
 private:
-    Ui::DialogNewGameClass ui;
     QString myCaption, myDir, myFilter;
 
 private slots:
-	void on_buttonSelectFile_clicked();
+    void selectFile();
+
+private: //ui setup methods
+    void setupUi();
+    void retranslateUi();
+
+private: //ui
+
+    QPushButton *buttonSelectFile;
+    QLineEdit *lineEditFileName;
+    QComboBox *cbPlayerWhite;
+    QComboBox *cbPlayerBlack;
+    QComboBox *cbLevelWhite;
+    QComboBox *cbLevelBlack;
+    QDialogButtonBox* buttonBox;
+
+
 
 };
 

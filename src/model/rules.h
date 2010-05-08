@@ -9,13 +9,13 @@ class Rules {
 		Rules();
 
 	public: //getters
-		const MOVERULES& getMoveRules(int figureId);
-		const FigureData& getFigureData(int figureId);
+		const MOVERULES& getMoveRules(int figureId) const;
+		const FigureData& getFigureData(int figureId) const;
+                std::string getPlayerData(int playerId) const;
 		const FIGURES_DATA& getAllFiguresData() const;
 		const FIGURES& getInitFigures(int playerId) const;
 		std::string getRulesName() const;
 		int getFirstTurnPlayer() const;
-		std::string getPlayerData(int playerId);
 		int getSpecialFigure(int player) const;
 		int getBoardSizeX() const;
 		int getBoardSizeY() const;

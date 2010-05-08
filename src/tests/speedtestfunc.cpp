@@ -9,7 +9,7 @@
 #include "../model/io/rules_io.h"
 #include "../model/io/model_io.h"
 
-
+/*
 void onlyWarningMessageOutput(QtMsgType type, const char * msg) {
 	switch ( type ) {
 		case QtDebugMsg:
@@ -116,8 +116,6 @@ int makeAISpeedTest() {
 
 
 
-	/**************************************************************************************************/
-
 	results.push_back( mittelshpielTest("AB search, deep 3", new AlphaBetaSearchAIPlayer(3,0) , false ) );
 	results.push_back( mittelshpielTest("AB search, deep 4", new AlphaBetaSearchAIPlayer(4,0) , false ) );
 	results.push_back( mittelshpielTest("AB search, deep 5", new AlphaBetaSearchAIPlayer(5,0) , false ) );
@@ -149,3 +147,4 @@ int makeAISpeedTest() {
 
 
 }
+*/

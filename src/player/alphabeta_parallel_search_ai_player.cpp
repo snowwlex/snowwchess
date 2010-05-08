@@ -5,6 +5,7 @@
 #include <algorithm>
 
 #include "alphabeta_parallel_search_ai_player.h"
+#include "../model/game.h"
 
 static pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
 
@@ -81,11 +82,11 @@ AlphaBetaParallelSearchAIPlayer::AlphaBetaParallelSearchAIPlayer(int depth, int 
 
 }
 
-void AlphaBetaParallelSearchAIPlayer::stop() {
+void AlphaBetaParallelSearchAIPlayer::stopGetMove() {
 	myPull.stop = true;
 }
 
-void AlphaBetaParallelSearchAIPlayer::makeTurn() {
+void AlphaBetaParallelSearchAIPlayer::getMove() {
 
         ++myTurnsCounter;
         myCounter = 0;
@@ -126,6 +127,6 @@ void AlphaBetaParallelSearchAIPlayer::allDone() {
 					 << "turns ="           << myTurnsCounter;
 	//qDebug() << ":AlphaBetaParallelSearchAIPlayer:" << "Time for searching:" << difftime(end,start);
 	if (myPull.stop == false) {
-		notifyMoveReady(bestMove);
+            Game::instance()->moveReady(myColor, bestMove);
 	}
 }

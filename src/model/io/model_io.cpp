@@ -84,7 +84,7 @@ const ModelIOXMLStorage& ModelIO::getStorage() const {
 }
 
 void ModelIO::updateModel(Model& model) const {
-	model.setFirstTurnPlayer(myStorage.firstTurn);
+	model.setCurrentPlayer( myStorage.firstTurn );
 	updateFiguresInfo(model);
 }
 
@@ -100,7 +100,7 @@ void ModelIO::updateFiguresInfo(Model& model) const {
 			tmpFigure.position.myY = boardSizeY - atoi(it->cell.substr(1,2).c_str());
 			tmpFigure.wasMoved = it->wasMoved;
 			tmpFigure.captured = it->captured;
-			model.setFigure(i, tmpFigure);
+			model.setFigureOnBoard(i, tmpFigure);
 		}
 	}
 }
@@ -127,7 +127,7 @@ void ModelIO::save(std::string file, const Model& model) const {
 	const char TAB = '\t';
 	std::string bufferStr;
 	fputs("<?xml version='1.0' encoding='UTF-8'?>\n", outfile);
-	player = model.getFirstTurnPlayer() + 1 + '0';
+	player = model.getCurrentPlayer() + 1 + '0';
 	bufferStr = "<positions rules='"+model.getRulesName()+"' turn='"+player+"'>\n";
 	fputs(bufferStr.c_str(),outfile);
 

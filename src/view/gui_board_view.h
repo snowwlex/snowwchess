@@ -7,73 +7,89 @@
 
 #include "../snowwchess.h"
 #include "../model/model.h"
-#include "../sender.h"
+#include "../subscriber.h"
+#include "../player/player.h"
 
-typedef std::vector< std::pair<Position, QColor> > HIGHLIGHT_CELLS;
+class GuiBoardView : public QWidget, public Subscriber {
+    Q_OBJECT
 
-class GuiBoardView : public QWidget, public Sender, public Listener {
-	Q_OBJECT
+public:
+    GuiBoardView(QWidget *parent = 0);
+    ~GuiBoardView();
 
-	public:
-		GuiBoardView(QWidget *parent = 0);
-		~GuiBoardView();
+public:
+    void setModel(Model* model);
+    void setActivePlayer(Player* player);
 
-	public:
-		void setModel(Model* model);
+public: //listener methods
+    virtual void updateIt();
 
-	public:
-		void highlight(const HIGHLIGHT_CELLS& highlightCells);
-		void clearHightlights();
+public: //ui methods
+    virtual QSize minimumSizeHint() const;
+    virtual int heightForWidth(int width) const;
 
-	public: //listener methods
-		virtual void turnMaked(const Move& move);
-		virtual void updateIt();
+protected: //events
+    virtual void paintEvent(QPaintEvent *pe);
+    virtual void mousePressEvent(QMouseEvent *me);
+    virtual void resizeEvent(QResizeEvent* re);
 
-	public slots:
+private: //draw preparing methods
+    void countSizes();
+    void scalingFigures();
+    void prepareBoardCells();
+    void prepareFigures();
+    void prepareMovesHighlights();
+    void prepareUnderCaptureHighlights();
 
-	private slots:
+private:
+    void loadFiguresGraphic();
 
-	signals:
+private:
+    void catchCell(const Position& pos);
+    void catchStartCell(const Position& pos);
+    void catchFinishCell(const Position& pos);
 
-	private: //sender methods
-		void notifyClickedCell(const Position& pos) const;
+private: //help methods
+    QString figureLetterToName(char letter);
+   
+
+private: //ui methods
+    void setupUi();
 
 
+private: //state of view
+
+    enum CATCHING {
+        NO_CATCH,
+        CATCH_START_CELL,
+        CATCH_FINISH_CELL
+    };
+
+private:
+    typedef std::map<char, QPixmap> PICTURES_FIGURES;
+    typedef std::vector< std::pair<Position, QColor> > HIGHLIGHT_CELLS;
+private: //fields
+    Model* myModel;
+    QPixmap myBoardCells;
+    QPixmap myBoardFigures;
+    QPixmap myBoardMovesHighlights;
+    QPixmap myBoardUnderCaptureHighlights;
+    HIGHLIGHT_CELLS myMovesHighlights;
+    HIGHLIGHT_CELLS myUnderCaptureHighlights;
+
+    PICTURES_FIGURES myPicturesFigureScaled[2];
+    PICTURES_FIGURES myPicturesFigure[2];
+
+    QSize myCellSize;
+    QSize myBoardSize;
 
 
-	protected: //events
-		virtual void paintEvent(QPaintEvent *pe);
-		virtual void mousePressEvent(QMouseEvent *pe);
+    Player* myActivePlayer;
+    CATCHING myCatch;
+    SimpleMove mySimpleMove;
 
-	private: //draw preparing methods
-		void prepareBoardCells();
-		void prepareFigures();
-		void prepareHighlightCells();
 
-	private:
-		void countSizes();
-		void loadBoardFigures();
-
-	private: //help methods
-		QString figureLetterToName(char letter);
-
-	private: //fields
-		Model* myModel;
-		QPixmap myBoardCells;
-		QPixmap myBoardFigures;
-		QPixmap myBoardHighlightCells;
-		HIGHLIGHT_CELLS myHighlightCells;
-
-		std::map<char, QPixmap> picturesFigure[2];
-
-		QSize boardSize;
-		QSize screenSize;
-		QSize cellSize;
-		bool redrawBoardCells,
-			 redrawBoardFigures,
-			 redrawBoardHighlightCells;
-		bool boardFiguresLoaded;
-
+private: //ui objects
 
 
 };
