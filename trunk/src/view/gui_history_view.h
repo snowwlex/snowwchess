@@ -1,46 +1,49 @@
 #ifndef GUI_HISTORY_VIEW_H_
 #define GUI_HISTORY_VIEW_H_
 
+#include <QWidget>
 #include <QListWidget>
+#include <QPushButton>
 
 #include "../snowwchess.h"
-#include "../model/model.h"
-#include "../listener.h"
-#include "../history.h"
-#include "../game.h"
-#include "gui_board_view.h"
+#include "../subscriber.h"
+#include "../model/history.h"
+#include "../model/game.h"
 
-class Game;
+class GuiHistoryView : public QWidget, public Subscriber {
+    Q_OBJECT
 
-class GuiHistoryView : public QListWidget, public Listener, public Sender {
-	Q_OBJECT
+public:
+    GuiHistoryView(QWidget *parent = 0);
+    ~GuiHistoryView();
 
-	public:
-		GuiHistoryView(QWidget *parent = 0);
-		~GuiHistoryView();
+public:
+    void setHistory(History* history);
 
-	public:
-		void setModel(Model* model);
-		void setBoardView(GuiBoardView* boardView) { myBoardView = boardView; }
-
-	public slots:
-		void makeUndo();
+public slots:
+    void makeUndo();
 
 
-	public: //listener methods
-		virtual void turnMaked(const Move& move);
+public: //listener methods
+    virtual void updateIt(); // history listener
 
-	private: //sender methods
-		void notifyStop() const;
-		void notifyStart() const;
+public: //ui methods
+    virtual QSize sizeHint() const;
 
-	public: //help method
-		static QString moveToString(const Move& move, const Model& model );
-	private: //fields
-		Model* myModel;
-		GuiBoardView* myBoardView;
-		History myHistory;
+private: //help method
+ static QString moveToString(const Move& move);
+ static QString makeComment(const Move& move);
 
+private: //ui setting methods
+    void setupUi();
+
+private: //fields
+    History* myHistory;
+
+
+private: //ui
+    QListWidget* listWidget;
+    QPushButton* undoButton;
 
 };
 

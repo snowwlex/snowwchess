@@ -25,10 +25,10 @@ class AlphaBetaParallelSearchAIPlayer : public AlphaBetaSearchAIPlayer {
                 AlphaBetaParallelSearchAIPlayer(int depth=0, int addDepth=0);
 
         public:
-                virtual void makeTurn();
+                virtual void getMove();
 
         public: //listener
-				void stop();
+				void stopGetMove();
 
         private:
                 friend void* parallelSearch(void*);

@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<positions rules='anticleric' turn='1'>
+	<player id='1'>
+		<figure id='1'>
+			<position cell='d1' unmoved='1'/>
+		</figure>
+		<figure id='2'>
+			<position cell='c1' unmoved='1'/>
+		</figure>
+		<figure id='3'>
+			<position cell='a1' unmoved='1'/>
+			<position cell='f1' unmoved='1'/>
+		</figure>
+		<figure id='4'>
+			<position cell='b1' unmoved='1'/>
+			<position cell='e1' unmoved='1'/>
+		</figure>
+		<figure id='5'>
+			<position cell='a2' unmoved='1'/>
+			<position cell='b2' unmoved='1'/>
+			<position cell='c2' unmoved='1'/>
+			<position cell='d2' unmoved='1'/>
+			<position cell='e3' unmoved='1'/>
+			<position cell='f2' unmoved='1'/>
+		</figure>
+	</player>
+	<player id='2'>
+		<figure id='1'>
+			<position cell='d6' unmoved='1'/>
+		</figure>
+		<figure id='2'>
+			<position cell='c6' unmoved='1'/>
+		</figure>
+		<figure id='3'>
+			<position cell='a6' unmoved='1'/>
+			<position cell='f6' unmoved='1'/>
+		</figure>
+		<figure id='4'>
+			<position cell='b6' unmoved='1'/>
+			<position cell='e6' unmoved='1'/>
+		</figure>
+		<figure id='5'>
+			<position cell='a5' unmoved='1'/>
+			<position cell='b5' unmoved='1'/>
+			<position cell='c5' unmoved='1'/>
+			<position cell='d5' unmoved='1'/>
+			<position cell='e4' unmoved='1'/>
+			<position cell='f5' unmoved='1'/>
+		</figure>
+	</player>

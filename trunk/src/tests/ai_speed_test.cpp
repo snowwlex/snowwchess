@@ -12,7 +12,7 @@ AISpeedTest::~AISpeedTest() {
 }
 
 void AISpeedTest::testing() {
-	myPlayer->makeTurn();
+	myPlayer->getMove();
 }
 
 void AISpeedTest::moveReady(const Move&) {

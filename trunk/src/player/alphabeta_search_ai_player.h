@@ -40,7 +40,7 @@ class AlphaBetaSearchAIPlayer : public AIPlayer {
 		AlphaBetaSearchAIPlayer(int depth=1, int addDepth=0);
 
 	public:
-		virtual void makeTurn();
+		virtual void getMove();
 
 	protected:
 		enum Infinity { INF=1 };

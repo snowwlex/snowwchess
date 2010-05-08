@@ -8,277 +8,390 @@
 
 #include "gui_board_view.h"
 
+#include <QBoxLayout>
+#include <QListWidget>
+#include <QPushButton>
 
 GuiBoardView::GuiBoardView(QWidget *parent)
-    : QWidget(parent)
-{
-	myModel = 0;
-	redrawBoardCells = true;
-	redrawBoardFigures = true;
-	redrawBoardHighlightCells = true;
-	boardFiguresLoaded = false;
+: QWidget(parent) {
+
+    setupUi();
+
+    myModel = 0;
+
+    myActivePlayer = 0;
+    myCatch = this->NO_CATCH;
+}
+
+void GuiBoardView::setupUi() {
+
+    QSizePolicy sizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+    sizePolicy.setHeightForWidth(true);
+    this->setSizePolicy(sizePolicy);
+}
+
+QSize GuiBoardView::minimumSizeHint() const {
+    return QSize(100, 100);
+}
+
+int GuiBoardView::heightForWidth(int width) const {
+    return width;
 }
 
 void GuiBoardView::countSizes() {
-	QSize tmpBoardSize (myModel->getBoardSizeX(), myModel->getBoardSizeY() );
-	QSize tmpScreenSize = this->size();
 
-	if (tmpBoardSize != boardSize || tmpScreenSize != screenSize) {
+    assert(myModel != 0);
 
-		boardSize = tmpBoardSize;
-		screenSize = tmpScreenSize;
+    QSize screenSize = this->size();
+    QSize boardSize(myModel->getBoardSizeX(), myModel->getBoardSizeY());
 
-		int leastSize = std::min( screenSize.width() , screenSize.height() );
-		int cellWidth = leastSize / boardSize.width();
-		int cellHeight = leastSize / boardSize.height();
-		cellSize = QSize(cellWidth, cellHeight);
+    int cellWidth = screenSize.width() / boardSize.width();
+    int cellHeight = screenSize.height() / boardSize.height();
+    int cellSize = std::min(cellWidth, cellHeight);
 
-		redrawBoardCells = true;
-		redrawBoardFigures = true;
-		redrawBoardHighlightCells = true;
+    myCellSize = QSize(cellSize, cellSize);
 
-		qDebug() << ":GuiBoardView:" << "recounted size:: "
-		         << boardSize << screenSize << cellSize;
+    myBoardSize = QSize(myCellSize.width() * boardSize.width(), myCellSize.height() * boardSize.height());
 
-	}
+    qDebug() << ":GuiBoardView:" << "recounted size:: "
+            << myCellSize << myBoardSize;
+
+
 }
 
-void GuiBoardView::loadBoardFigures() {
-	assert (myModel != 0);
+void GuiBoardView::loadFiguresGraphic() {
+    assert(myModel != 0);
 
-	boardFiguresLoaded = true;
+    qDebug() << ":GuiBoardView: " << "loadBoardFigures()";
+    for (FIGURES_DATA::const_iterator itFigure = myModel->getAllFiguresData().begin();
+            itFigure != myModel->getAllFiguresData().end();
+            ++itFigure) {
 
-	for (FIGURES_DATA::const_iterator itFigure = myModel->getAllFiguresData().begin();
-		 itFigure != myModel->getAllFiguresData().end();
-		 ++itFigure) {
+        for (int i = 0; i != 2; ++i) {
 
-		for (int i = 0; i < 2; ++i) {
+            QString pictureFile = itFigure->second.picture[i].c_str();
+            char letter = itFigure->second.letter;
+            if (pictureFile == "") {
+                QString name = ":/images/pieces/";
+                name += (i == WHITE) ? "white" : "black";
+                name += figureLetterToName(letter);
+                name += ".svg";
+                pictureFile = name;
+            }
 
-			QString pictureFile = itFigure->second.picture[i].c_str();
-			char letter = itFigure->second.letter;
-			if (pictureFile == "") {
-				QString name = ":/images/pieces/";
-				name += (i == WHITE) ? "white" : "black";
-				name += figureLetterToName(letter);
-				name += ".svg";
-				pictureFile = name;
-			}
 
-			QPixmap picture( pictureFile );
-			picture = picture.scaledToWidth(cellSize.width());
-			picturesFigure[i][letter] =  picture;
-		}
+            QPixmap picture(pictureFile);
+            myPicturesFigure[i][letter] = picture;
+        }
 
-	}
+    }
+}
+
+void GuiBoardView::scalingFigures() {
+
+
+    qDebug() << ":GuiBoardView: " << "scalingFigures()";
+
+    for (int i = 0; i != 2; ++i) {
+        myPicturesFigureScaled[i].clear();
+    }
+    PICTURES_FIGURES::iterator it;
+    for (int i = 0; i != 2; ++i) {
+        for (it = myPicturesFigure[i].begin(); it != myPicturesFigure[i].end(); ++it) {
+            qDebug() << ":GuiBoardView: " << "scalingFigures() " << "scaling" << it->first;
+            myPicturesFigureScaled[i][it->first] = it->second.scaled(myCellSize, Qt::KeepAspectRatio);
+        }
+    }
+
 }
 
 QString GuiBoardView::figureLetterToName(char letter) {
-	QString name;
-	switch (letter) {
-		case 'K':
-			name = "King";
-			break;
-		case 'Q':
-			name = "Queen";
-			break;
-		case 'R':
-			name = "Rook";
-			break;
-		case 'N':
-			name = "Knight";
-			break;
-		case 'B':
-			name = "Bishop";
-			break;
-		case 'P':
-			name = "Pawn";
-			break;
-		default:
-			name = "Default";
-			break;
-	}
-	return name;
+    QString name;
+    switch (letter) {
+        case 'K':
+            name = "King";
+            break;
+        case 'Q':
+            name = "Queen";
+            break;
+        case 'R':
+            name = "Rook";
+            break;
+        case 'N':
+            name = "Knight";
+            break;
+        case 'B':
+            name = "Bishop";
+            break;
+        case 'P':
+            name = "Pawn";
+            break;
+        default:
+            name = "Default";
+            break;
+    }
+    return name;
 }
 
 void GuiBoardView::prepareBoardCells() {
 
-	if (redrawBoardCells == false) {
-		return;
-	}
 
-	if (boardFiguresLoaded == false) {
-		loadBoardFigures();
-	}
+    qDebug() << ":GuiBoardView: " << "prepareBoardCells() ";
 
-	redrawBoardCells = false;
-
-	QColor  whiteCellColor(255,247,153),
-			blackCellColor(140,98,57);
+    QColor whiteCellColor(255, 247, 153),
+            blackCellColor(140, 98, 57);
 
 
-	myBoardCells = QPixmap(screenSize);
-	QPainter painter(&myBoardCells);
+    myBoardCells = QPixmap(myBoardSize);
+    QPainter painter(&myBoardCells);
 
-	// black color background
-	myBoardCells.fill(Qt::black);
-
-	//board drawing
-	painter.setPen(Qt::NoPen);
-	painter.setBrush(whiteCellColor);
-	painter.drawRect( QRect( QPoint(0,0), QSize(cellSize.width()*boardSize.width(),cellSize.height()*boardSize.height() )) );
-	painter.setBrush(blackCellColor);
-
-	for (int i = 0; i != boardSize.height(); ++i) {
-		for (int j = 0; j != boardSize.width(); ++j) {
-			if ( (i+j)%2 == 0) {
-				painter.drawRect( QRect( QPoint(cellSize.width()*j,cellSize.height()*i), cellSize ) );
-			}
-		}
-	}
+    //board drawing
+    painter.setPen(Qt::NoPen);
+    myBoardCells.fill(whiteCellColor);
+    painter.setBrush(blackCellColor);
+    for (int i = 0; i != myBoardSize.height(); ++i) {
+        for (int j = 0; j != myBoardSize.width(); ++j) {
+            if ((i + j) % 2 == 0) {
+                painter.drawRect(QRect(QPoint(myCellSize.width() * j, myCellSize.height() * i), myCellSize));
+            }
+        }
+    }
 
 
 }
-
-
 
 void GuiBoardView::prepareFigures() {
 
-	if (redrawBoardFigures == false) {
-			return;
-	}
 
 
-	redrawBoardFigures = false;
+    qDebug() << ":GuiBoardView: " << "prepareFigures()";
 
-	myBoardFigures = QPixmap(screenSize);
-	myBoardFigures.fill(Qt::transparent);
+    myBoardFigures = QPixmap(myBoardSize);
+    myBoardFigures.fill(Qt::transparent);
+    QPainter painter(&myBoardFigures);
 
-
-	QPainter painter(&myBoardFigures);
-	//painter.setRenderHint(QPainter::Antialiasing, true);
-
-	FIGURES::const_iterator itFigure;
-	for (int i=0; i<2; ++i) {
-		for ( itFigure=myModel->getSetFigures(i).begin(); itFigure != myModel->getSetFigures(i).end(); ++itFigure ) {
-			if (itFigure->captured == false) {
-//				qDebug() << ":GuiBoardView:" << (i==0? "white":"black")
-//						 << "id: " << itFigure->id
-//						 << "position: x: " << itFigure->position.myX << " y: " << itFigure->position.myY
-//						 << myModel->getFigureData(itFigure->id).picture[WHITE].c_str()
-//						 << myModel->getFigureData(itFigure->id).picture[BLACK].c_str();
-
-				char letter = myModel->getFigureData(itFigure->id).letter;
-				QPixmap picture = picturesFigure[i][letter];
-				QPoint point(cellSize.width() * itFigure->position.myX, cellSize.height() * itFigure->position.myY);
-
-
-				painter.drawPixmap(point, picture);
-			}
-		}
-	}
+    FIGURES::const_iterator itFigure;
+    for (int i = 0; i < 2; ++i) {
+        for (itFigure = myModel->getSetFigures(i).begin(); itFigure != myModel->getSetFigures(i).end(); ++itFigure) {
+            if (itFigure->captured == false) {
+                //                qDebug() << ":GuiBoardView: " << "prepareFigures(): "
+                //                        << (i == 0 ? "white" : "black")
+                //                        << "id: " << itFigure->id
+                //                        << "position: x: " << itFigure->position.myX << " y: " << itFigure->position.myY
+                //                        << myModel->getFigureData(itFigure->id).picture[WHITE].c_str()
+                //                        << myModel->getFigureData(itFigure->id).picture[BLACK].c_str();
+                //qDebug() << ":GuiBoardView: " << "prepareFigures(): " << "asking for letter of figure id: " << itFigure->id << "player " << i;
+                char letter = myModel->getFigureData(itFigure->id).letter;
+                PICTURES_FIGURES::const_iterator it = myPicturesFigureScaled[i].find(letter);
+                assert(it != myPicturesFigureScaled[i].end());
+                QPoint point(myCellSize.width() * itFigure->position.myX, myCellSize.height() * itFigure->position.myY);
+                painter.drawPixmap(point, it->second);
+            }
+        }
+    }
 
 }
 
+void GuiBoardView::prepareMovesHighlights() {
 
-void GuiBoardView::highlight(const HIGHLIGHT_CELLS& highlightCells) {
-	myHighlightCells = highlightCells;
-	redrawBoardHighlightCells = true;
-	this->update();
-}
-void GuiBoardView::clearHightlights() {
-	myHighlightCells.clear();
-	redrawBoardHighlightCells = true;
-	this->update();
-}
+    qDebug() << ":GuiBoardView: " << "prepareHighlights()";
+    myBoardMovesHighlights = QPixmap(myBoardSize);
+    myBoardMovesHighlights.fill(Qt::transparent);
+    QPainter painter(&myBoardMovesHighlights);
+    painter.setPen(Qt::NoPen);
 
-void GuiBoardView::prepareHighlightCells() {
+    Position pos;
+    QColor color;
+    for (HIGHLIGHT_CELLS::iterator itHighlight = myMovesHighlights.begin(); itHighlight != myMovesHighlights.end(); ++itHighlight) {
+        pos = itHighlight->first;
+        color = itHighlight->second;
+        painter.setBrush(color);
+        painter.drawRect(QRect(QPoint(myCellSize.width() * pos.myX, myCellSize.height() * pos.myY), myCellSize));
+        //painter.drawEllipse(QRect(QPoint(myCellSize.width() * pos.myX, myCellSize.height() * pos.myY), myCellSize));
 
-	if (redrawBoardHighlightCells == false) {
-		return;
-	}
-
-
-
-	redrawBoardHighlightCells = false;
-
-	myBoardHighlightCells = QPixmap(screenSize);
-	myBoardHighlightCells.fill(Qt::transparent);
-	QPainter painter(&myBoardHighlightCells);
-	painter.setPen(Qt::NoPen);
-
-
-	Position pos;
-	QColor color;
-	for (HIGHLIGHT_CELLS::iterator itHighlight = myHighlightCells.begin(); itHighlight != myHighlightCells.end(); ++itHighlight ) {
-		 pos = itHighlight->first;
-		 color =  itHighlight->second;
-		 qDebug() << ":GuiBoardView:" << pos.myX << pos.myY << color;
-		 painter.setBrush(color);
-		 painter.drawRect( QRect(  QPoint(cellSize.width()*pos.myX,cellSize.height()*pos.myY), cellSize ) );
-	}
-
-
+    }
 
 }
 
+void GuiBoardView::prepareUnderCaptureHighlights() {
+
+    qDebug() << ":GuiBoardView: " << "prepareUnderCaptureHighlights()";
+    myBoardUnderCaptureHighlights = QPixmap(myBoardSize);
+    myBoardUnderCaptureHighlights.fill(Qt::transparent);
+    QPainter painter(&myBoardUnderCaptureHighlights);
+    painter.setPen(Qt::NoPen);
+
+
+    assert(myModel != 0);
+    myUnderCaptureHighlights.clear();
+    MOVES moves = myModel->allMoves(1 - myModel->getCurrentPlayer(), CAPTURE);
+    MOVES::const_iterator itMove;
+    for (itMove = moves.begin(); itMove != moves.end(); ++itMove) {
+        QColor color(255, 0, 0, 128);
+        myUnderCaptureHighlights.push_back(std::make_pair(itMove->pos2, color));
+    }
+
+    Position pos;
+    QColor color;
+    for (HIGHLIGHT_CELLS::iterator itHighlight = myUnderCaptureHighlights.begin(); itHighlight != myUnderCaptureHighlights.end(); ++itHighlight) {
+        pos = itHighlight->first;
+        color = itHighlight->second;
+        painter.setBrush(color);
+        painter.drawRect(QRect(QPoint(myCellSize.width() * pos.myX, myCellSize.height() * pos.myY), myCellSize));
+    }
+}
 
 void GuiBoardView::setModel(Model* model) {
-	myModel = model;
+    myModel = model;
+    loadFiguresGraphic();
+    countSizes();
+    prepareBoardCells();
+    scalingFigures();
+    prepareFigures();
+    this->update();
 }
+
+void GuiBoardView::resizeEvent(QResizeEvent*) {
+
+    qDebug() << ":GuiBoardView: " << "resizeEvent()";
+
+    if (myModel == 0) {
+        qDebug() << ":GuiBoardView: " << "resizeEvent()" << "model is not setted";
+        return;
+    }
+
+    countSizes();
+    scalingFigures();
+    prepareBoardCells();
+    prepareFigures();
+    prepareMovesHighlights();
+    prepareUnderCaptureHighlights();
+}
+
 void GuiBoardView::paintEvent(QPaintEvent*) {
-	qDebug() << ":GuiBoardView:" << "paint event rendering";
 
-	if (myModel == 0) {
-		qDebug() << ":GuiBoardView:" << "model is not setted";
-		return;
-	}
+    if (myModel == 0) {
+        qDebug() << ":GuiBoardView:" << "paintEvent() " << "model is not setted";
+        return;
+    }
 
-	countSizes();
-	prepareBoardCells();
-	prepareFigures();
-	prepareHighlightCells();
+    qDebug() << ":GuiBoardView: " << "paintEvent() " << "---rendering of board view is started---";
+    QPainter painter(this);
+    QPoint leftTopEdge(0, 0);
 
-	QPainter painter(this);
-	QPoint leftTopEdge(0,0);
-	//painter.setRenderHint(QPainter::Antialiasing, true);
-	painter.drawPixmap( leftTopEdge, myBoardCells);
-	painter.drawPixmap( leftTopEdge, myBoardHighlightCells);
-	painter.drawPixmap( leftTopEdge, myBoardFigures);
 
-	qDebug() << ":GuiBoardView:" << "rendering of board view is finished";
+    //it should doing in updateIt function
+    // some bugs with thread, that didn't end;
+    prepareUnderCaptureHighlights();
+    prepareFigures();
+    //////////////////////////////////////
+
+    painter.drawPixmap(leftTopEdge, myBoardCells);
+    painter.drawPixmap(leftTopEdge, myBoardUnderCaptureHighlights);
+    painter.drawPixmap(leftTopEdge, myBoardMovesHighlights);
+    painter.drawPixmap(leftTopEdge, myBoardFigures);
+    qDebug() << ":GuiBoardView: " << "paintEvent() " << "---rendering of board view is finished---";
 
 }
 
 void GuiBoardView::mousePressEvent(QMouseEvent *pe) {
-	if ( pe->buttons() & Qt::LeftButton) {
+    if (pe->buttons() & Qt::LeftButton) {
 
-		if (myModel != 0) {
-			countSizes();
-			Position pos;
-			pos.myX = pe->x() / cellSize.width();
-			pos.myY = pe->y() / cellSize.height();
-			qDebug() << ":GuiBoardView:" << "CELL IS " << pos.myX << pos.myY;
-			notifyClickedCell(pos);
-		}
-	}
+        if (myModel != 0) {
+            Position pos;
+            pos.myX = pe->x() / myCellSize.width();
+            pos.myY = pe->y() / myCellSize.height();
+            qDebug() << ":GuiBoardView:" << "CELL IS " << pos.myX << pos.myY;
+            catchCell(pos);
+        }
+    }
 }
+
 GuiBoardView::~GuiBoardView() {
 }
 
-void GuiBoardView::notifyClickedCell(const Position& pos) const {
-	for (LISTENERS::const_iterator itListener = myListeners.begin(); itListener != myListeners.end(); ++itListener) {
-		(*itListener)->pushedCell(pos);
-		qDebug() << ":GuiBoardView:" << "calling of listener clickedCell";
-	}
-}
-
-void GuiBoardView::turnMaked(const Move&) {
-	redrawBoardFigures = true;
-	this->update();
-}
-
 void GuiBoardView::updateIt() {
-	redrawBoardFigures = true;
-	prepareFigures();
-	this->update();
+    this->update();
 }
+
+void GuiBoardView::setActivePlayer(Player* player) {
+    myActivePlayer = player;
+
+    if (myActivePlayer == 0) {
+        myCatch = this->NO_CATCH;
+        return;
+    }
+    myCatch = this->CATCH_START_CELL;
+
+}
+
+void GuiBoardView::catchCell(const Position& pos) {
+
+    if (myActivePlayer == 0) {
+        myCatch = this->NO_CATCH;
+        return; //no cathcing, if no active player
+    }
+
+    if (myCatch == this->CATCH_START_CELL) {
+        catchStartCell(pos);
+    } else if (myCatch == this->CATCH_FINISH_CELL) {
+        catchFinishCell(pos);
+    }
+}
+
+void GuiBoardView::catchStartCell(const Position& pos) {
+    assert(myActivePlayer != 0);
+
+
+
+    if (myModel->getBoardCell(pos.myX, pos.myY).player != myActivePlayer->getColor()) {
+        qDebug() << ":GuiBoardView:" << "catched start cell for not active player ";
+        return;
+    };
+
+    qDebug() << ":GuiBoardView:" << "catched start cell for active player: " << myActivePlayer->getColor();
+
+
+
+
+    MOVES moves = myModel->movesFromPosition(pos);
+    if (moves.empty()) {
+        return;
+    }
+
+    mySimpleMove.pos1 = pos;
+    myCatch = this->CATCH_FINISH_CELL;
+
+    myMovesHighlights.clear();
+    MOVES::const_iterator itMove;
+    for (itMove = moves.begin(); itMove != moves.end(); ++itMove) {
+        QColor color = itMove->type & MOVE ? Qt::cyan : Qt::red;
+        myMovesHighlights.push_back(std::make_pair(itMove->pos2, color));
+    }
+
+    prepareMovesHighlights();
+    this->update();
+}
+
+void GuiBoardView::catchFinishCell(const Position& pos) {
+
+    qDebug() << ":GuiBoardView:" << "catched finish cell";
+
+    myMovesHighlights.clear();
+    prepareMovesHighlights();
+    this->update();
+
+    mySimpleMove.pos2 = pos;
+    if (myModel->canMove(mySimpleMove) == false) {
+        myCatch = this->CATCH_START_CELL;
+        return;
+    }
+
+
+
+    myCatch = this->NO_CATCH;
+
+    myActivePlayer->moveFromBoard(mySimpleMove);
+
+}
+

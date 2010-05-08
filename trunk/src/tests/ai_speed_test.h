@@ -4,12 +4,12 @@
 
 #include "../snowwchess.h"
 #include "time_test.h"
-#include "../listener.h"
+#include "../subscriber.h"
 #include "../player/ai_player.h"
 
 int makeAISpeedTest();
 
-class AISpeedTest : public TimeTest, public Listener {
+class AISpeedTest : public TimeTest, public Subscriber {
 
 	public:
 		AISpeedTest();

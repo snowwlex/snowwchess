@@ -9,6 +9,7 @@
 #include <algorithm>
 
 #include "alphabeta_search_ai_player.h"
+#include "../model/game.h"
 
 AlphaBetaSearchAIPlayer::AlphaBetaSearchAIPlayer(int depth, int addDepth) {
 	myDepth = depth;
@@ -16,7 +17,7 @@ AlphaBetaSearchAIPlayer::AlphaBetaSearchAIPlayer(int depth, int addDepth) {
 }
 
 
-void AlphaBetaSearchAIPlayer::makeTurn() {
+void AlphaBetaSearchAIPlayer::getMove() {
 
 	time_t start,end;
 
@@ -65,7 +66,8 @@ void AlphaBetaSearchAIPlayer::makeTurn() {
 	qWarning() << ":AlphaBetaSearchAIPlayer: "
 			   << "counter: " << myCounter;
 
-	notifyMoveReady(bestMove);
+        
+	 Game::instance()->moveReady(myColor, bestMove);
 }
 
 

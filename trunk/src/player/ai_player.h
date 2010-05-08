@@ -13,7 +13,7 @@
 
 class AIPlayer : public Player {
 	public:
-		virtual void makeTurn() = 0;
+		virtual void getMove() = 0;
 
 	public: //setters
 		void setDepth(int depth);
