@@ -1,5 +1,5 @@
 <?dxml version="1.0" encoding="UTF-8"?>
-<rules name="magaradja">
+<rules name="maharajah">
 	<board sizex="8" sizey="8"/>
 	<players turns="1">
 		<player id="1" name="WHITE"/>
