@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rules name="kapablanka">
+<rules name="capablanca">
 	<board sizex="10" sizey="8"/>
 	<players turns="1">
 		<player id="1" name="WHITE"/>
