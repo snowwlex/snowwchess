@@ -93,7 +93,7 @@ int AlphaBetaSearchAIPlayer::alphaBetaNegaMaxSearch(Border alpha, Border beta, i
 	}
 	Border score(0, -INF);
 
-	std::sort(moves.begin(),moves.end(), *this);
+	std::sort(moves.begin(),moves.end(), sortMVV_LVA(myModel) );
 
 	for (pruning = false, itMove = moves.begin(); !pruning &&  itMove != moves.end(); ++itMove) {
 
@@ -145,7 +145,7 @@ int AlphaBetaSearchAIPlayer::quiesSearch(Border alpha, Border beta, int curPlaye
 	if (moves.empty()) {
 		return score.myValue;
 	}
-	sort(moves.begin(),moves.end(),*this);
+	sort(moves.begin(),moves.end(),sortMVV_LVA(myModel));
 	if (alpha < score) alpha = score;
 
 	for (pruning = false, itMove = moves.begin(); !pruning &&  itMove != moves.end(); ++itMove) {

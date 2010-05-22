@@ -24,7 +24,10 @@ int AIPlayer::sefMaterial(const Model& model, int player) const {
 
 }
 
-bool AIPlayer::operator()(const Move& move1,const Move& move2) {
+
+
+
+bool sortMVV_LVA::operator()(const Move& move1,const Move& move2) {
 	//sort by principe: Most Value Victim - Least Value Actor (MVV - LVA)
 	if (move1.type == MOVE && move2.type == MOVE) {
 		if (myModel->getFigureData(move1.figureId).weight > myModel->getFigureData(move2.figureId).weight) return true;

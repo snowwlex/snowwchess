@@ -19,7 +19,7 @@ class Player {
 
 	protected:
 		int myColor;
-		Model *myModel;
+		const Model *myModel;
 
 };
 

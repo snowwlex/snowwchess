@@ -14,7 +14,6 @@ MainWindow::MainWindow(QWidget *parent)
     setupUi();
     Game::instance()->setBoardView(this->boardView);
     Game::instance()->setHistoryView(this->historyView);
-
     bool ok = restoreLastGame();
     if (ok == false) {
         qDebug() << ":MainWindow: " << "constructor " << "last game was not saved";
@@ -64,6 +63,8 @@ void MainWindow::setupUi() {
     historyView->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Ignored);
     boxLayout->addWidget(historyView);
 
+
+    setWindowIcon( QIcon(":/images/interface/chess.png")  );
     retranslateUi();
 
     // CONNECTS

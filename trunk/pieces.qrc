@@ -1,16 +1,16 @@
 <RCC>
     <qresource prefix="/images/pieces">
-        <file alias="blackBishop.svg">images/pieces/fancy/blackBishop.svg</file>
-        <file alias="blackKing.svg">images/pieces/fancy/blackKing.svg</file>
-        <file alias="blackKnight.svg">images/pieces/fancy/blackKnight.svg</file>
-        <file alias="blackPawn.svg">images/pieces/fancy/blackPawn.svg</file>
-        <file alias="blackQueen.svg">images/pieces/fancy/blackQueen.svg</file>
-        <file alias="blackRook.svg">images/pieces/fancy/blackRook.svg</file>
-        <file alias="whiteBishop.svg">images/pieces/fancy/whiteBishop.svg</file>
-        <file alias="whiteKing.svg">images/pieces/fancy/whiteKing.svg</file>
-        <file alias="whiteKnight.svg">images/pieces/fancy/whiteKnight.svg</file>
-        <file alias="whitePawn.svg">images/pieces/fancy/whitePawn.svg</file>
-        <file alias="whiteQueen.svg">images/pieces/fancy/whiteQueen.svg</file>
-        <file alias="whiteRook.svg">images/pieces/fancy/whiteRook.svg</file>
+        <file alias="blackBishop.svg">images/pieces/simple/blackBishop.svg</file>
+        <file alias="blackKing.svg">images/pieces/simple/blackKing.svg</file>
+        <file alias="blackKnight.svg">images/pieces/simple/blackKnight.svg</file>
+        <file alias="blackPawn.svg">images/pieces/simple/blackPawn.svg</file>
+        <file alias="blackQueen.svg">images/pieces/simple/blackQueen.svg</file>
+        <file alias="blackRook.svg">images/pieces/simple/blackRook.svg</file>
+        <file alias="whiteBishop.svg">images/pieces/simple/whiteBishop.svg</file>
+        <file alias="whiteKing.svg">images/pieces/simple/whiteKing.svg</file>
+        <file alias="whiteKnight.svg">images/pieces/simple/whiteKnight.svg</file>
+        <file alias="whitePawn.svg">images/pieces/simple/whitePawn.svg</file>
+        <file alias="whiteQueen.svg">images/pieces/simple/whiteQueen.svg</file>
+        <file alias="whiteRook.svg">images/pieces/simple/whiteRook.svg</file>
     </qresource>
 </RCC>
