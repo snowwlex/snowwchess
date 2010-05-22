@@ -244,6 +244,7 @@ bool Game::loadGame(const std::string& fileName, const PlayerType* playerTypes, 
 
     myHistory = new History(*myModel); //consructed with Model (and after Model's initiate),
     //because History at first take the inital snapshot of model
+    
     createPlayer(WHITE, playerTypes[WHITE], aiLevels[WHITE]);
     createPlayer(BLACK, playerTypes[BLACK], aiLevels[BLACK]);
     setupModels();

@@ -39,8 +39,8 @@ void DialogNewGame::setupUi() {
 
     // RULES SELECTION
 
-    lbl = new QLabel("<b>Select file with rules:</b>");
-    gridLayout->addWidget(lbl, 0, 0, 1, 2, Qt::AlignCenter);
+    lblWhatLoading = new QLabel("<b>Select file with rules:</b>");
+    gridLayout->addWidget(lblWhatLoading, 0, 0, 1, 2, Qt::AlignCenter);
 
     lineEditFileName = new QLineEdit;
     lineEditFileName->setReadOnly(true);
@@ -143,6 +143,10 @@ void DialogNewGame::setLoadFileText(QString caption, QString dir, QString filter
     myCaption = caption;
     myDir = dir;
     myFilter = filter;
+}
+
+void DialogNewGame::setWhatLoadingText(QString text) {
+    this->lblWhatLoading->setText(text);
 }
 
 void DialogNewGame::selectFile() {

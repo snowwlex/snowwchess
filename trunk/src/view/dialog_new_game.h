@@ -11,6 +11,7 @@
 #include <QtGui/QHeaderView>
 #include <QtGui/QLineEdit>
 #include <QtGui/QPushButton>
+#include <QtGui/QLabel>
 #include <QString>
 
 
@@ -30,6 +31,7 @@ public:
 
 public:
     void setLoadFileText(QString caption, QString dir, QString filter);
+     void setWhatLoadingText(QString text);
 
 public slots:
     void whitePlayerChanged(const QString& string);
@@ -53,6 +55,7 @@ private: //ui
     QComboBox *cbLevelWhite;
     QComboBox *cbLevelBlack;
     QDialogButtonBox* buttonBox;
+    QLabel* lblWhatLoading;
 
 
 

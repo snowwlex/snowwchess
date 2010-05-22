@@ -135,6 +135,7 @@ void MainWindow::on_actionNewGame_activated() {
 void MainWindow::on_actionLoadGame_activated() {
 
     DialogNewGame* dialog = new DialogNewGame();
+    dialog->setWhatLoadingText("<b>Select load file</b>");
     dialog->setLoadFileText(tr("Opening file with board"), "saves", tr("Board in xml (*.xml)"));
     if (dialog->exec() != QDialog::Accepted) {
         delete dialog;
@@ -171,7 +172,15 @@ void MainWindow::on_actionExit_activated() {
 
 bool MainWindow::restoreLastGame() {
 
+    return false;
+    //temporaly we turn off setting's saving coz it causes a crash on startup
+    //with some rules: al least, kapablanka and grand
+    //reasons are not detected yet
+
     QSettings settings("Snowware", "Snowwchess");
+    
+  
+    
     bool saved = settings.value("/Settings/LastGame/saved", "false").toBool();
 
     PlayerType playerTypes[2];

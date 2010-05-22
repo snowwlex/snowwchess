@@ -9,11 +9,11 @@
 		<figure id="1" name="KING" letter="K"/>
 		<figure id="2" name="QUEEN" letter="Q"/>
 		<figure id="3" name="ROOK" letter="R"/>
-		<figure id="4" name="KNIGHT" letter="H"/>
+		<figure id="4" name="KNIGHT" letter="N"/>
 		<figure id="5" name="BISHOP" letter="B"/>
 		<figure id="6" name="PAWN" letter="P"/>
-		<figure id="7" name="KANCLER" letter="N"/>
-		<figure id="8" name="ARCHIEPISKOP" letter="A"/>
+		<figure id="7" name="KANCLER" letter="C" wpicture="images/pieces/unusual/w_rooknight.png" bpicture="images/pieces/unusual/b_rooknight.png" />
+		<figure id="8" name="ARCHIEPISKOP" letter="A" wpicture="images/pieces/unusual/w_bishopknight.png" bpicture="images/pieces/unusual/b_bishopknight.png" />
 	</figures>
 	<positions>
 		<player id="1">

@@ -8,7 +8,7 @@ class Player {
 	public: // turn making methods methods
                 virtual void moveFromBoard(const SimpleMove& ) { qDebug() << ":Player:" << "moveFromBoard()"; }
  		virtual void getMove() = 0;
-                virtual void stopGetMove() { qDebug() << ":Player:" << "stopMakeTurn()"; }
+                virtual void stopGetMove() { qDebug() << ":Player:" << "stopGetMove() "; }
 
         public: //getters
                 int getColor();
