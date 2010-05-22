@@ -12,8 +12,8 @@
 		<figure id="4" name="KNIGHT" letter="N"/>
 		<figure id="5" name="BISHOP" letter="B"/>
 		<figure id="6" name="PAWN" letter="P"/>
-		<figure id="7" name="MARSHAL" letter="M"/>
-		<figure id="8" name="KARDINAL" letter="A"/>
+		<figure id="7" name="MARSHAL" letter="M" wpicture="images/pieces/unusual/w_rooknight.png" bpicture="images/pieces/unusual/b_rooknight.png"/>
+		<figure id="8" name="KARDINAL" letter="A" wpicture="images/pieces/unusual/w_bishopknight.png" bpicture="images/pieces/unusual/b_bishopknight.png"/>
 	</figures>
 	<positions>
 		<player id="1">

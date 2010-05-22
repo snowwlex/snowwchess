@@ -12,7 +12,7 @@
 		<figure id="4" name="KNIGHT" weight="3" letter="N"/>
 		<figure id="5" name="BISHOP" weight="3" letter="B"/>
 		<figure id="6" name="PAWN"   weight="1" letter="P"/>
-		<figure id="7" name="MAGARADJA" weight="100" letter="M"/>
+		<figure id="7" name="MAGARADJA" weight="100" letter="M" wpicture="images/pieces/unusual/maharajah.png"/>
 	</figures>
 	<positions>
 		<player id="1">
