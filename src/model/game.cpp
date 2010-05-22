@@ -164,6 +164,7 @@ void Game::askForTurn() {
 
     int currentPlayer = myModel->getCurrentPlayer();
 
+    qDebug() << "Game::askForTurn() checking game status";
     GameStatus status = myModel->checkGameStatus(currentPlayer);
     if (status == MATE) {
         QString playerName = currentPlayer == WHITE ? "white" : "black";
@@ -176,8 +177,12 @@ void Game::askForTurn() {
         stopGameProcess();
     } else {
         myBoardView->setActivePlayer(myPlayers[currentPlayer]);
+
+        qDebug() << "Game::askForTurn() asking player for a turn";
         myPlayers[currentPlayer]->getMove();
     }
+
+
 }
 
 void Game::setupModels() {

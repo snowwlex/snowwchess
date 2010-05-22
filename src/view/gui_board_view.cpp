@@ -169,6 +169,7 @@ void GuiBoardView::prepareFigures() {
     myBoardFigures = QPixmap(myBoardSize);
     myBoardFigures.fill(Qt::transparent);
     QPainter painter(&myBoardFigures);
+    // painter.setRenderHint(QPainter::Antialiasing, true);
 
     FIGURES::const_iterator itFigure;
     for (int i = 0; i < 2; ++i) {
@@ -277,6 +278,7 @@ void GuiBoardView::paintEvent(QPaintEvent*) {
 
     qDebug() << ":GuiBoardView: " << "paintEvent() " << "---rendering of board view is started---";
     QPainter painter(this);
+    //painter.setRenderHint(QPainter::Antialiasing, true);
     QPoint leftTopEdge(0, 0);
 
 

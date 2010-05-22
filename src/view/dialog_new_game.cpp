@@ -14,7 +14,7 @@ DialogNewGame::DialogNewGame(QWidget *parent)
     this->cbPlayerWhite->addItems(players);
     this->cbPlayerBlack->addItems(players);
     QStringList level;
-    level << "Low" << "Middle" << "Hard";
+    level << "Very Low" << "Low" << "Middle" << "Hard";
     this->cbLevelWhite->addItems(level);
     this->cbLevelBlack->addItems(level);
 

@@ -7,11 +7,11 @@
 
 class Publisher {
 	public:
-		void addSubscriber(Subscriber* listener) {
-			mySubscribers.insert(listener);
+		void addSubscriber(Subscriber* subscriber) {
+			mySubscribers.insert(subscriber);
 		}
-		void removeSubscriber(Subscriber* listener) {
-			mySubscribers.erase(listener);
+		void removeSubscriber(Subscriber* subscriber) {
+			mySubscribers.erase(subscriber);
 		}
 
 	protected:

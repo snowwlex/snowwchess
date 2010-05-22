@@ -12,37 +12,49 @@
 #include "player.h"
 
 class AIPlayer : public Player {
-	public:
-		virtual void getMove() = 0;
+public:
+    virtual void getMove() = 0;
 
-	public: //setters
-		void setDepth(int depth);
-		void setAddDepth(int addDepth);
-		void setABEqualPruning(bool b) { abEqualPruning = b; }
+public: //setters
+    void setDepth(int depth);
+    void setAddDepth(int addDepth);
 
-	public: //help methods
-		bool operator()(const Move& move1,const Move& move2); //for moves sort
+    void setABEqualPruning(bool b) {
+        abEqualPruning = b;
+    }
 
-	protected:
-		AIPlayer() { myTurnsCounter = 0; abEqualPruning = false; }
+protected:
 
-	protected:
-		int sefMaterial(const Model& model, int player) const;
+    AIPlayer() {
+        myTurnsCounter = 0;
+        abEqualPruning = false;
+    }
 
-	protected:
-		int myDepth;
-		int myAddDepth;
-		bool abEqualPruning;
+protected:
+    int sefMaterial(const Model& model, int player) const;
 
-	protected: //for debug
-		int myTurnsCounter;
-		int myCounter;
-		int myQCounter;
+protected:
+    int myDepth;
+    int myAddDepth;
+    bool abEqualPruning;
+
+protected: //for debug
+    int myTurnsCounter;
+    int myCounter;
+    int myQCounter;
 
 
 };
 
+class sortMVV_LVA {
+public:
 
+    sortMVV_LVA(const Model* model) : myModel(model) {
+    }
+    bool operator()(const Move& move1, const Move& move2);
+private:
+    const Model* myModel;
+};
 
 
 
